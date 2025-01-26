@@ -80,5 +80,14 @@
     "cssFile": "features/sidebar-link-api-connector/sidebar-link-api-connector.css",
     "jsFile": "features/sidebar-link-api-connector/sidebar-link-api-connector.js",
     "default": true
+  },
+  {
+    "key": "discourage_changes_in_main",
+    "category": "Branches",
+    "name": "Discourage Edits in Main",
+    "description": "...",
+    "cssFile": "features/discourage_changes_in_main/style.css",
+    "jsFile": "features/discourage_changes_in_main/script.js",
+    "default": true
   }
 ]

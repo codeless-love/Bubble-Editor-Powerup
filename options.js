@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const container = document.getElementById("features-list");
 
-  const categories = ["Expressions", "Expression Composers", "Sidebar", "Style Tab", "Design Canvas", "Option Set Tab", "Workflow View"];
+  const categories = ["Expressions", "Expression Composers", "Branches", "Sidebar", "Style Tab", "Design Canvas", "Option Set Tab", "Workflow View"];
 
   // Group features by categories
   const featuresByCategory = features.reduce((acc, feature) => {
