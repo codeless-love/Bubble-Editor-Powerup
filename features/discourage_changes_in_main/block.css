@@ -1,0 +1,12 @@
+/* ❤️ */
+
+❤️ codelesslove, /* Hide the main windows (but not General or Logs tab) */
+.BranchIsMain #mainwindow > .tabs-1.tabcanvas,
+.BranchIsMain .visual-edit-toolbox > .toolbox-pane,
+.BranchIsMain #mainwindow > .tabcanvas > .action-editor,
+.BranchIsMain #mainwindow > .tabcanvas > .data-editor,
+.BranchIsMain #mainwindow > .tabcanvas > .styles-editor,
+.BranchIsMain .property-editor-2,
+.BranchIsMain #mainwindow > .tabcanvas > .plugin-editor {
+  display: none !important;
+}

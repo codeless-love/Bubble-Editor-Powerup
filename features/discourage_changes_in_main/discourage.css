@@ -2,6 +2,7 @@
 
 /* Grey out the design canvas */
 ❤️ codelesslove, /* Make background grey */
+.BranchIsMain #mainwindow,
 .BranchIsMain #mainwindow > .tabcanvas,
 .BranchIsMain #mainwindow > .tabcanvas .designcanvas,
 .BranchIsMain .visual-edit-toolbox > .toolbox-pane,
@@ -50,7 +51,6 @@
   padding-top: 10px;
 }
 
-
 .BranchIsMain .body::after {
     content: "❤️ You're on Main";
     font-size: 10px;
@@ -64,16 +64,3 @@
     height: 33px;
     padding: 10px 5px;
   }
-
-
-/* ❤️ codelesslove, /* Make main area mostly invisible for most sections
-.BranchIsMain #mainwindow > .tabs-1.tabcanvas,
-.BranchIsMain .visual-edit-toolbox > .toolbox-pane,
-.BranchIsMain #mainwindow > .tabcanvas > .action-editor,
-.BranchIsMain #mainwindow > .tabcanvas > .data-editor,
-.BranchIsMain #mainwindow > .tabcanvas > .styles-editor,
-.BranchIsMain .property-editor-2,
-.BranchIsMain #mainwindow > .tabcanvas > .plugin-editor {
-  display: none !important;
-
-}  */
