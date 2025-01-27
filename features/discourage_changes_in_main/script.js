@@ -19,14 +19,14 @@ window.loadedCodelessLoveScripts ||= {};
     if (!version || version === "test") {
       if (!document.body.classList.contains("BranchIsMain")) {
         document.body.classList.add("BranchIsMain");
-        console.log("BranchIsMain class added to the root element.");
+        console.log("❤️"+"BranchIsMain class added to the root element.");
       }
     } else {
       if (document.body.classList.contains("BranchIsMain")) {
         document.body.classList.remove("BranchIsMain");
-        console.log("BranchIsMain class removed from the root element.");
+        console.log("❤️"+"BranchIsMain class removed from the root element.");
       }
-      console.log(`Version parameter detected: "${version}". BranchIsMain not added.`);
+      console.log("❤️"+`Version parameter detected: "${version}". BranchIsMain not added.`);
     }
   }
 

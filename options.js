@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Log any undefined categories to the console for debugging
   Object.keys(featuresByCategory).forEach((category) => {
     if (!categories.includes(category)) {
-      console.warn(`Category "${category}" is not in the defined categories array.`);
+      console.warn("❤️"+`Category "${category}" is not in the defined categories array.`);
     }
   });
 
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Save button updates preferences in chrome.storage.sync
   document.getElementById("save-button").addEventListener("click", async () => {
-    console.log("Save clicked.")
+    console.log("❤️"+"Save clicked.")
     // Dynamically construct newPrefs object
     const newPrefs = {};
     features.forEach(feature => {
