@@ -1,4 +1,10 @@
-console.log("❤️❤️❤️❤️ Sidebar Link");
+window.loadedCodelessLoveScripts ||= {};
+(function() { console.log("❤️"+"Sidebar Link");
+let thisScriptKey = "sidebar_link_api_connector";
+console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
+if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} // Exit if the script has already been loaded
+window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
+console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
 
 function waitForElement(selector, callback, timeout = 5000) {
   const startTime = Date.now();
@@ -8,7 +14,7 @@ function waitForElement(selector, callback, timeout = 5000) {
       observer.disconnect(); // Stop observing once the element is found
       callback(element);
     } else if (Date.now() - startTime > timeout) {
-      console.error(`Element ${selector} not found within ${timeout}ms`);
+      console.error("❤️"+`Element ${selector} not found within ${timeout}ms`);
       observer.disconnect();
     }
   });
@@ -23,7 +29,7 @@ function handleApiConnectorClick() {
 
   // Trigger a click on the element if it exists
   if (element) {
-    console.log('Triggering click on API Connector element.');
+    console.log("❤️"+'Triggering click on API Connector element.');
     element.click();
 
     // Remove the focus class ('up8wd42') from the Plugins button
@@ -38,7 +44,7 @@ function handleApiConnectorClick() {
       apiConnectorButton.classList.add('up8wd42');  // Highlight the API Connector button
     }
   } else {
-    console.log('[data-id="apiconnector2"] element not found. Waiting...');
+    console.log("❤️"+'[data-id="apiconnector2"] element not found. Waiting...');
   }
 }
 
@@ -68,7 +74,7 @@ function waitForApiConnectorElement(callback, timeout = 5000) {
       observer.disconnect(); // Stop observing once the element is found
       callback();
     } else if (Date.now() - startTime > timeout) {
-      console.error(`[data-id="apiconnector2"] not found within ${timeout}ms`);
+      console.error("❤️"+`[data-id="apiconnector2"] not found within ${timeout}ms`);
       observer.disconnect();
     }
   });
@@ -79,11 +85,11 @@ function waitForApiConnectorElement(callback, timeout = 5000) {
 
 // Wait for the Plugins button to exist and then create the new element
 waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
-  console.log("Plugins button found:", APIButton);
+  console.log("❤️"+"Plugins button found:", APIButton);
   // Check if the API Connector button already exists
   const existingApiConnectorButton = document.querySelector('button[data-tab-item="API Connector"]');
   if (existingApiConnectorButton) {
-    console.log("API Connector button already exists. Skipping creation.");
+    console.log("❤️"+"API Connector button already exists. Skipping creation.");
     return;  // Exit the function if the button already exists
   }
 
@@ -149,6 +155,7 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
   // Preserve the following parameters with whatever they currently have:
   //  * id
   //  * name
+  //  * version
   //
   // Update or add the following parameters to match this
   //  * tab=Plugins
@@ -167,6 +174,9 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
     if (currentParams.has('name')) {
       preservedParams.name = currentParams.get('name');
     }
+    if (currentParams.has('version')) {
+      preservedParams.version = currentParams.get('version');
+    }
 
     // Update or add the specified parameters
     const updatedParams = {
@@ -183,7 +193,7 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
     history.pushState(null, '', newUrl); // Update the URL without reloading
     // Trigger a popstate event so Bubble actually sees this happens
     window.dispatchEvent(new PopStateEvent('popstate'));
-    console.log("Updated URL:", newUrl);
+    console.log("❤️"+"Updated URL:", newUrl);
 
     // Wait for the API Connector element to load and then handle the click
     waitForApiConnectorElement(handleApiConnectorClick);
@@ -192,3 +202,4 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
     addMenuButtonListeners();
   });
 });
+})();

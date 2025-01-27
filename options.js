@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const container = document.getElementById("features-list");
 
-  const categories = ["Expressions", "Expression Composers", "Sidebar", "Style Tab", "Design Canvas", "Option Set Tab", "Workflow View"];
+  const categories = ["Expressions", "Expression Composers", "Branches", "Sidebar", "Style Tab", "Design Canvas", "Option Set Tab", "Workflow View"];
 
   // Group features by categories
   const featuresByCategory = features.reduce((acc, feature) => {
@@ -25,6 +25,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     acc[category].push(feature);
     return acc;
   }, {});
+
+  const isDependencySatisfied = (feature, prefs) => {
+    if (!feature.requires) return true; // No dependency
+    return !!prefs[feature.requires];  // Dependency is enabled
+  };
 
   // Display features by category in the defined order
   categories.forEach((category) => {
@@ -44,6 +49,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         checkbox.checked = prefs[feature.key];
         checkbox.id = feature.key;
 
+        // Disable checkbox if dependency is not satisfied
+        if (!isDependencySatisfied(feature, prefs)) {
+          checkbox.disabled = true;
+          checkbox.title = `Requires "${features.find(f => f.key === feature.requires)?.name || feature.requires}" to be enabled.`;
+        }
+
         const label = document.createElement("label");
         label.append(checkbox, feature.name);
 
@@ -56,12 +67,53 @@ document.addEventListener("DOMContentLoaded", async () => {
         container.appendChild(div);
       });
     }
+
+    // Add event listeners to update dependent features dynamically
+    features.forEach((feature) => {
+      const checkbox = document.getElementById(feature.key);
+      if (!checkbox) return;
+
+      checkbox.addEventListener("change", () => {
+        // Update dependent features
+        features.forEach((f) => {
+          if (f.requires === feature.key) {
+            const dependentCheckbox = document.getElementById(f.key);
+            if (dependentCheckbox) {
+              const enabled = checkbox.checked;
+              dependentCheckbox.disabled = !enabled;
+              dependentCheckbox.title = enabled
+                ? ""
+                : `Requires "${feature.name}" to be enabled.`;
+              if (!enabled) {
+                dependentCheckbox.checked = false; // Uncheck if disabled
+              }
+            }
+          }
+        });
+
+        // Dynamically uncheck all dependent features if the requirement is unchecked
+        uncheckDependentFeatures(feature, checkbox.checked);
+      });
+    });
   });
+
+  // Function to uncheck dependent features
+  function uncheckDependentFeatures(feature, isChecked) {
+    features.forEach((f) => {
+      if (f.requires === feature.key && !isChecked) {
+        const dependentCheckbox = document.getElementById(f.key);
+        if (dependentCheckbox) {
+          dependentCheckbox.checked = false; // Uncheck dependent feature
+          dependentCheckbox.disabled = true;  // Disable it
+        }
+      }
+    });
+  }
 
   // Log any undefined categories to the console for debugging
   Object.keys(featuresByCategory).forEach((category) => {
     if (!categories.includes(category)) {
-      console.warn(`Category "${category}" is not in the defined categories array.`);
+      console.warn("❤️"+`Category "${category}" is not in the defined categories array.`);
     }
   });
 
@@ -85,7 +137,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Save button updates preferences in chrome.storage.sync
   document.getElementById("save-button").addEventListener("click", async () => {
-    console.log("Save clicked.")
+    console.log("❤️"+"Save clicked.")
     // Dynamically construct newPrefs object
     const newPrefs = {};
     features.forEach(feature => {

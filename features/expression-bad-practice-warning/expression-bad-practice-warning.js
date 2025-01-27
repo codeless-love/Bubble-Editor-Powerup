@@ -1,7 +1,13 @@
-console.log("Codeless Love plugin running.");
+window.loadedCodelessLoveScripts ||= {};
+(function() { console.log("❤️"+"Bad Practice Warning");
+let thisScriptKey = "expression_bad_practice_warning";
+console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
+if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} // Exit if the script has already been loaded
+window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
+console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
+
 let debounceTimeout;
 let isProcessing = false; // Flag to prevent redundant processing
-
 
 // Outline and add a warning to detected bad practices
 function addWarning(nodes, warningTagNode, practiceName, practiceURL, warningText) {
@@ -58,7 +64,7 @@ function detectBadPractices() {
       const secondItem = dynamicSpans[i + 1] ?? null;//if we're near the end of the list, these may not exist, so avoid an error by passing null if it isn't there.
       const thirdItem  = dynamicSpans[i + 2] ?? null;
       const fourthItem = dynamicSpans[i + 3] ?? null;
-      //console.log(firstItem.textContent);
+      //console.log("❤️"+firstItem.textContent);
 
       // BAD PRACTICE: :count is 0
       const searchItem = firstItem;
@@ -73,7 +79,7 @@ function detectBadPractices() {
         validOperators?.includes(comparisonItem.textContent.trim()) &&
         zeroItem?.textContent.trim() === '0'
       ) {
-        console.log('Bad practice detected: ":count is 0"');
+        console.log("❤️"+'Bad practice detected: ":count is 0"');
         addWarning(
           [searchItem, countItem, comparisonItem, zeroItem],
           zeroItem,
@@ -88,7 +94,7 @@ function detectBadPractices() {
         firstItem.textContent.includes("Current User") &&
         url.searchParams.get('tab') === 'BackendWorkflows'
       ) {
-        console.log('Warning: "Current user in Backend workflows tab"');
+        console.log("❤️"+'Warning: "Current user in Backend workflows tab"');
         addWarning([firstItem],
           firstItem,
           "Current User used in Backend",
@@ -104,13 +110,12 @@ function detectBadPractices() {
 // Initial detection on page load
 detectBadPractices();
 
-
 // Insert collapser when .nested element is added
 function insertCollapser(element) {
   // Ensure it's not already present
   if (element && !element.querySelector('.❤️collapser')) {
     const nestedAncestors = element.closestAll('.nested');  // Custom helper function to get all ancestors with '.nested'
-    console.log(nestedAncestors);
+    console.log("❤️"+nestedAncestors);
     if (nestedAncestors.length >= 2) {//dont show the first one
       const collapser = document.createElement('div');
       collapser.className = '❤️collapser';
@@ -186,7 +191,6 @@ observer.observe(document.body, {
   characterData: true // Watch for text content changes
 });
 
-
 // Polyfill for closestAll to get all ancestors with a specific class
 Element.prototype.closestAll = function(selector) {
   let ancestors = [];
@@ -199,3 +203,4 @@ Element.prototype.closestAll = function(selector) {
   }
   return ancestors;
 };
+})();

@@ -1,0 +1,66 @@
+/* ❤️ */
+
+/* Grey out the design canvas */
+❤️ codelesslove, /* Make background grey */
+.BranchIsMain #mainwindow,
+.BranchIsMain #mainwindow > .tabcanvas,
+.BranchIsMain #mainwindow > .tabcanvas .designcanvas,
+.BranchIsMain .visual-edit-toolbox > .toolbox-pane,
+.BranchIsMain .visual-edit-toolbox > .toolbox-pane [data-name=elements-tree-container] > div {
+  background-color: #ccc;
+}
+❤️ codelesslove, /* Make main area mostly invisible for most sections */
+.BranchIsMain #mainwindow > .tabs-1.tabcanvas,
+.BranchIsMain .visual-edit-toolbox > .toolbox-pane,
+.BranchIsMain #mainwindow > .tabcanvas > .action-editor,
+.BranchIsMain #mainwindow > .tabcanvas > .data-editor,
+.BranchIsMain #mainwindow > .tabcanvas > .styles-editor,
+.BranchIsMain .property-editor-2 {
+  opacity: .1;
+}
+❤️ codelesslove, /* Plugins are slightly more visible because you might be justified to make changes here on Main */
+.BranchIsMain #mainwindow > .tabcanvas > .plugin-editor {
+   opacity: .5;
+}
+❤️ codelesslove, /* Settings and logs are only slightly dimmed because there's legitimate reasons to make changes here */
+.BranchIsMain #mainwindow > .tabcanvas > .settings-editor,
+.BranchIsMain #mainwindow > .tabcanvas > .logs-editor {
+   opacity: .8;
+}
+
+/* Menu bar warning */
+.BranchIsMain .menu-bar.menu-bar::before,
+.BranchIsMain .menu-bar.pop-enabled::before {
+    content: "❤️ You are on Main ❤️";
+    font-size: 8px;
+    position: absolute;
+    background: #ff000078;
+    color: #00000078;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 2px 0;
+}
+.BranchIsMain .menu-bar.menu-bar.menu-bar {
+  height: calc(10px + 35px);
+  padding-top: 10px;
+}
+.BranchIsMain .menu-bar.menu-bar.menu-bar.pop-enabled {
+  height: calc(10px + var(--menubar-height));
+  padding-top: 10px;
+}
+
+.BranchIsMain .body::after {
+    content: "❤️ You're on Main";
+    font-size: 10px;
+    top: 50%;
+    left: 50%;
+    position: fixed;
+    background: white;
+    border-radius: 300px;
+    text-align: center;
+    width: 41px;
+    height: 33px;
+    padding: 10px 5px;
+  }
