@@ -1,4 +1,10 @@
-console.log("❤️❤️❤️❤️ Sidebar Link");
+window.loadedCodelessLoveScripts ||= {};
+(function() { console.log("❤️"+"Sidebar Link");
+let thisScriptKey = "sidebar_link_api_connector";
+console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
+if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} // Exit if the script has already been loaded
+window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
+console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
 
 function waitForElement(selector, callback, timeout = 5000) {
   const startTime = Date.now();
@@ -192,3 +198,4 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
     addMenuButtonListeners();
   });
 });
+})();
