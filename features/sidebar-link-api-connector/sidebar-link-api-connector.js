@@ -155,6 +155,7 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
   // Preserve the following parameters with whatever they currently have:
   //  * id
   //  * name
+  //  * version
   //
   // Update or add the following parameters to match this
   //  * tab=Plugins
@@ -172,6 +173,9 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
     }
     if (currentParams.has('name')) {
       preservedParams.name = currentParams.get('name');
+    }
+    if (currentParams.has('version')) {
+      preservedParams.version = currentParams.get('version');
     }
 
     // Update or add the specified parameters
