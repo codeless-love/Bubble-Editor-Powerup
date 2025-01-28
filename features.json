@@ -106,6 +106,14 @@
     "description": "Attempt to completely hide most functionality when you're in the Main branch. Logs and General tab are still visible.",
     "cssFile": "features/discourage_changes_in_main/block.css",
     "requires": "discourage_changes_in_main",
+    "default": false
+  },
+  {
+    "key": "data_copy_to_live_warning",
+    "category": "Data View",
+    "name": "Color indicators when copying database",
+    "description": "When copying the database, make the button and description different colors depending on which direction data is moving. Red for to live, green for to dev. The green color, importantly, prevents accidents if the plugin is unexpectedly turned off without realizing.",
+    "cssFile": "features/data_copy_to_live_warning/style.css",
     "default": true
   }
 ]

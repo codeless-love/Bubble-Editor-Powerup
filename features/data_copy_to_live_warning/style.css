@@ -1,0 +1,32 @@
+/* ❤️ */
+/* Show red colors when copying to LIVE. */
+❤️ codelesslove, /* turn the button red when you're copying to live */
+.from_test_to_live.selected {
+    background-color: red !important;
+}
+❤️ codelesslove, /* turn the text red when you're copying to live */
+.copy-panel:has(.from_test_to_live.selected) .confirmation-box .instruction {
+    color: red;
+}
+❤️ codelesslove, /* Heart indicator goes after the instruction text. */
+.copy-panel:has(.from_test_to_live.selected) .confirmation-box .instruction::after {
+  content: "❤️";
+  padding-left: 5px;
+  font-size: 8px;
+  vertical-align: middle;
+}
+/* Show green colors when copying to TEST (important so you know the plugin is ON) otherwise you could become dependent on this and not notice when it's off. */
+❤️ codelesslove, /* turn the button green when you're copying to dev */
+.from_live_to_test.selected {
+    background-color: #74ac69 !important;
+}
+❤️ codelesslove, /* turn the text red when you're copying to dev */
+.copy-panel:has(.from_live_to_test.selected) .confirmation-box .instruction {
+    color: #74ac69;
+}
+❤️ codelesslove, /* Heart indicator goes after the instruction text. */
+.copy-panel:has(.from_live_to_test.selected) .confirmation-box .instruction::after {
+  content: "♥︎";
+  color: #74ac69;
+  padding-left: 5px;
+}
