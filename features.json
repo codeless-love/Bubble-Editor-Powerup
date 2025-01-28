@@ -26,7 +26,7 @@
   },
   {
     "key": "data_optionsets_expand_inputs",
-    "category": "Option Set Tab",
+    "category": "Data View",
     "name": "Maximum Sized Option Set Inputs",
     "description": "On the option set tab of the Data view, Stretch Option Set inputs to be as wide as possible for your screen so that content is not cut off.",
     "cssFile": "features/data-optionsets-expand-inputs/data-optionsets-expand-inputs.css",
@@ -34,7 +34,7 @@
   },
   {
     "key": "data_optionsets_move_gaps",
-    "category": "Option Set Tab",
+    "category": "Data View",
     "name": "Option Set Move Gaps",
     "description": "On the option set tab of the Data view, add a gap to the top item where 'move up' normally is, so that everything else is in line. Do the same at the bottom for 'move down'.",
     "cssFile": "features/data-optionsets-move-gaps/data-optionsets-move-gaps.css",
@@ -54,6 +54,15 @@
     "name": "Multiline Expressions",
     "description": "Make expressions multiple lines, indented, and collapsible.",
     "cssFile": "features/property-editor-expression-composer-multiline/property-editor-expression-composer-multiline.css",
+    "default": true
+  },
+  {
+    "key": "expression_collapser",
+    "category": "Expressions",
+    "name": "Collapse and expand subexpressions",
+    "description": "Allow expanding and collapsing parts of the expression for clarity. Requires multiline expressions.",
+    "jsFile": "features/expression_collapser/script.js",
+    "requires": "property_editor_expression_composer_multiline",
     "default": true
   },
   {
@@ -85,10 +94,10 @@
     "key": "discourage_changes_in_main",
     "category": "Branches",
     "name": "Discourage Edits in Main",
-    "description": "When you're on Main, Dim the main window and add a red banner at the top of the page. The app is still technically editable, though difficult.",
+    "description": "When you're on Main, dim the main window and add a red banner at the top of the page. The app is still technically editable.",
     "cssFile": "features/discourage_changes_in_main/discourage.css",
     "jsFile": "features/discourage_changes_in_main/script.js",
-    "default": true
+    "default": false
   },
   {
     "key": "block_changes_in_main",
@@ -97,6 +106,14 @@
     "description": "Attempt to completely hide most functionality when you're in the Main branch. Logs and General tab are still visible.",
     "cssFile": "features/discourage_changes_in_main/block.css",
     "requires": "discourage_changes_in_main",
+    "default": false
+  },
+  {
+    "key": "data_copy_to_live_warning",
+    "category": "Data View",
+    "name": "Color indicators when copying database",
+    "description": "When copying the database, make the button and description different colors depending on which direction data is moving. Red for to live, green for to dev. The green color, importantly, prevents accidents if the plugin is unexpectedly turned off without realizing.",
+    "cssFile": "features/data_copy_to_live_warning/style.css",
     "default": true
   }
 ]
