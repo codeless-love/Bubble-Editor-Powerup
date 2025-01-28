@@ -94,10 +94,10 @@
     "key": "discourage_changes_in_main",
     "category": "Branches",
     "name": "Discourage Edits in Main",
-    "description": "When you're on Main, Dim the main window and add a red banner at the top of the page. The app is still technically editable, though difficult.",
+    "description": "When you're on Main, dim the main window and add a red banner at the top of the page. The app is still technically editable.",
     "cssFile": "features/discourage_changes_in_main/discourage.css",
     "jsFile": "features/discourage_changes_in_main/script.js",
-    "default": true
+    "default": false
   },
   {
     "key": "block_changes_in_main",
