@@ -1,4 +1,3 @@
-
 /* Expression Bad Practice Warning */
 ❤️ codelesslove,/* yellow outline on bad practices in expressions */
 .❤️expression-warning {
@@ -57,12 +56,12 @@
     padding: 0 4px;
     opacity: .7;
 }
+❤️ codelesslove,
 .❤️expression-warning-tag:hover,
 .composer.hover_fade_out:hover .hovering .❤️expression-warning-tag:hover {
   opacity: 1 !important;
 }
-/* put a heart indicator in the top-left corner of the outlined expression fragment */
-❤️ codelesslove,
+❤️ codelesslove,/* put a heart indicator in the top-left corner of the outlined expression fragment */
 .❤️expression-warning-left::before {
     content: "💛";
     top: -2px;

@@ -26,7 +26,7 @@
   },
   {
     "key": "data_optionsets_expand_inputs",
-    "category": "Option Set Tab",
+    "category": "Data View",
     "name": "Maximum Sized Option Set Inputs",
     "description": "On the option set tab of the Data view, Stretch Option Set inputs to be as wide as possible for your screen so that content is not cut off.",
     "cssFile": "features/data-optionsets-expand-inputs/data-optionsets-expand-inputs.css",
@@ -34,7 +34,7 @@
   },
   {
     "key": "data_optionsets_move_gaps",
-    "category": "Option Set Tab",
+    "category": "Data View",
     "name": "Option Set Move Gaps",
     "description": "On the option set tab of the Data view, add a gap to the top item where 'move up' normally is, so that everything else is in line. Do the same at the bottom for 'move down'.",
     "cssFile": "features/data-optionsets-move-gaps/data-optionsets-move-gaps.css",
@@ -54,6 +54,15 @@
     "name": "Multiline Expressions",
     "description": "Make expressions multiple lines, indented, and collapsible.",
     "cssFile": "features/property-editor-expression-composer-multiline/property-editor-expression-composer-multiline.css",
+    "default": true
+  },
+  {
+    "key": "expression_collapser",
+    "category": "Expressions",
+    "name": "Collapse and expand subexpressions",
+    "description": "Allow expanding and collapsing parts of the expression for clarity. Requires multiline expressions.",
+    "jsFile": "features/expression_collapser/script.js",
+    "requires": "property_editor_expression_composer_multiline",
     "default": true
   },
   {
