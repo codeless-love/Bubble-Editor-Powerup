@@ -38,11 +38,11 @@ If you don't want to use the Chrome Web Store, you may install this extension to
 your browser manually.
 
 1. Download the Source Code
-  1. Go to https://github.com/codeless-love/Bubble-Editor-Powerup
-  1. Click the big green button <> Code then select Download ZIP
-  1. Navigate to the ZIP file and decompress it.
+   1. Go to https://github.com/codeless-love/Bubble-Editor-Powerup
+   1. Click the big green button <> Code then select Download ZIP
+   1. Navigate to the ZIP file and decompress it.
 1. Manually Load the Extension into Chrome
-  1. Go to chrome://extensions/
-  1. Click Developer Mode in the top right to enable it
-  1. Click the Load Unpacked button
-  1. Select the compressed ZIP file you downloaded in step 1.
+   1. Go to [chrome://extensions/](chrome://extensions/)
+   1. Click Developer Mode in the top right to enable it
+   1. Click the "Load Unpacked" button
+   1. Select the compressed ZIP file you downloaded in step 1.
