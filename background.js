@@ -37,7 +37,11 @@ async function isFeatureInjected(tabId, featureKey) {
 // Injects enabled features (CSS/JS) into the specified tab
 async function injectFeatures(tabId) {
   const featuresConfig = await loadFeatures(); // Load the list of all available features
-  const prefs = await chrome.storage.sync.get(null); // Load user preferences from chrome storage
+  const defaults = Object.fromEntries(featuresConfig.map(f => [f.key, f.default])); // get defaults from the json
+  const prefs = await chrome.storage.sync.get(defaults);// Load user preferences from chrome storage
+  if (Object.keys(prefs).length === 0) {
+    await chrome.storage.sync.set(defaults);
+  }
 
   // renitialize
   bubbleTabs.set(tabId, new Set()); // Create a new Set to track injected features for this tab
