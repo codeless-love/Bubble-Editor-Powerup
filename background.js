@@ -49,7 +49,7 @@ async function injectFeatures(tabId) {
 
   // Iterate through all features in the configuration
   for (const feature of featuresConfig) {
-    const isEnabled = prefs[feature.key] !== false; // Check if the feature is enabled in user preferences
+    const isEnabled = prefs[feature.key] == true; // Check if the feature is enabled in user preferences
 
     // Inject the feature only if it's enabled and hasn't been injected already
     if (isEnabled) {
