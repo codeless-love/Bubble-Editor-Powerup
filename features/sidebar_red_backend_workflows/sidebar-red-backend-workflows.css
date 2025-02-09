@@ -1,0 +1,13 @@
+❤️ codelesslove,/* turn the SVG red */
+[data-tab-item=BackendWorkflows] .py1871p path {
+    fill: red !important;
+}
+❤️ codelesslove,/* show red heart indicator */
+[data-tab-item=BackendWorkflows]::before {
+    content: "❤️";
+    font-size: 4px;
+    color: red;
+    position: absolute;
+    top: 4px;
+    left: 4px;
+}
