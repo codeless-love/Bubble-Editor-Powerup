@@ -91,6 +91,14 @@
     "default": true
   },
   {
+    "key": "sidebar_red_backend_workflows",
+    "category": "Sidebar",
+    "name": "Make Backend Workflows Button Red",
+    "description": "Makes the Backend Workflow button red so you stop accidentally clicking it.",
+    "cssFile": "features/sidebar_red_backend_workflows/sidebar_red_backend_workflows.css",
+    "default": false
+  },
+  {
     "key": "discourage_changes_in_main",
     "category": "Branches",
     "name": "Discourage Edits in Main",
