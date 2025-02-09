@@ -86,7 +86,6 @@
     "category": "Sidebar",
     "name": "Add API Connector link to sidebar",
     "description": "Adds a link to the sidebar which will take you directly to the API Connector plugin.",
-    "cssFile": "features/sidebar-link-api-connector/sidebar-link-api-connector.css",
     "jsFile": "features/sidebar-link-api-connector/sidebar-link-api-connector.js",
     "default": true
   },
