@@ -25,7 +25,6 @@
     {
       "matches": ["*://*.bubble.io/*", "*://bubble.io/*"],
       "resources": [
-        "features/style-drag-rearrange/drag.js",
         "utils/Sortable.min.js"
       ],
       "use_dynamic_url": false
