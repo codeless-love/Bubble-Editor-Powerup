@@ -19,6 +19,8 @@ function load() {
 
   // Create a new script element
   const script = document.createElement("script");
+  script.type = "module";
+
   console.log("loaded script", script);
 
   // Alternatively, if you have an external JS file, set the src attribute:
