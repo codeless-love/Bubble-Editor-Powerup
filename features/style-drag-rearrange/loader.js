@@ -54,7 +54,16 @@ async function handleTokenColors() {
 
   const colorWrapper = document.querySelector(".tokens-editor-wrapper.colors");
   if (!colorWrapper) return;
-  console.log("found colorWrapper", colorWrapper);
+
+  // Add save button to the page (hidden by default)
+  const saveButton = document.createElement("button");
+  saveButton.id = "sortable-save-button";
+  saveButton.innerHTML = "💾 Save New Order";
+  saveButton.style.display = "none";
+  document.body.appendChild(saveButton);
+
+  // Store initial order
+  let initialOrder;
 
   const sortableModule = await import(
     chrome.runtime.getURL("utils/Sortable.min.js")
@@ -81,10 +90,31 @@ async function handleTokenColors() {
     draggable: ".token-wrapper:has(.token-name-and-edit)", // Only make token-wrapper elements draggable, except the subtext
     handle: ".token-name-and-edit", // Make it draggable by the caption
     dataIdAttr: "data-id",
-    onEnd: (evt) => {
-      let order = colorsSortable.toArray();
-      console.log("New order:", order);
+    onStart: () => {
+      // Store initial order when drag starts
+      if (!initialOrder) {
+        initialOrder = colorsSortable.toArray();
+      }
     },
+    onEnd: (evt) => {
+      let currentOrder = colorsSortable.toArray();
+
+      // Compare current order with initial order
+      if (JSON.stringify(currentOrder) !== JSON.stringify(initialOrder)) {
+        saveButton.style.display = "block";
+      } else {
+        saveButton.style.display = "none";
+      }
+    },
+  });
+
+  // Add save button click handler
+  saveButton.addEventListener("click", () => {
+    // Here you would implement the actual save logic
+    console.log("Saving new order:", colorsSortable.toArray());
+    // After saving, update the initial order and hide the button
+    initialOrder = colorsSortable.toArray();
+    saveButton.style.display = "none";
   });
 
   console.log("colorsSortable initialized", colorsSortable);
