@@ -39,17 +39,8 @@ function load() {
       window.loadedCodelessLoveScripts[thisScriptKey] = "loaded"; // Set status to loaded after drag.js is loaded and executed
       console.log("❤️ " + thisScriptKey + " drag.js loaded and executed.");
     };
-    const sortableScript = document.createElement("script");
-    sortableScript.src = chrome.runtime.getURL("utils/Sortable.min.js");
-    sortableScript.type = "module";
-    script.onload = () => {
-      // Initial run
-      console.log("loaded Sortable", Sortable);
-      handleTokenColors();
-    };
-    document.head.appendChild(sortableScript);
-
     document.head.appendChild(script);
+    handleTokenColors();
   });
 }
 
@@ -73,7 +64,7 @@ async function handleTokenColors() {
   console.log("Imported Sortable:", Sortable);
 
   // Initialize Sortable directly on the tokens-editor-wrapper
-  let colorsSortable = Sortable(colorWrapper, {
+  let colorsSortable = new Sortable(colorWrapper, {
     animation: 150,
     ghostClass: "sortable-ghost",
     dragClass: "sortable-drag",
