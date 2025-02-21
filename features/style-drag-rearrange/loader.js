@@ -59,6 +59,7 @@ async function handleTokenColors() {
   const sortableModule = await import(
     chrome.runtime.getURL("utils/Sortable.min.js")
   );
+
   // Get the Sortable constructor - try different ways of accessing it
   const SortableConstructor =
     sortableModule.Sortable || // Try direct named export
@@ -77,8 +78,8 @@ async function handleTokenColors() {
     animation: 150,
     ghostClass: "sortable-ghost",
     dragClass: "sortable-drag",
-    draggable: ".token-wrapper:not(.style-section-subtext)", // Only make token-wrapper elements draggable, except the subtext
-    handle: ".token-caption", // Make it draggable by the caption
+    draggable: ".token-wrapper:has(.token-name-and-edit)", // Only make token-wrapper elements draggable, except the subtext
+    handle: ".token-name-and-edit", // Make it draggable by the caption
     dataIdAttr: "data-id",
     onEnd: (evt) => {
       let order = colorsSortable.toArray();

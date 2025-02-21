@@ -1,0 +1,36 @@
+.sortable-ghost {
+    opacity: 0.5;
+    background-color: #f0f0f0;
+  }
+  .sortable-drag {
+    transform: scale(0.95) rotate(-5deg);
+    background-color: white;
+    padding: 8px;
+    border-radius: 6px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  .thing {
+    background-color: black;
+  }
+
+  /* Add styles for the drag handle */
+.token-name-and-edit::before {
+    content: "⋮⋮";  /* Double vertical dots to create a grip icon */
+    margin-right: 8px;
+    color: #888;
+    cursor: grab;
+    font-size: 14px;
+    display: inline-block;
+    transform: rotate(90deg);
+    user-select: none;
+  }
+  
+  /* Style when being dragged */
+  .sortable-drag .token-caption::before {
+    cursor: grabbing;
+  }
+  
+  /* Optional: Add hover effect */
+  .token-caption:hover::before {
+    color: #555;
+  }
