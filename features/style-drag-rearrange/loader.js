@@ -59,9 +59,18 @@ async function handleTokenColors() {
   const sortableModule = await import(
     chrome.runtime.getURL("utils/Sortable.min.js")
   );
-  // Some UMD bundles return the library as a default export, others attach it directly.
-  const Sortable = sortableModule.default || sortableModule;
-  console.log("Imported Sortable:", Sortable);
+  // Get the Sortable constructor - try different ways of accessing it
+  const SortableConstructor =
+    sortableModule.Sortable || // Try direct named export
+    sortableModule.default || // Try default export
+    window.Sortable; // Try global
+
+  if (!SortableConstructor) {
+    console.error("Failed to load Sortable constructor", sortableModule);
+    return;
+  }
+
+  console.log("Imported Sortable:", SortableConstructor);
 
   // Initialize Sortable directly on the tokens-editor-wrapper
   let colorsSortable = new Sortable(colorWrapper, {
