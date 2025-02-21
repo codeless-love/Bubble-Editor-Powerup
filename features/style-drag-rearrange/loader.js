@@ -9,10 +9,14 @@ let childNodeCount = 0;
 let colorWrapperObserver;
 
 // receive the initial color from the appquery element so we can match that with what's on the screen.
-let initialColorOrder;
+let initialColorOrder = {};
 let initialOrder = [];
 let initialColorArray = [];
 document.addEventListener("initialColorOrder", (e) => {
+  initialColorOrder = {};
+  initialOrder = [];
+  initialColorArray = [];
+
   initialColorOrder = e.detail.default;
 
   // remove deleted items and put this in an array for easier handling
@@ -86,9 +90,6 @@ async function handleTokenColors() {
       ".token-wrapper:has(.token-name-and-edit)"
     );
 
-    console.log("tokenWrappers", tokenWrappers);
-    console.log(initialOrder.length);
-
     // TODO: need better error handling here, this needs to not add the drag-handles if it errors
     if (tokenWrappers.length !== initialOrder.length) {
       throw new Error(
@@ -99,8 +100,12 @@ async function handleTokenColors() {
       );
     }
 
+    // iterate through the tokens and add the item.id to each
     tokenWrappers.forEach((wrapper, index) => {
       item = initialColorArray[index];
+
+      // check if the colors of the item and the wrapper match to ensure that
+      // we don't continue if there is a mistmatch
       const colorSwatch = wrapper.querySelector(".color-swatch");
       const swatchBgColor = colorSwatch?.style.background;
 
@@ -151,7 +156,7 @@ async function handleTokenColors() {
       animation: 150,
       ghostClass: "sortable-ghost",
       dragClass: "sortable-drag",
-      draggable: ".draggable-custom-color", // Only make token-wrapper elements draggable, except the subtext
+      draggable: ".draggable-custom-color", // Only make token-wrapper elements draggable
       handle: ".token-name-and-edit", // Make it draggable by the caption
       dataIdAttr: "data-id",
       onEnd: (evt) => {
@@ -182,24 +187,14 @@ async function handleTokenColors() {
           console.log("item not found");
         }
       });
-      console.log("initialColorOrder object", initialColorOrder);
-      chrome.runtime.sendMessage(
-        {
-          action: "colorOrderChanged",
-          newOrder: newOrder,
-        },
-        (response) => {
-          console.log("response from message sender: ", response);
-        }
-      );
 
       const event = new CustomEvent("colorOrderChanged", {
-        detail: newOrder,
+        detail: initialColorOrder,
       });
       document.dispatchEvent(event);
+      console.log("event", event);
 
       // After saving, update the initial order and hide the button
-      initialOrder = colorsSortable.toArray();
       saveButton.style.display = "none";
     });
   } catch (error) {

@@ -1,15 +1,17 @@
-const initial_order = appquery.get_public_setting("color_tokens_user");
-console.log("initial_order", initial_order);
-
-document.dispatchEvent(
-  new CustomEvent("initialColorOrder", {
-    detail: initial_order,
-  })
-);
+function setInitialOrder() {
+  const initial_order = appquery.get_public_setting("color_tokens_user");
+  document.dispatchEvent(
+    new CustomEvent("initialColorOrder", {
+      detail: initial_order,
+    })
+  );
+}
+setInitialOrder();
 
 document.addEventListener("colorOrderChanged", (e) => {
-  console.log("received event", e.detail);
-  console.log("editor link", appquery.get_editor_link());
+  console.log("payload", e);
+  appquery.set_setting(!0, "color_tokens_user", e.detail);
+  setInitialOrder();
 });
 
 // chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
