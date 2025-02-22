@@ -1,49 +1,48 @@
 /**
- * Loads and initializes the drag & drop functionality for color tokens in the Bubble editor.
+ * Module to load and initialize the drag & drop functionality for color tokens in the Bubble editor.
  *
- * This script allows users to reorder color tokens by dragging and dropping them in the UI.
- * It also manages the synchronization between the UI order and the order provided by appquery.
+ * This module allows users to reorder color tokens by dragging and dropping them through the UI.
+ * It synchronizes the UI order with the order provided by Bubble's appquery.
  *
  * @module style-drag-rearrange/loader
  *
- * @requires Sortable.min.js - For drag & drop functionality.
- * @requires appqueryScripts.js - For interacting with Bubble's appquery API.
+ * @requires Sortable.min.js - Library used for implementing drag & drop functionality.
+ * @requires appqueryScripts.js - Module for interacting with Bubble's appquery API.
  *
- * @global {Object} window.loadedCodelessLoveScripts - Tracks the loading status of scripts.
- * @global {Object} initialColorOrder - Stores the original color order from appquery.
- * @global {Array} initialColorArray - Array of active (non-deleted) colors with metadata.
- * @global {Array} initialOrder - Simple array of color IDs representing the initial order.
- * @global {MutationObserver} observer - Observes DOM changes for element availability.
- * @global {HTMLElement} sortableScript - Script element for loading appquery scripts.
- * @global {Sortable} colorsSortable - Instance of the Sortable class for drag & drop.
- * @global {HTMLElement} saveButton - Button element for saving the new color order.
+ * @global {Object} window.loadedCodelessLoveScripts - Global registry tracking the loading status of scripts.
+ * @global {Object} initialColorOrder - Object storing the color tokens configuration from appquery.
+ * @global {Array} initialColorArray - Array containing active (non-deleted) color tokens along with metadata.
+ * @global {Array} initialOrder - Array of color token IDs representing the initial order.
+ * @global {MutationObserver} observer - Observes DOM mutations for element availability.
+ * @global {HTMLElement} sortableScript - Script element for loading appquery-related functionality.
+ * @global {Sortable} colorsSortable - Instance of the Sortable class for drag & drop operations.
+ * @global {HTMLElement} saveButton - Button element used to save an updated color order.
  *
- * @fires Event#getInitialColors - Triggered to request the initial color order.
- * @fires CustomEvent#colorOrderChanged - Dispatched when the color order is saved.
- * @fires CustomEvent#initialColorOrder - Dispatched with the initial colors from appquery.
+ * @fires Event#getInitialColors - Triggered to request the initial color order from appquery.
+ * @fires CustomEvent#colorOrderChanged - Dispatched when a new color order is saved.
+ * @fires CustomEvent#initialColorOrder - Dispatched with the tokens order configuration from appquery.
  *
  * @example
- * // Initialize the drag & drop functionality
+ * // Start the drag & drop functionality:
  * load();
  *
- * @todo Reset initialColorOrder if a color is changed.
- * @todo Reset initialColorOrder after saving the new order.
- * @todo Allow multi-drag and drop of colors.
+ * @todo Reset initialColorOrder if any color token is modified. Maybe use the color from the HTML element instead?
+ * @todo Allow multi-drag and drop of color tokens.
  */
+
+// Ensure the global script tracking object is available.
 
 window.loadedCodelessLoveScripts ||= {};
 
-let initialColorOrder = {}; // Object holding colors from appquery.get_custom...
-let initialColorArray = []; // Array of active colors without deleted items.
-let initialOrder = []; // Simple array of ids used in Sortable to manage the save button.
+let initialColorOrder = {};
+let initialColorArray = [];
+let initialOrder = [];
 
 let observer;
-let sortableScript;
 let colorsSortable;
-let sortableNodes = [];
 let isResetting = false;
-let classRestoreObserver;
 
+const sortableScript = document.createElement("script");
 const saveButton = document.createElement("button");
 
 /**
@@ -95,9 +94,12 @@ document.addEventListener("initialColorOrder", (e) => {
   // Remove deleted items and reassemble the arrays for easier processing.
   for (const [key, value] of Object.entries(initialColorOrder)) {
     if (value.deleted === false) {
-      value.id = key;
-      initialColorArray.splice(value.order, 0, value);
-      initialOrder.splice(value.order, 0, key);
+      // Create a new object by cloning 'value' and adding/updating the id property.
+      const newValue = { ...value, id: key };
+
+      // Insert the newValue and key at the appropriate positions.
+      initialColorArray.splice(newValue.order, 0, newValue);
+      initialOrder.splice(newValue.order, 0, key);
     }
   }
 
@@ -110,10 +112,9 @@ document.addEventListener("initialColorOrder", (e) => {
 });
 
 /**
- * Dynamically loads the appquery scripts required for token operations.
+ * Dynamically loads the appquery scripts required for color operations.
  */
 function loadAppqueryScripts() {
-  sortableScript = document.createElement("script");
   sortableScript.src = chrome.runtime.getURL(
     "features/style-drag-rearrange/appqueryScripts.js",
   );
@@ -135,9 +136,6 @@ function load() {
   let thisScriptKey = "style_drag_rearrange";
 
   if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {
-    if (classRestoreObserver) {
-      classRestoreObserver.disconnect();
-    }
     console.warn(
       "❤️ " +
         thisScriptKey +
