@@ -1,0 +1,64 @@
+.sortable-ghost {
+    opacity: 0.5;
+    background-color: #f0f0f0;
+  }
+  .sortable-drag {
+    transform: scale(0.95) rotate(-5deg);
+    background-color: white;
+    padding: 8px;
+    border-radius: 6px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  .thing {
+    background-color: black;
+  }
+
+  /* Add styles for the drag handle */
+.token-name-and-edit::before {
+    content: "⋮⋮";  /* Double vertical dots to create a grip icon */
+    margin-right: 8px;
+    color: #888;
+    cursor: grab;
+    font-size: 14px;
+    display: inline-block;
+    transform: rotate(90deg);
+    user-select: none;
+  }
+  
+  /* Style when being dragged */
+  .sortable-drag .token-caption::before {
+    cursor: grabbing;
+  }
+  
+  /* Optional: Add hover effect */
+  .token-caption:hover::before {
+    color: #555;
+  }
+
+  #sortable-save-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    transition: all 0.2s ease;
+  }
+  
+  #sortable-save-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  #sortable-save-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
