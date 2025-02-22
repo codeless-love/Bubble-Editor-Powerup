@@ -3,10 +3,9 @@ function setInitialOrder() {
   document.dispatchEvent(
     new CustomEvent("initialColorOrder", {
       detail: initial_order,
-    })
+    }),
   );
 }
-setInitialOrder();
 
 document.addEventListener("colorOrderChanged", (e) => {
   appquery.set_setting(!0, "color_tokens_user", e.detail);
