@@ -1,3 +1,15 @@
+/**
+ * Module to handle the interaction with Bubble's appquery API for color token settings.
+ *
+ * This script registers event listeners to set and update the initial color order
+ * and to persist changes when the order is modified.
+ *
+ * @module style-drag-rearrange/appqueryScripts
+ */
+
+/**
+ * Retrieves the initial color order from appquery and dispatches the 'initialColorOrder' event.
+ */
 function setInitialOrder() {
   const initial_order = appquery.get_public_setting("color_tokens_user");
   document.dispatchEvent(
@@ -8,7 +20,8 @@ function setInitialOrder() {
 }
 
 document.addEventListener("colorOrderChanged", (e) => {
-  appquery.set_setting(!0, "color_tokens_user", e.detail);
+  // Update the color token settings in appquery on order change.
+  appquery.set_setting(true, "color_tokens_user", e.detail);
 });
 
 document.addEventListener("getInitialColors", () => {
