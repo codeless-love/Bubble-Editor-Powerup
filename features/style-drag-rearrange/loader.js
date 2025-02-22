@@ -4,15 +4,45 @@
 
 window.loadedCodelessLoveScripts ||= {};
 
-let shouldReRun = true; // I believe this can be done away with.
-let childNodeCount = 0;
-let colorWrapperObserver;
-
 // receive the initial color from the appquery element so we can match that with what's on the screen.
 let initialColorOrder = {};
 let initialOrder = [];
 let initialColorArray = [];
+
+let observer;
+let sortableScript;
+
+function getInitialColors() {
+  const event = new Event("getInitialColors");
+  document.dispatchEvent(event);
+}
+
+function waitForElement(selector, callback) {
+  console.log("waitForElement", selector);
+  observer = new MutationObserver((mutationsList, observer) => {
+    if (document.querySelector(selector)) {
+      console.log("found selectors", selector);
+      observer.disconnect();
+      console.log("disconnecting observer", selector, "performing callback");
+      callback();
+    }
+  });
+  console.log("created observer", selector);
+
+  observer.observe(document.body, { childList: true, subtree: true });
+  console.log("observer observing", selector);
+  if (document.querySelector(selector)) {
+    console.log(
+      "selector was already there, disconnecting, and running callback"
+    );
+    // Check if element is already there on load
+    observer.disconnect();
+    callback();
+  }
+}
+
 document.addEventListener("initialColorOrder", (e) => {
+  console.log("event triggered getInitialColors");
   initialColorOrder = {};
   initialOrder = [];
   initialColorArray = [];
@@ -23,12 +53,25 @@ document.addEventListener("initialColorOrder", (e) => {
   for (const [key, value] of Object.entries(initialColorOrder)) {
     if (value.deleted === false) {
       value.id = key;
-      initialOrder.push(key);
-      initialColorArray.push(value);
+      initialColorArray.splice(value.order, 0, value);
+      initialOrder.splice(value.order, 0, key);
     }
   }
+
   handleTokenColors();
 });
+
+function loadSortableScript() {
+  sortableScript = document.createElement("script");
+  sortableScript.src = chrome.runtime.getURL(
+    "features/style-drag-rearrange/drag.js"
+  );
+  sortableScript.onload = () => {
+    console.log("sortable script loaded");
+    handleTokenColors();
+  };
+  document.head.appendChild(sortableScript);
+}
 
 function load() {
   console.log("❤️ " + "Drag & Drop Style");
@@ -46,39 +89,16 @@ function load() {
 
   window.loadedCodelessLoveScripts[thisScriptKey] = "loading"; // Change status to loading
 
-  const waitForElement = (selector, callback) => {
-    const observer = new MutationObserver((mutationsList, observer) => {
-      if (document.querySelector(selector)) {
-        observer.disconnect();
-        callback();
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    if (document.querySelector(selector)) {
-      // Check if element is already there on load
-      observer.disconnect();
-      callback();
-    }
-  };
-
-  waitForElement(".tokens-editor-wrapper.colors", () => {
-    console.log("waitForElement running");
-    const script = document.createElement("script");
-    script.src = chrome.runtime.getURL("features/style-drag-rearrange/drag.js");
-    script.onload = () => {
-      window.loadedCodelessLoveScripts[thisScriptKey] = "loaded"; // Set status to loaded after drag.js is loaded and executed
-      console.log("❤️ " + thisScriptKey + " drag.js loaded and executed.");
-    };
-    document.head.appendChild(script);
-  });
-  handleTokenColors();
+  waitForElement(".tokens-editor-wrapper.colors", loadSortableScript);
 }
 
 async function handleTokenColors() {
   console.log("handleTokenColors running");
   try {
-    if (shouldReRun === false) return;
-    if (!initialOrder) return;
+    if (!initialOrder) {
+      console.log("Missing initialOrder, returning");
+      return;
+    }
 
     const colorWrapper = document.querySelector(
       ".tokens-editor-wrapper.colors"
@@ -188,14 +208,57 @@ async function handleTokenColors() {
         }
       });
 
-      const event = new CustomEvent("colorOrderChanged", {
-        detail: initialColorOrder,
+      // After dispatching the event, set up observer to watch for class removals
+      // const tabPanel = document.querySelector(".tab-panel.style");
+      // console.log("tabPanel", tabPanel);
+      // if (!tabPanel) {
+      //   console.warn("Could not find .tab-panel.style element");
+      //   return;
+      // }
+
+      // observer = new MutationObserver((mutations) => {
+      //   console.log("observer detected changes in tab panel");
+      //   const colorWrapper = tabPanel.querySelector(
+      //     ".tokens-editor-wrapper.colors"
+      //   );
+      //   if (!colorWrapper) {
+      //     console.log(".tokens-editor-wrapper not present, returning");
+      //     return;
+      //   }
+
+      //   const elements = colorWrapper.querySelectorAll(".token-wrapper");
+      //   const needsReinitialization = Array.from(elements).some(
+      //     (el) => !el.classList.contains("draggable-custom-color")
+      //   );
+
+      //   console.log("needsReinitialization status", needsReinitialization);
+      //   if (needsReinitialization) {
+      //     console.log("Drag classes removed after save, reinitializing...");
+      //     observer.disconnect();
+      //     getInitialColors();
+      //   }
+      // });
+
+      // observer.observe(tabPanel, {
+      //   attributes: true,
+      //   attributeFilter: ["class"],
+      //   subtree: true,
+      //   childList: true,
+      // });
+
+      // console.log("save flow, observer", observer);
+
+      waitForElement(".tokens-editor-wrapper.colors", () => {
+        handleTokenColors();
       });
-      document.dispatchEvent(event);
-      console.log("event", event);
 
       // After saving, update the initial order and hide the button
       saveButton.style.display = "none";
+      const event = new CustomEvent("colorOrderChanged", {
+        detail: { default: initialColorOrder },
+      });
+      document.dispatchEvent(event);
+      console.log("save flow, dispatched event", event);
     });
   } catch (error) {
     console.error("there was an error", error);
