@@ -1,7 +1,7 @@
 [
   {
     "key": "feature_key_goes_here",
-    "category": "How to Contribute",
+    "category": "Example Feature",
     "name": "Example Feature",
     "description": "This is an example feature for developers to duplicate. To add a new feature, copy this entire object and paste it in this file (features.json), and then replace the variables with the relevant info. Then find the folder /feature_key_goes_here and duplicate it. Follow the instructions in /feature_key_goes_here/readme.txt to add your feature and create a PR.",
     "cssFile": "features/feature_key_goes_here/feature_key_goes_here.css",
@@ -28,9 +28,18 @@
   {
     "key": "top_menu_layout",
     "category": "Top Menubar",
-    "name": "Improve Layout of Top Menubar",
-    "description": "Description coming soon",
+    "name": "Maximize App Information Manager dropdown in top menubar",
+    "description": "Make the unexpanded page dropdown take up the full width in the top menubar.",
     "cssFile": "features/top_menu_layout/top_menu_layout.css",
+    "default": true
+  },
+  {
+    "key": "top_menu_aim",
+    "category": "Top Menubar",
+    "name": "Maximize the expanded App Information Manager dropdown menu",
+    "description": "When the AIM menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
+    "cssFile": "features/top_menu_layout/top_menu_aim.css",
+    "requires": "top_menu_layout",
     "default": true
   },
   {
