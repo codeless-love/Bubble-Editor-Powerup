@@ -9,6 +9,22 @@
     "default": true
   },
   {
+    "key": "expression_bad_practice_warning_count_is_zero",
+    "category": "Expressions",
+    "name": "Warn about ':count is 0' pattern",
+    "description": "Highlights when the ':count is 0' pattern is used instead of the more efficient 'is empty' check.",
+    "requires": "expression_bad_practice_warning",
+    "default": true
+  },
+  {
+    "key": "expression_bad_practice_warning_current_user_in_backend",
+    "category": "Expressions",
+    "name": "Warn about 'Current User' in backend workflows",
+    "description": "Highlights when 'Current User' is used in backend workflows, which can cause issues.",
+    "requires": "expression_bad_practice_warning",
+    "default": true
+  },
+  {
     "key": "style_row_hover",
     "category": "Style Tab",
     "name": "Hi-light style variable rows on hover",

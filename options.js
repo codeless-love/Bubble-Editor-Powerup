@@ -31,6 +31,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     return !!prefs[feature.requires];  // Dependency is enabled
   };
 
+  // Function to check if a feature is a sub-feature (has a parent)
+  const isSubFeature = (feature) => {
+    return !!feature.requires;
+  };
+
+  // Function to get all sub-features for a given parent feature
+  const getSubFeatures = (parentFeatureKey) => {
+    return features.filter(f => f.requires === parentFeatureKey);
+  };
+
   // Display features by category in the defined order
   categories.forEach((category) => {
     if (featuresByCategory[category]) {
@@ -41,6 +51,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Iterate through features in the category
       featuresByCategory[category].forEach((feature) => {
+        // Skip sub-features as they will be handled with their parent
+        if (isSubFeature(feature)) return;
+
         const div = document.createElement("div");
         div.className = "feature";
 
@@ -65,6 +78,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         div.appendChild(description);
 
         container.appendChild(div);
+
+        // Check if this feature has sub-features
+        const subFeatures = getSubFeatures(feature.key);
+        if (subFeatures.length > 0) {
+          // Create a container for sub-features
+          const subFeaturesContainer = document.createElement("div");
+          subFeaturesContainer.className = "sub-features";
+          
+          // Add each sub-feature
+          subFeatures.forEach(subFeature => {
+            const subDiv = document.createElement("div");
+            subDiv.className = "feature sub-feature";
+
+            const subCheckbox = document.createElement("input");
+            subCheckbox.type = "checkbox";
+            subCheckbox.checked = prefs[subFeature.key];
+            subCheckbox.id = subFeature.key;
+            
+            // Disable sub-feature checkbox if parent is disabled
+            if (!checkbox.checked) {
+              subCheckbox.disabled = true;
+              subCheckbox.title = `Requires "${feature.name}" to be enabled.`;
+            }
+
+            const subLabel = document.createElement("label");
+            subLabel.append(subCheckbox, subFeature.name);
+
+            subDiv.appendChild(subLabel);
+
+            const subDescription = document.createElement("p");
+            subDescription.textContent = subFeature.description;
+            subDiv.appendChild(subDescription);
+
+            subFeaturesContainer.appendChild(subDiv);
+          });
+
+          container.appendChild(subFeaturesContainer);
+        }
       });
     }
 
@@ -90,6 +141,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
           }
         });
+
+        // Special handling for the expression_bad_practice_warning feature
+        if (feature.key === "expression_bad_practice_warning") {
+          // Get all sub-features
+          const countIsZeroCheckbox = document.getElementById("expression_bad_practice_warning_count_is_zero");
+          const currentUserCheckbox = document.getElementById("expression_bad_practice_warning_current_user_in_backend");
+          
+          // Enable/disable based on parent state
+          if (countIsZeroCheckbox) {
+            countIsZeroCheckbox.disabled = !checkbox.checked;
+            if (!checkbox.checked) countIsZeroCheckbox.checked = false;
+          }
+          
+          if (currentUserCheckbox) {
+            currentUserCheckbox.disabled = !checkbox.checked;
+            if (!checkbox.checked) currentUserCheckbox.checked = false;
+          }
+        }
 
         // Dynamically uncheck all dependent features if the requirement is unchecked
         uncheckDependentFeatures(feature, checkbox.checked);

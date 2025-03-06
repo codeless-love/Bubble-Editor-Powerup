@@ -18,7 +18,7 @@
         margin: auto;
         border: solid 1px #ccc;
         border-radius: var(--base-padding);
-        var(--base-padding) var(--base-padding) calc(var(--base-padding)*3) -var(--base-padding) #000000DD;
+        box-shadow: var(--base-padding) var(--base-padding) calc(var(--base-padding)*3) -var(--base-padding) #000000DD;
         margin-top: calc(var(--base-padding)*2);
     }
     header {
@@ -106,6 +106,15 @@
     .feature p {
       margin-left: 20px;
       color: #888;
+    }
+    .sub-features {
+      margin-left: 20px;
+      padding-left: 10px;
+      border-left: 1px solid #eee;
+    }
+    .sub-feature {
+      margin-top: 5px;
+      padding-top: 5px;
     }
     #status {
       display: none;
