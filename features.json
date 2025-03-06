@@ -33,6 +33,14 @@
     "default": true
   },
   {
+    "key": "data_optionsets_limitless_attribute_lists",
+    "category": "Data View",
+    "name": "OS Limitless Attribute Lists",
+    "description": "On the option set tab of the Data view, allow attribute lists to grow as tall as they want, with no scorlling.",
+    "cssFile": "features/data_optionsets_limitless_attribute_lists/data_optionsets_limitless_attribute_lists.css",
+    "default": true
+  },
+  {
     "key": "data_optionsets_move_gaps",
     "category": "Data View",
     "name": "Option Set Move Gaps",
