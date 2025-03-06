@@ -251,6 +251,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                     console.log("❤️ Event target:", event.target.tagName, event.target.className);
                     console.log("❤️ Event target text:", event.target.textContent);
                     
+                    // The issue is that clicks on label elements automatically trigger clicks on the associated checkbox
+                    // We need to prevent this default behavior for label and span elements
+                    if (event.target.tagName === 'LABEL' ||
+                        (event.target.tagName === 'SPAN' && event.target.parentElement && event.target.parentElement.tagName === 'LABEL')) {
+                      console.log("❤️ Preventing default behavior for label/span click in dependent feature");
+                      event.preventDefault(); // Prevent the default behavior (clicking the checkbox)
+                    }
+                    
                     // Stop propagation to prevent double-toggling
                     event.stopPropagation();
                     
