@@ -28,7 +28,7 @@
     "key": "data_optionsets_expand_inputs",
     "category": "Data View",
     "name": "Maximum Sized Option Set Inputs",
-    "description": "On the option set tab of the Data view, Stretch Option Set inputs to be as wide as possible for your screen so that content is not cut off.",
+    "description": "On the option set tab of the Data view, stretch Option Set inputs to be as wide as possible for your screen so that content is not cut off.",
     "cssFile": "features/data-optionsets-expand-inputs/data-optionsets-expand-inputs.css",
     "default": true
   },

@@ -2,29 +2,30 @@
 /* Data > Option sets - make Display inputs as wide as they can be */
 /* Set the container grid */
 ❤️ codelesslove,
-#mainwindow .option-set-values > .field {
+#mainwindow .tab-panel.option.sets .field {
     display: grid;
     grid-template-columns: 1fr auto auto auto auto auto;
     gap: 0px;
 }
+
 /* Expand the input and it's container */
 ❤️ codelesslove,
-#mainwindow .option-set-values > .field .composer-textbox,
-#mainwindow .option-set-values > .field .composer-textbox > input {
+#mainwindow .tab-panel.option.sets .field .composer-textbox,
+#mainwindow .tab-panel.option.sets .field .composer-textbox > input {
   width: 100% !important;
 }
 /* Trash can and icon are switched when grid template is used, put them back in the correct order.  */
 ❤️ codelesslove,
-#mainwindow .custom-fields > .field .delete-btn {
+#mainwindow .tab-panel.option.sets .field .delete-btn {
   order: 2;
 }
 /* Heart indicator on the right-edge of the input */
 ❤️ codelesslove,
-#mainwindow .option-set-values > .field .composer-textbox {
+#mainwindow .tab-panel.option.sets .field .composer-textbox {
   position: relative;/* give the ::after pseudoelement something to be relative to */
 }
 ❤️ codelesslove,
-#mainwindow .option-set-values > .field .composer-textbox::after {
+#mainwindow .tab-panel.option.sets .field .composer-textbox::after {
     content: "❤️";
     font-size: 5px;
     margin-left: 0px;
