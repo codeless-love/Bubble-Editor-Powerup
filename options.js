@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const div = document.createElement("div");
         div.className = "feature";
-
+        
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.checked = prefs[feature.key];
@@ -66,16 +66,57 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!isDependencySatisfied(feature, prefs)) {
           checkbox.disabled = true;
           checkbox.title = `Requires "${features.find(f => f.key === feature.requires)?.name || feature.requires}" to be enabled.`;
+          div.classList.add("disabled");
         }
 
         const label = document.createElement("label");
-        label.append(checkbox, feature.name);
+        const labelText = document.createElement("span");
+        labelText.textContent = feature.name;
+        label.append(checkbox, labelText);
 
         div.appendChild(label);
 
         const description = document.createElement("p");
         description.textContent = feature.description;
         div.appendChild(description);
+        
+        // Make the entire card clickable to toggle the checkbox
+        if (!checkbox.disabled) {
+          div.addEventListener("click", (event) => {
+            // Debug logging
+            console.log("❤️ Feature card clicked:", feature.name);
+            console.log("❤️ Event target:", event.target.tagName, event.target.className);
+            console.log("❤️ Event target text:", event.target.textContent);
+            
+            // The issue is that clicks on label elements automatically trigger clicks on the associated checkbox
+            // We need to prevent this default behavior for label and span elements
+            if (event.target.tagName === 'LABEL' ||
+                (event.target.tagName === 'SPAN' && event.target.parentElement && event.target.parentElement.tagName === 'LABEL')) {
+              console.log("❤️ Preventing default behavior for label/span click");
+              event.preventDefault(); // Prevent the default behavior (clicking the checkbox)
+            }
+            
+            // Stop propagation to prevent double-toggling
+            event.stopPropagation();
+            
+            // Let's check if the click is on the checkbox itself, and if not, toggle the checkbox
+            if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox') {
+              console.log("❤️ Direct checkbox click, letting default behavior handle it");
+              // Let the default checkbox behavior handle this
+              return;
+            } else if (div.contains(event.target)) {
+              // For any other element within the div (including label, span, p), toggle the checkbox
+              console.log("❤️ Toggling feature checkbox for:", feature.name);
+              checkbox.checked = !checkbox.checked;
+              // Trigger the change event to update dependent features
+              checkbox.dispatchEvent(new Event("change"));
+            } else {
+              console.log("❤️ Click did not trigger toggle for:", feature.name);
+              console.log("❤️ Is in div?", div.contains(event.target));
+            }
+          });
+          div.style.cursor = "pointer";
+        }
 
         container.appendChild(div);
 
@@ -100,16 +141,57 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!checkbox.checked) {
               subCheckbox.disabled = true;
               subCheckbox.title = `Requires "${feature.name}" to be enabled.`;
+              subDiv.classList.add("disabled");
             }
 
             const subLabel = document.createElement("label");
-            subLabel.append(subCheckbox, subFeature.name);
+            const subLabelText = document.createElement("span");
+            subLabelText.textContent = subFeature.name;
+            subLabel.append(subCheckbox, subLabelText);
 
             subDiv.appendChild(subLabel);
 
             const subDescription = document.createElement("p");
             subDescription.textContent = subFeature.description;
             subDiv.appendChild(subDescription);
+            
+            // Make the entire sub-feature card clickable to toggle the checkbox
+            if (!subCheckbox.disabled) {
+              subDiv.addEventListener("click", (event) => {
+                // Debug logging
+                console.log("❤️ Subfeature card clicked:", subFeature.name);
+                console.log("❤️ Event target:", event.target.tagName, event.target.className);
+                console.log("❤️ Event target text:", event.target.textContent);
+                
+                // The issue is that clicks on label elements automatically trigger clicks on the associated checkbox
+                // We need to prevent this default behavior for label and span elements
+                if (event.target.tagName === 'LABEL' ||
+                    (event.target.tagName === 'SPAN' && event.target.parentElement && event.target.parentElement.tagName === 'LABEL')) {
+                  console.log("❤️ Preventing default behavior for label/span click in subfeature");
+                  event.preventDefault(); // Prevent the default behavior (clicking the checkbox)
+                }
+                
+                // Stop propagation to prevent double-toggling
+                event.stopPropagation();
+                
+                // Apply the same fix as for feature cards
+                if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox') {
+                  console.log("❤️ Direct checkbox click on subfeature, letting default behavior handle it");
+                  // Let the default checkbox behavior handle this
+                  return;
+                } else if (subDiv.contains(event.target)) {
+                  // For any other element within the div (including label, span, p), toggle the checkbox
+                  console.log("❤️ Toggling subfeature checkbox for:", subFeature.name);
+                  subCheckbox.checked = !subCheckbox.checked;
+                  // Trigger change event to ensure proper state update
+                  subCheckbox.dispatchEvent(new Event('change'));
+                } else {
+                  console.log("❤️ Click did not trigger toggle for subfeature:", subFeature.name);
+                  console.log("❤️ Is in div?", subDiv.contains(event.target));
+                }
+              });
+              subDiv.style.cursor = "pointer";
+            }
 
             subFeaturesContainer.appendChild(subDiv);
           });
@@ -135,8 +217,61 @@ document.addEventListener("DOMContentLoaded", async () => {
               dependentCheckbox.title = enabled
                 ? ""
                 : `Requires "${feature.name}" to be enabled.`;
-              if (!enabled) {
-                dependentCheckbox.checked = false; // Uncheck if disabled
+              
+              // Find the parent feature div of the dependent checkbox
+              const dependentFeatureDiv = dependentCheckbox.closest('.feature');
+              if (dependentFeatureDiv) {
+                if (!enabled) {
+                  // Disable the feature card
+                  dependentFeatureDiv.classList.add('disabled');
+                  dependentFeatureDiv.style.cursor = 'not-allowed';
+                  
+                  // Remove any existing click event listeners
+                  const oldElement = dependentFeatureDiv;
+                  const newElement = oldElement.cloneNode(true);
+                  oldElement.parentNode.replaceChild(newElement, oldElement);
+                  
+                  // Make sure the checkbox is still accessible in the DOM
+                  const newCheckbox = newElement.querySelector('input[type="checkbox"]');
+                  if (newCheckbox) {
+                    newCheckbox.id = dependentCheckbox.id;
+                    newCheckbox.checked = false; // Uncheck if disabled
+                    newCheckbox.disabled = true;
+                  }
+                } else {
+                  // Enable the feature card
+                  dependentFeatureDiv.classList.remove('disabled');
+                  dependentFeatureDiv.style.cursor = 'pointer';
+                  
+                  // Add click event listener back
+                  dependentFeatureDiv.addEventListener('click', (event) => {
+                    // Debug logging for dependent features
+                    const dependentFeature = features.find(feat => feat.key === f.key);
+                    console.log("❤️ Dependent feature card clicked:", dependentFeature ? dependentFeature.name : f.key);
+                    console.log("❤️ Event target:", event.target.tagName, event.target.className);
+                    console.log("❤️ Event target text:", event.target.textContent);
+                    
+                    // Stop propagation to prevent double-toggling
+                    event.stopPropagation();
+                    
+                    const clickedCheckbox = dependentFeatureDiv.querySelector('input[type="checkbox"]');
+                    // Apply the same fix as for feature and subfeature cards
+                    if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox') {
+                      console.log("❤️ Direct checkbox click on dependent feature, letting default behavior handle it");
+                      // Let the default checkbox behavior handle this
+                      return;
+                    } else if (dependentFeatureDiv.contains(event.target) && !clickedCheckbox.disabled) {
+                      // For any other element within the div (including label, span, p), toggle the checkbox
+                      console.log("❤️ Toggling dependent feature checkbox for:", dependentFeature ? dependentFeature.name : f.key);
+                      clickedCheckbox.checked = !clickedCheckbox.checked;
+                      clickedCheckbox.dispatchEvent(new Event('change'));
+                    } else {
+                      console.log("❤️ Click did not trigger toggle for dependent feature:", dependentFeature ? dependentFeature.name : f.key);
+                      console.log("❤️ Is in div?", dependentFeatureDiv.contains(event.target));
+                      console.log("❤️ Is checkbox disabled?", clickedCheckbox.disabled);
+                    }
+                  });
+                }
               }
             }
           }
@@ -150,13 +285,35 @@ document.addEventListener("DOMContentLoaded", async () => {
           
           // Enable/disable based on parent state
           if (countIsZeroCheckbox) {
+            const countIsZeroDiv = countIsZeroCheckbox.closest('.feature');
             countIsZeroCheckbox.disabled = !checkbox.checked;
-            if (!checkbox.checked) countIsZeroCheckbox.checked = false;
+            
+            if (countIsZeroDiv) {
+              if (!checkbox.checked) {
+                countIsZeroDiv.classList.add('disabled');
+                countIsZeroDiv.style.cursor = 'not-allowed';
+                countIsZeroCheckbox.checked = false;
+              } else {
+                countIsZeroDiv.classList.remove('disabled');
+                countIsZeroDiv.style.cursor = 'pointer';
+              }
+            }
           }
           
           if (currentUserCheckbox) {
+            const currentUserDiv = currentUserCheckbox.closest('.feature');
             currentUserCheckbox.disabled = !checkbox.checked;
-            if (!checkbox.checked) currentUserCheckbox.checked = false;
+            
+            if (currentUserDiv) {
+              if (!checkbox.checked) {
+                currentUserDiv.classList.add('disabled');
+                currentUserDiv.style.cursor = 'not-allowed';
+                currentUserCheckbox.checked = false;
+              } else {
+                currentUserDiv.classList.remove('disabled');
+                currentUserDiv.style.cursor = 'pointer';
+              }
+            }
           }
         }
 
@@ -172,8 +329,33 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (f.requires === feature.key && !isChecked) {
         const dependentCheckbox = document.getElementById(f.key);
         if (dependentCheckbox) {
-          dependentCheckbox.checked = false; // Uncheck dependent feature
-          dependentCheckbox.disabled = true;  // Disable it
+          // Find the parent feature div of the dependent checkbox
+          const dependentFeatureDiv = dependentCheckbox.closest('.feature');
+          
+          if (dependentFeatureDiv) {
+            // Disable the feature card
+            dependentFeatureDiv.classList.add('disabled');
+            dependentFeatureDiv.style.cursor = 'not-allowed';
+            
+            // Remove any existing click event listeners
+            const oldElement = dependentFeatureDiv;
+            const newElement = oldElement.cloneNode(true);
+            oldElement.parentNode.replaceChild(newElement, oldElement);
+            
+            // Make sure the checkbox is still accessible in the DOM
+            const newCheckbox = newElement.querySelector('input[type="checkbox"]');
+            if (newCheckbox) {
+              newCheckbox.id = dependentCheckbox.id;
+              newCheckbox.checked = false; // Uncheck dependent feature
+              newCheckbox.disabled = true;  // Disable it
+            }
+          } else {
+            dependentCheckbox.checked = false; // Uncheck dependent feature
+            dependentCheckbox.disabled = true;  // Disable it
+          }
+          
+          // Recursively uncheck any features that depend on this one
+          uncheckDependentFeatures(f, false);
         }
       }
     });
@@ -221,7 +403,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       chrome.storage.sync.set(newPrefs, resolve);
     });
     if (notificationStatus) {
-      notificationStatus.textContent = "Options saved! Please reload all Bubble editor tabs for changes to take effect.";
+      notificationStatus.textContent = "Options saved! Please reload Bubble editor tabs for changes to take effect.";
       notificationStatus.style.display = "block";
     }
     if (refreshSection) {
