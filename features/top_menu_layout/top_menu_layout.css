@@ -10,10 +10,13 @@
 .menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child,
 .menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child > div,
 .menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child > div > div:not(.app-interface-manager-side-panel), /* When AIM is unexpanded, this is just a parent to .trigger-button. But when AIM expands, this becomes .app-interface-manager-side-panel */
-.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child > div > div:not(.app-interface-manager-side-panel) > ._1uejfp94
 .menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child .trigger-button {
   width: 100%;
   max-width: 100%;
+}
+❤️ codelesslove,/* Make trigger button stay wide when expanded */
+.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child > div > div:not(.app-interface-manager-side-panel) > ._1uejfp94 {
+  width: 100% !important; /* When AIM menu is expanded, this is the new structure for the AIM .trigger-button. It has a width: 432px style attribute that needs to be overridden. */
 }
 ❤️ codelesslove,
 .trigger-button {/* This is the unopened AIM dropdown */
