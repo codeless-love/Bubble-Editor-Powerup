@@ -1,5 +1,14 @@
 [
   {
+    "key": "feature_key_goes_here",
+    "category": "How to Contribute",
+    "name": "Example Feature",
+    "description": "This is an example feature for developers to duplicate. To add a new feature, copy this entire object and paste it in this file (features.json), and then replace the variables with the relevant info. Then find the folder /feature_key_goes_here and duplicate it. Follow the instructions in /feature_key_goes_here/readme.txt to add your feature and create a PR.",
+    "cssFile": "features/feature_key_goes_here/feature_key_goes_here.css",
+    "jsFile": "features/feature_key_goes_here/feature_key_goes_here.js",
+    "default": false
+  },
+  {
     "key": "expression_bad_practice_warning",
     "category": "Expressions",
     "name": "Bad Practice Warning",
