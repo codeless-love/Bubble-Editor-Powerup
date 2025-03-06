@@ -112,27 +112,16 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url &&
       (tab.url.includes("bubble.io") || tab.url.includes("bubble.is"))) {
     
-    // Check if this is a Bubble editor page - we're expanding the pattern to catch more Bubble pages
-    // Try a more flexible approach for bubble.is domains
+    // Check if this is a Bubble editor page - only allowing /page paths
     let isBubbleEditor = false;
     
     try {
       const urlObj = new URL(tab.url);
-      const isPagePath = urlObj.pathname === "/page" ||
-                         urlObj.pathname.startsWith("/page/") ||
-                         urlObj.pathname.endsWith("/page") ||
-                         urlObj.pathname.includes("/page");
-      
-      isBubbleEditor = isPagePath ||
-                      tab.url.includes("/version-test") ||
-                      tab.url.includes("/admin") ||
-                      tab.url.includes("/editor");
+      // Only permit exact /page paths
+      isBubbleEditor = urlObj.pathname === "/page";
     } catch (e) {
-      // Fallback to the original check
-      isBubbleEditor = tab.url.includes("/page") ||
-                      tab.url.includes("/version-test") ||
-                      tab.url.includes("/admin") ||
-                      tab.url.includes("/editor");
+      // Fallback to a simple check if URL parsing fails
+      isBubbleEditor = tab.url.includes("/page");
     }
     
     if (isBubbleEditor) {
@@ -148,3 +137,4 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
   }
 });
+
