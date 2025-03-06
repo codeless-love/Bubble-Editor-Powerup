@@ -1,0 +1,40 @@
+/* ❤️ */
+/* Top Menu Layout Improvementes */
+
+❤️ codelesslove,/* Make AIM wide */
+.menu-bar .menubar-style {
+  grid-template-columns: 1fr auto auto;
+}
+❤️ codelesslove,
+.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u,
+.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child,
+.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child > div,
+.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child > div > div,
+.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child .trigger-button {
+  width: 100%;
+  max-width: 100%;
+}
+❤️ codelesslove,
+.trigger-button {
+  margin-right: 10px;
+}
+❤️ codelesslove,
+.menu-bar .menubar-style .app-interface-manager-side-panel {
+  min-width: 50% !important;
+  max-width: calc(100% - 120px) !important;
+  width: fit-content !important;
+}
+❤️ codelesslove,
+.menu-bar .menubar-style .app-interface-manager-side-panel .app-interface-list-item {
+  width: auto !important;
+  margin-right: -32px;
+  padding-right: 40px;/* offset the 32px then add back the 8px of padding*/
+}
+.menu-bar .menubar-style .app-interface-manager-side-panel .app-interface-list-item > div {
+  margin-right: -32px;
+}
+
+
+._1ox6jxm6 [role=region] > div > div {
+  width: fit-content !important;
+}

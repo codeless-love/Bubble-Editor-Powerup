@@ -17,6 +17,14 @@
     "default": true
   },
   {
+    "key": "top_menu_layout",
+    "category": "Top Menubar",
+    "name": "Improve Layout of Top Menubar",
+    "description": "Description coming soon",
+    "cssFile": "features/top_menu_layout/top_menu_layout.css",
+    "default": true
+  },
+  {
     "key": "canvas_left_align_canvas",
     "category": "Design Canvas",
     "name": "Left Align the Design Canvas",
