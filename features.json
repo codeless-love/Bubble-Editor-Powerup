@@ -179,5 +179,26 @@
     "description": "When copying the database, make the button and description different colors depending on which direction data is moving. Red for to live, green for to dev. The green color, importantly, prevents accidents if the plugin is unexpectedly turned off without realizing.",
     "cssFile": "features/data_copy_to_live_warning/style.css",
     "default": true
+  },
+  {
+    "key": "elements_tree_height",
+    "category": "Design Canvas",
+    "name": "Elements Tree Row Height",
+    "description": "Customize the height of elements tree rows in the Bubble editor. Default is 32px, but you can set a custom height in pixels.",
+    "cssFile": "features/elements_tree_height/elements_tree_height.css",
+    "jsFile": "features/elements_tree_height/elements_tree_height.js",
+    "default": false,
+    "config": {
+      "inputs": [
+        {
+          "type": "number",
+          "key": "elements_tree_height_value",
+          "label": "Row height (px)",
+          "default": 32,
+          "min": 20,
+          "max": 100
+        }
+      ]
+    }
   }
 ]

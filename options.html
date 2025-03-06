@@ -288,6 +288,33 @@
     #refreshSection {
       display: none;
     }
+    
+    /* Feature input field styling */
+    .input-container {
+      margin-left: 28px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .input-label {
+      margin-right: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .input-field {
+      width: 60px;
+      padding: 4px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    
+    .input-field:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
   </style>
   <script src="options.js" defer></script>
 </head>

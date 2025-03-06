@@ -1,0 +1,9 @@
+/* 
+ * Elements Tree Height Feature
+ * Overrides the default height of elements tree rows
+ */
+
+/* This class is used for the elements tree rows in Bubble editor */
+.qtwclhh {
+  height: var(--elements-tree-height, 32px) !important;
+}

@@ -45,6 +45,76 @@ document.addEventListener("DOMContentLoaded", async () => {
   const getSubFeatures = (parentFeatureKey) => {
     return features.filter(f => f.requires === parentFeatureKey);
   };
+  
+  // Function to create input fields based on feature config
+  const createFeatureInputs = (feature, containerDiv, isVisible = true) => {
+    if (!feature.config || !feature.config.inputs || !feature.config.inputs.length) {
+      return;
+    }
+    
+    feature.config.inputs.forEach(inputConfig => {
+      // Get the stored value or use default
+      chrome.storage.sync.get([inputConfig.key], function(result) {
+        const value = result[inputConfig.key] !== undefined ? result[inputConfig.key] : inputConfig.default;
+        
+        // Create input container
+        const inputContainer = document.createElement("div");
+        inputContainer.className = "input-container";
+        inputContainer.style.display = isVisible ? "flex" : "none";
+        
+        // Create label for input
+        const inputLabel = document.createElement("label");
+        inputLabel.textContent = `${inputConfig.label}: `;
+        inputLabel.className = "input-label";
+        
+        // Create input element based on type
+        const input = document.createElement("input");
+        input.className = "input-field";
+        input.id = inputConfig.key;
+        
+        // Set input attributes based on type
+        switch (inputConfig.type) {
+          case "number":
+            input.type = "number";
+            if (inputConfig.min !== undefined) input.min = inputConfig.min;
+            if (inputConfig.max !== undefined) input.max = inputConfig.max;
+            input.value = value;
+            break;
+          case "text":
+            input.type = "text";
+            input.value = value;
+            break;
+          case "checkbox":
+            input.type = "checkbox";
+            input.checked = value;
+            break;
+          default:
+            input.type = "text";
+            input.value = value;
+        }
+        
+        // Add event listener to input
+        input.addEventListener("change", () => {
+          // Store the value in chrome.storage
+          const newValue = input.type === "checkbox" ? input.checked :
+                          input.type === "number" ? parseInt(input.value, 10) :
+                          input.value;
+          
+          const storageUpdate = {};
+          storageUpdate[inputConfig.key] = newValue;
+          chrome.storage.sync.set(storageUpdate);
+          
+          changesMade = true;
+          saveButton.style.display = "block";
+        });
+        
+        // Append elements to container
+        inputContainer.appendChild(inputLabel);
+        inputContainer.appendChild(input);
+        containerDiv.appendChild(inputContainer);
+      });
+    });
+  };
 
   // Function to create a feature card (works for both main features and sub-features)
   const createFeatureCard = (feature, isSubFeature = false, parentFeature = null) => {
@@ -95,7 +165,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       checkbox.addEventListener("change", () => {
         updateDependentFeatures(feature, checkbox.checked);
         checkForChanges();
+        
+        // Handle feature input visibility
+        if (feature.config && feature.config.inputs) {
+          const inputContainers = div.querySelectorAll('.input-container');
+          if (inputContainers.length > 0) {
+            inputContainers.forEach(container => {
+              container.style.display = checkbox.checked ? "flex" : "none";
+            });
+          } else if (checkbox.checked) {
+            // Create the input fields if they don't exist yet
+            createFeatureInputs(feature, div);
+          }
+        }
       });
+      
+      // Add input fields for features with config
+      if (feature.config && feature.config.inputs) {
+        createFeatureInputs(feature, div, checkbox.checked);
+      }
     }
 
     return { div, checkbox };
@@ -113,6 +201,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       
       // Stop propagation to prevent double-toggling
       event.stopPropagation();
+      
+      // Don't toggle if clicking on an input field or its label
+      if (event.target.tagName === 'INPUT' ||
+          (event.target.tagName === 'LABEL' && event.target.closest('.input-container')) ||
+          event.target.closest('.input-container')) {
+        return;
+      }
       
       // Handle checkbox clicks
       if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox') {
