@@ -39,7 +39,6 @@
     "name": "Maximize the expanded App Information Manager dropdown menu",
     "description": "When the AIM menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
     "cssFile": "features/top_menu_layout/top_menu_aim.css",
-    "requires": "top_menu_layout",
     "default": true
   },
   {
