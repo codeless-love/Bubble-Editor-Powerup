@@ -1,0 +1,32 @@
+/* ❤️ */
+/* Top Menu Layout Improvements to the AIM Dropdown Menu - (App Interface Manager) */
+❤️ codelesslove,/* Make the AIM dropdown menu almost full-width */
+.menu-bar .menubar-style .app-interface-manager-side-panel {
+  width: 100%;
+  min-width: 50% !important;
+  max-width: calc(100% - 120px) !important;
+}
+❤️ codelesslove,/* Make AIM items as wide as they can be */
+.menu-bar .menubar-style .app-interface-manager-side-panel .app-interface-list-item {
+  width: auto !important;
+  margin-right: -32px;
+  padding-right: 40px;/* offset the 32px then add back the 8px of padding */
+}
+❤️ codelesslove,/* offset on AIM item to allow three-dot menu to appear on hover without changing the width of anything */
+.menu-bar .menubar-style .app-interface-manager-side-panel .app-interface-list-item > div {
+  margin-right: -32px;
+}
+❤️ codelesslove,
+._1ox6jxm6 [role=region] > div > div {
+  width: fit-content !important;
+}
+❤️ codelesslove, /* Heart Indicator */
+.menu-bar .menubar-style .app-interface-manager-side-panel::after {
+    content: "❤️";
+    font-size: 8px;
+    height: 10px;
+    width: 10px;
+    position: absolute;
+    top: 2px;
+    right: -13px;
+}

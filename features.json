@@ -1,5 +1,14 @@
 [
   {
+    "key": "feature_key_goes_here",
+    "category": "Example Feature",
+    "name": "Example Feature",
+    "description": "This is an example feature for developers to duplicate. To add a new feature, copy this entire object and paste it in this file (features.json), and then replace the variables with the relevant info. Then find the folder /feature_key_goes_here and duplicate it. Follow the instructions in /feature_key_goes_here/readme.txt to add your feature and create a PR.",
+    "cssFile": "features/feature_key_goes_here/feature_key_goes_here.css",
+    "jsFile": "features/feature_key_goes_here/feature_key_goes_here.js",
+    "default": false
+  },
+  {
     "key": "expression_bad_practice_warning",
     "category": "Expressions",
     "name": "Bad Practice Warning",
@@ -33,6 +42,22 @@
     "default": true
   },
   {
+    "key": "top_menu_layout",
+    "category": "Top Menubar",
+    "name": "Maximize App Information Manager dropdown in top menubar",
+    "description": "Make the unexpanded page dropdown take up the full width in the top menubar.",
+    "cssFile": "features/top_menu_layout/top_menu_layout.css",
+    "default": true
+  },
+  {
+    "key": "top_menu_aim",
+    "category": "Top Menubar",
+    "name": "Maximize the expanded App Information Manager dropdown menu",
+    "description": "When the AIM menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
+    "cssFile": "features/top_menu_layout/top_menu_aim.css",
+    "default": true
+  },
+  {
     "key": "canvas_left_align_canvas",
     "category": "Design Canvas",
     "name": "Left Align the Design Canvas",
@@ -44,8 +69,24 @@
     "key": "data_optionsets_expand_inputs",
     "category": "Data View",
     "name": "Maximum Sized Option Set Inputs",
-    "description": "On the option set tab of the Data view, Stretch Option Set inputs to be as wide as possible for your screen so that content is not cut off.",
-    "cssFile": "features/data-optionsets-expand-inputs/data-optionsets-expand-inputs.css",
+    "description": "On the option set tab of the Data view, stretch Option Set inputs to be as wide as possible for your screen so that content is not cut off.",
+    "cssFile": "features/data_optionsets_expand_inputs/data_optionsets_expand_inputs.css",
+    "default": true
+  },
+  {
+    "key": "data_datatype_expand_inputs",
+    "category": "Data View",
+    "name": "Maximum Sized Data Type Inputs",
+    "description": "On the Data type view, stretch inputs to be as wide as possible for your screen so that content is not cut off.",
+    "cssFile": "features/data_datatype_expand_inputs/data_datatype_expand_inputs.css",
+    "default": true
+  },
+  {
+    "key": "data_optionsets_limitless_attribute_lists",
+    "category": "Data View",
+    "name": "OS Limitless Attribute Lists",
+    "description": "On the option set tab of the Data view, allow attribute lists to grow as tall as they want, with no scorlling.",
+    "cssFile": "features/data_optionsets_limitless_attribute_lists/data_optionsets_limitless_attribute_lists.css",
     "default": true
   },
   {

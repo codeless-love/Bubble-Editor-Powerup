@@ -1,0 +1,18 @@
+/* ❤️ */
+/* Data > Option sets - allow attribute lists be as tall as they can be */
+❤️ codelesslove,
+.modal-popup .popup-content .composer-list-manager .list-wrapper.list-wrapper.list-wrapper {
+  max-height: unset !important;
+  overflow-y: visible;
+  position: relative;
+}
+
+❤️ codelesslove,/* Heart Indicator */
+ .popup-content .list-wrapper::after {
+  content: "❤️";
+  position: absolute;
+  left: -8px;
+  height: 8px;
+  font-size: 6px;
+  bottom: 0px;
+}
