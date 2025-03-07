@@ -4,8 +4,13 @@ let debounceTimeouts = {}; // Store timeouts for each tabId
 
 // Load features dynamically from a JSON file
 async function loadFeatures() {
-  const response = await fetch(chrome.runtime.getURL("features.json")); // Fetch the features configuration file
-  return response.json(); // Return the parsed JSON
+  try {
+    const response = await fetch(chrome.runtime.getURL("features.json")); // Fetch the features configuration file
+    return response.json(); // Return the parsed JSON
+  } catch (error) {
+    console.error("❤️ Error loading features:", error);
+    return []; // Return empty array to prevent further errors
+  }
 }
 
 // Store injected features by tabId using a Map
@@ -29,6 +34,7 @@ async function isFeatureInjected(tabId, featureKey) {
     // Return the result from the tab's execution context
     return response[0].result;
   } catch (error) {
+    console.error("❤️ Error checking if feature is injected:", error);
     return false; // Default to false in case of an error
   }
 }
@@ -37,19 +43,20 @@ async function isFeatureInjected(tabId, featureKey) {
 async function injectFeatures(tabId) {
   try {
     // Get the tab URL
-    const tabInfo = await chrome.tabs.get(tabId);
-    
     const featuresConfig = await loadFeatures(); // Load the list of all available features
-    
+    if (!featuresConfig || featuresConfig.length === 0) {
+      console.warn("❤️ No features found to inject");
+      return;
+    }
+
     const defaults = Object.fromEntries(featuresConfig.map(f => [f.key, f.default])); // get defaults from the json
-    
     const prefs = await chrome.storage.sync.get(defaults);// Load user preferences from chrome storage
     
     if (Object.keys(prefs).length === 0) {
       await chrome.storage.sync.set(defaults);
     }
 
-    // renitialize
+    // reinitialize
     bubbleTabs.set(tabId, new Set()); // Create a new Set to track injected features for this tab
     const injectedFeatures = bubbleTabs.get(tabId); // Get the Set of injected features for this tab
 
@@ -58,45 +65,48 @@ async function injectFeatures(tabId) {
       const isEnabled = prefs[feature.key] == true; // Check if the feature is enabled in user preferences
 
       // Inject the feature only if it's enabled and hasn't been injected already
-      if (isEnabled) {
-        if(!injectedFeatures.has(feature.key)) {
+      if (isEnabled && !injectedFeatures.has(feature.key)) {
+        // Inject CSS if available
+        if (feature.cssFile) {
           try {
-            if (feature.cssFile) {
-              // Inject the CSS file into the tab
-              await chrome.scripting.insertCSS({
-                target: { tabId }, // Specify the target tab
-                files: [feature.cssFile], // CSS file to inject
-              });
-            }
-            if (feature.jsFile) {
-              try {
-                let alreadyInjected = await isFeatureInjected(tabId, feature.key);
-                if (!alreadyInjected) {
-                  try {
-                    await chrome.scripting.executeScript({
-                      target: { tabId },
-                      files: [feature.jsFile],
-                    });
-                    
-                    // Verify injection was successful
-                    await isFeatureInjected(tabId, feature.key);
-                  } catch (scriptError) {
-                    // Script injection error occurred
-                  }
-                }
-              } catch (checkError) {
-                // Error checking if feature is injected
-              }
-            }
-            injectedFeatures.add(feature.key); // Mark the feature as injected in the Set
-          } catch (error) {
-            // Failed to inject feature
+            await chrome.scripting.insertCSS({
+              target: { tabId }, // Specify the target tab
+              files: [feature.cssFile], // CSS file to inject
+            });
+          } catch (cssError) {
+            console.error(`❤️ Error injecting CSS for ${feature.key}:`, cssError);
+            // Continue to try JS injection even if CSS fails
           }
         }
+
+        // Inject JS if available
+        if (feature.jsFile) {
+          const alreadyInjected = await isFeatureInjected(tabId, feature.key);
+          if (!alreadyInjected) {
+            try {
+              await chrome.scripting.executeScript({
+                target: { tabId },
+                files: [feature.jsFile],
+              });
+              
+              // Verify injection was successful
+              const verifyInjected = await isFeatureInjected(tabId, feature.key);
+              if (!verifyInjected) {
+                console.warn(`❤️ JS injection for ${feature.key} may not have been successful`);
+              }
+            } catch (scriptError) {
+              console.error(`❤️ Error injecting JS for ${feature.key}:`, scriptError);
+              // Continue with other features even if this one fails
+            }
+          }
+        }
+
+        // Mark as injected regardless of success to avoid repeated injection attempts
+        injectedFeatures.add(feature.key);
       }
     }
   } catch (error) {
-    // Error in injectFeatures
+    console.error("❤️ Error in injectFeatures:", error);
   }
 }
 
@@ -120,8 +130,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       // Only permit exact /page paths
       isBubbleEditor = urlObj.pathname === "/page";
     } catch (e) {
-      // Fallback to a simple check if URL parsing fails
-      isBubbleEditor = tab.url.includes("/page");
+      // Use regex check if URL parsing fails
+      const regex = /bubble\.(io|is)\/page($|\?)/;
+      isBubbleEditor = regex.test(tab.url);
     }
     
     if (isBubbleEditor) {

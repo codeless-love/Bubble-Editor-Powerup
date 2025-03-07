@@ -1,12 +1,11 @@
 // Elements Tree Height Feature
 // Allows users to customize the height of elements tree rows
 
+window.loadedCodelessLoveScripts ||= {};
 (function() {
-  // Mark this script as loaded to prevent duplicate injections
-  if (!window.loadedCodelessLoveScripts) {
-    window.loadedCodelessLoveScripts = {};
-  }
-  window.loadedCodelessLoveScripts["elements_tree_height"] = "loaded";
+  console.log("❤️"+"Elements Tree Height Feature");
+  let thisScriptKey = "elements_tree_height";
+  /* You can ignore all the stuff on this line, but don't delete! */ console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} /*Exit if already loaded*/ window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
 
   // Get the stored height value from chrome.storage
   chrome.storage.sync.get(["elements_tree_height_value"], function(result) {
