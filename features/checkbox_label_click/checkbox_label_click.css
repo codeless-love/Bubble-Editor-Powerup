@@ -1,0 +1,16 @@
+/* ❤️ */
+/* Checkbox Label Click Feature */
+
+/* Make field captions next to checkboxes have a pointer cursor to indicate they're clickable */
+❤️ codelesslove,
+.field-wrapper .field-caption,
+.permission-div .permission-caption {
+  cursor: pointer;
+}
+
+/* Add a subtle hover effect to indicate labels are clickable */
+❤️ codelesslove,
+.field-wrapper .field-caption:hover,
+.permission-div .permission-caption:hover {
+  text-decoration: underline;
+}
