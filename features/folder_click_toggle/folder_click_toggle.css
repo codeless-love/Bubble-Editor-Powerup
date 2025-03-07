@@ -1,0 +1,14 @@
+/* ❤️ */
+/* Folder Click Toggle Feature */
+
+/* Add a subtle hover effect to indicate folders are clickable */
+❤️ codelesslove,
+div[data-name="FolderItem"] {
+  cursor: pointer;
+}
+
+/* Ensure the caret still shows its pointer cursor */
+❤️ codelesslove,
+div[data-name="FolderItem"] [aria-label="Caret"] {
+  cursor: pointer;
+}

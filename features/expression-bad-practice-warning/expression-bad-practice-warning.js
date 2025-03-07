@@ -6,6 +6,22 @@ if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("
 window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
 console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
 
+// Store warning preferences
+let warningPrefs = {
+  countIsZero: true,
+  currentUserInBackend: true
+};
+
+// Load user preferences for specific warning types
+chrome.storage.sync.get([
+  'expression_bad_practice_warning_count_is_zero',
+  'expression_bad_practice_warning_current_user_in_backend'
+], (result) => {
+  warningPrefs.countIsZero = result.expression_bad_practice_warning_count_is_zero !== false; // Default to true if not set
+  warningPrefs.currentUserInBackend = result.expression_bad_practice_warning_current_user_in_backend !== false; // Default to true if not set
+  console.log("❤️"+"Warning preferences loaded:", warningPrefs);
+});
+
 let debounceTimeout;
 let isProcessing = false; // Flag to prevent redundant processing
 
@@ -66,41 +82,45 @@ function detectBadPractices() {
       const fourthItem = dynamicSpans[i + 3] ?? null;
       //console.log("❤️"+firstItem.textContent);
 
-      // BAD PRACTICE: :count is 0
-      const searchItem = firstItem;
-      const countItem = secondItem;
-      const comparisonItem = thirdItem;
-      const zeroItem = fourthItem;
-      const validOperators = ['is', 'is not', '>', '<', '≤', '≥'];
+      // BAD PRACTICE: :count is 0 - Only check if this warning is enabled
+      if (warningPrefs.countIsZero) {
+        const searchItem = firstItem;
+        const countItem = secondItem;
+        const comparisonItem = thirdItem;
+        const zeroItem = fourthItem;
+        const validOperators = ['is', 'is not', '>', '<', '≤', '≥'];
 
-      if (
-        searchItem?.textContent.match("Search for") &&
-        countItem?.textContent.trim() === ':count' &&
-        validOperators?.includes(comparisonItem.textContent.trim()) &&
-        zeroItem?.textContent.trim() === '0'
-      ) {
-        console.log("❤️"+'Bad practice detected: ":count is 0"');
-        addWarning(
-          [searchItem, countItem, comparisonItem, zeroItem],
-          zeroItem,
-          ":count is 0",
-          "https://codeless.love/practice?practice=determine-if-a-list-is-empty",
-          "Bad Practice"
-        );
+        if (
+          searchItem?.textContent.match("Search for") &&
+          countItem?.textContent.trim() === ':count' &&
+          validOperators?.includes(comparisonItem.textContent.trim()) &&
+          zeroItem?.textContent.trim() === '0'
+        ) {
+          console.log("❤️"+'Bad practice detected: ":count is 0"');
+          addWarning(
+            [searchItem, countItem, comparisonItem, zeroItem],
+            zeroItem,
+            ":count is 0",
+            "https://codeless.love/practice?practice=determine-if-a-list-is-empty",
+            "Bad Practice"
+          );
+        }
       }
 
-      //WARNING PRACTICE: Current User in BackendWorkflows
-      if (
-        firstItem.textContent.includes("Current User") &&
-        url.searchParams.get('tab') === 'BackendWorkflows'
-      ) {
-        console.log("❤️"+'Warning: "Current user in Backend workflows tab"');
-        addWarning([firstItem],
-          firstItem,
-          "Current User used in Backend",
-          null,
-          "Warning"
-        );
+      // WARNING PRACTICE: Current User in BackendWorkflows - Only check if this warning is enabled
+      if (warningPrefs.currentUserInBackend) {
+        if (
+          firstItem.textContent.includes("Current User") &&
+          url.searchParams.get('tab') === 'BackendWorkflows'
+        ) {
+          console.log("❤️"+'Warning: "Current user in Backend workflows tab"');
+          addWarning([firstItem],
+            firstItem,
+            "Current User used in Backend",
+            null,
+            "Warning"
+          );
+        }
       }
     }
   });

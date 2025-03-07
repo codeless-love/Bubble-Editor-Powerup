@@ -16,7 +16,8 @@
     "tabs"
   ],
   "host_permissions": [
-    "https://bubble.io/*"
+    "https://*.bubble.io/*",
+    "https://*.bubble.is/*"
   ],
   "background": {
     "service_worker": "background.js"
