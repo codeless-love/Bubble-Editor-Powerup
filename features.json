@@ -200,5 +200,14 @@
         }
       ]
     }
+  },
+  {
+    "key": "folder_click_toggle",
+    "category": "Workflow View",
+    "name": "Click Anywhere to Toggle Folders",
+    "description": "Allows clicking anywhere on a folder item to expand or collapse it, not just on the caret icon.",
+    "cssFile": "features/folder_click_toggle/folder_click_toggle.css",
+    "jsFile": "features/folder_click_toggle/folder_click_toggle.js",
+    "default": true
   }
 ]
