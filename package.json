@@ -1,0 +1,15 @@
+{
+  "name": "bubble-editor-powerup",
+  "version": "1.0.0",
+  "description": "This Chrome extension enhances your Bubble.io editor and improves the UI. It's free to use and maintained by the Bubble community! You can contribute by:",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^3.5.3"
+  }
+}

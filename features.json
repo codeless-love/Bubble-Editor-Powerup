@@ -42,6 +42,14 @@
     "default": true
   },
   {
+    "key": "style_drag_rearrange",
+    "category": "Style Tab",
+    "name": "Drag and Rearrange Style Variables",
+    "description": "Allows you to drag and rearrange style variables in the Style tab.",
+    "jsFile": "features/style-drag-rearrange/loader.js",
+    "default": true
+  },
+  {
     "key": "canvas_left_align_canvas",
     "category": "Design Canvas",
     "name": "Left Align the Design Canvas",
