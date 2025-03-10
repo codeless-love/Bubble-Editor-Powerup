@@ -5,12 +5,13 @@
 1. Duplicate this folder (/new_features_go_here) and the files inside it.
    IMPORTANT: Leave this example folder in place unaltered, so that future devs
    can use it!
-2. Add code to the CSS and JS files.
-3. Update features.json with a new object following the pattern in that style.
+2. Change the folder and file names to match your feature key name.
+3. Add code to the CSS and JS files.
+4. Update features.json with a new object following the pattern in that style.
    IMPORTANT: Duplicate the example object, don't replace it. Leave the example
    object in place for future devs.
-4. Delete this readme from your duplicated folder.
-5. Submit a Pull Request!
+5. Delete this readme from your duplicated folder.
+6. Submit a Pull Request!
 
 ## THINGS TO NOTE
 
