@@ -2,119 +2,318 @@
 <html>
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bubble Editor Powerup Options</title>
   <style>
     :root {
+      /* Color variables */
+      --primary-color: #4361ee;
+      --primary-hover: #3a56d4;
+      --secondary-color: #f8f9fa;
+      --text-color: #212529;
+      --text-secondary: #6c757d;
+      --border-color: #e9ecef;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+      --background-color: #ffffff;
+      --card-background: #ffffff;
+      --shadow-color: rgba(0, 0, 0, 0.08);
+      
+      /* Spacing variables */
       --close-button-width: 40px;
-      --base-padding: 10px;
+      --base-padding: 12px;
+      --border-radius: 8px;
+      --transition-speed: 0.2s;
     }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
       width: 450px;
       margin: 0;
       position: relative;
-      background-color: #fff;
+      background-color: var(--background-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      color: var(--text-color);
+      line-height: 1.5;
+      font-size: 14px;
     }
+    
     body.full-page {
-        margin: auto;
-        border: solid 1px #ccc;
-        border-radius: var(--base-padding);
-        var(--base-padding) var(--base-padding) calc(var(--base-padding)*3) -var(--base-padding) #000000DD;
-        margin-top: calc(var(--base-padding)*2);
+      margin: auto;
+      border: solid 1px var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: 0 10px 25px var(--shadow-color);
+      margin-top: calc(var(--base-padding) * 2);
     }
+    
     header {
       position: sticky;
       top: 0;
       padding: var(--base-padding);
-      background-color: #fff;
-      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for visibility */
+      background-color: var(--background-color);
+      box-shadow: 0 2px 10px var(--shadow-color);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 10;
     }
+    
     main {
       margin: var(--base-padding);
       padding: 0 var(--base-padding) var(--base-padding) var(--base-padding);
     }
+    
     footer {
       position: sticky;
       bottom: 0;
       padding: var(--base-padding);
-      background-color: #fff;
-      box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for visibility */
+      background-color: var(--background-color);
+      box-shadow: 0 -2px 10px var(--shadow-color);
+      border-top: 1px solid var(--border-color);
+      z-index: 10;
     }
+    
     h1 {
       margin: 0;
-      font-size: 2em;
+      font-size: 1.5em;
+      font-weight: 600;
     }
+    
+    h2 {
+      font-size: 1.2em;
+      margin-top: 1.5em;
+      margin-bottom: 0.75em;
+      padding-bottom: 0.5em;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--primary-color);
+    }
+    
     button {
-        padding: var(--base-padding) calc(var(--base-padding) * 2);
+      padding: var(--base-padding) calc(var(--base-padding) * 2);
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-speed) ease;
+      font-size: 14px;
     }
+    
+    button#save-button {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    button#save-button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .button-secondary {
+      background-color: var(--secondary-color);
+      color: var(--text-color);
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+    
+    .button-secondary:hover {
+      background-color: var(--border-color);
+    }
+    
     .row {
       display: flex;
       align-items: center;
       gap: var(--base-padding);
     }
+    
     .space-between {
       justify-content: space-between;
     }
+    
     .justify-center {
       justify-content: center;
     }
+    
     .fill-available {
       width: -webkit-fill-available;
+      width: -moz-available;
+      width: stretch;
     }
+    
     .space-for-close-button {
-       padding-right: calc(var(--close-button-width) + var(--base-padding) + var(--base-padding))
-     }
-    .logo {
-      height: 40px;
-      width: 40px;
+      padding-right: calc(var(--close-button-width) + var(--base-padding) + var(--base-padding))
     }
+    
+    .logo {
+      height: 36px;
+      width: 36px;
+      border-radius: 8px;
+    }
+    
     .button-close {
       position: absolute;
-      top: 0;
-      right: 0;
+      top: 8px;
+      right: 8px;
       background: none;
       border: none;
-      font-size: 2em;
-      padding: var(--base-padding);
+      font-size: 1.5em;
+      padding: 8px;
       margin: 0;
-      border-radius: var(--close-button-width);
+      border-radius: 50%;
       line-height: 0;
       width: var(--close-button-width);
       height: var(--close-button-width);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all var(--transition-speed) ease;
     }
+    
     .top-margin {
-      margin-top: calc(var(--base-padding)*2);
+      margin-top: calc(var(--base-padding) * 2);
     }
+    
     .button-close:hover {
-      background: #ccc;
+      background-color: var(--secondary-color);
+      color: var(--text-color);
     }
-    .button-secondary {
-      padding: calc(var(--base-padding) / 4) calc(var(--base-padding) / 2);
-    }
+    
     .column {
       display: flex;
       flex-direction: column;
       gap: var(--base-padding);
     }
+    
+    /* Feature styling */
+    .feature {
+      padding: 12px;
+      border-radius: var(--border-radius);
+      margin-bottom: 12px;
+      transition: all var(--transition-speed) ease;
+      border: 1px solid transparent;
+    }
+    
+    .feature:hover {
+      background-color: var(--secondary-color);
+      border-color: var(--border-color);
+    }
+    
     .feature label {
       display: flex;
       align-items: center;
+      font-weight: 500;
+      cursor: pointer;
     }
-    .feature input[disabled] + label {
-      color: #888;
+    
+    /* Custom checkbox styling */
+    .feature input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--text-secondary);
+      border-radius: 4px;
+      margin-right: 10px;
+      display: grid;
+      place-content: center;
+      transition: all var(--transition-speed) ease;
+    }
+    
+    .feature input[type="checkbox"]:checked {
+      border-color: var(--primary-color);
+      background-color: var(--primary-color);
+    }
+    
+    .feature input[type="checkbox"]::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      transform: scale(0);
+      transition: transform var(--transition-speed) ease;
+      box-shadow: inset 1em 1em white;
+      transform-origin: center;
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    }
+    
+    .feature input[type="checkbox"]:checked::before {
+      transform: scale(1);
+    }
+    
+    .feature input[disabled] {
+      border-color: var(--border-color);
+      background-color: var(--secondary-color);
+    }
+    
+    .feature input[disabled] + span {
+      color: var(--text-secondary);
       cursor: not-allowed;
     }
-    .feature p {
-      margin-left: 20px;
-      color: #888;
+    
+    .feature.disabled {
+      opacity: 0.7;
+      background-color: var(--secondary-color);
+      cursor: not-allowed;
     }
+    
+    .feature p {
+      margin: 8px 0 0 28px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+    
+    .sub-features {
+      margin-left: 28px;
+      padding-left: 12px;
+      border-left: 2px solid var(--border-color);
+      margin-bottom: 16px;
+    }
+    
+    .sub-feature {
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+    
     #status {
       display: none;
-      font-size: 1.2em;
-      color: green;
+      font-size: 14px;
+      color: var(--success-color);
       margin-bottom: 10px;
+      padding: 8px 12px;
+      background-color: rgba(16, 185, 129, 0.1);
+      border-radius: var(--border-radius);
+      border-left: 3px solid var(--success-color);
     }
+    
     #refreshSection {
       display: none;
+    }
+    
+    /* Feature input field styling */
+    .input-container {
+      margin-left: 28px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .input-label {
+      margin-right: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    .input-field {
+      width: 60px;
+      padding: 4px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    
+    .input-field:focus {
+      border-color: var(--primary-color);
+      outline: none;
     }
   </style>
   <script src="options.js" defer></script>
@@ -128,16 +327,16 @@
     <button class="button-close" id="close-button" aria-label="Close">&times;</button>
   </header>
   <main>
-    <p>Please select the features that you want to enable:</p>
-    <div id="features-list"></div>
+    <p>Select which features you want to enable:</p>
+    <div id="features-list" class="features-container"></div>
   </main>
   <footer>
     <div id="status"></div>
     <div class="row">
-      <button id="save-button">Save</button>
+      <button id="save-button">Save Changes</button>
       <div class="row justify-center fill-available" id="refreshSection">
         <button id="refresh-button" class="button-secondary">Reload this tab</button>
-        <button id="refresh-all-button" class="button-secondary">Reload all Bubble editor tabs</button>
+        <button id="refresh-all-button" class="button-secondary">Reload all editor tabs</button>
       </div>
     </div>
   </footer>
