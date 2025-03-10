@@ -14,7 +14,7 @@
 #mainwindow .action-editor [data-name=workflowList]>div {
   position: relative; /* give the heart indicator something to attach to */
 }
-❤️ codelesslove,
+❤️ codelesslove,❤️ codelesslove, /* Add heart indicator (this intentionally overlaps with the rule in folder_click_toggle) */
 #mainwindow .action-editor [data-name=workflowList] div[data-name=FolderItem]::after {
   content: "❤️";
   font-size: 3px;

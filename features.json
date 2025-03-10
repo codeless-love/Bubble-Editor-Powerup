@@ -12,7 +12,7 @@
     "key": "checkbox_label_click",
     "category": "Data View",
     "name": "Clickable Checkbox Labels",
-    "description": "Makes checkbox labels clickable, allowing you to toggle checkboxes by clicking on their labels instead of just the checkbox itself.",
+    "description": "In Privacy Rules, make checkbox labels clickable, allowing you to toggle checkboxes by clicking on their labels instead of just the checkbox itself.",
     "cssFile": "features/checkbox_label_click/checkbox_label_click.css",
     "jsFile": "features/checkbox_label_click/checkbox_label_click.js",
     "default": true

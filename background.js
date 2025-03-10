@@ -51,7 +51,7 @@ async function injectFeatures(tabId) {
 
     const defaults = Object.fromEntries(featuresConfig.map(f => [f.key, f.default])); // get defaults from the json
     const prefs = await chrome.storage.sync.get(defaults);// Load user preferences from chrome storage
-    
+
     if (Object.keys(prefs).length === 0) {
       await chrome.storage.sync.set(defaults);
     }
@@ -88,10 +88,10 @@ async function injectFeatures(tabId) {
                 target: { tabId },
                 files: [feature.jsFile],
               });
-              
+
               // Verify injection was successful
-              const verifyInjected = await isFeatureInjected(tabId, feature.key);
-              if (!verifyInjected) {
+              const featureIsInjected = await isFeatureInjected(tabId, feature.key);
+              if (!featureIsInjected) {
                 console.warn(`❤️ JS injection for ${feature.key} may not have been successful`);
               }
             } catch (scriptError) {
@@ -117,14 +117,14 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 
 // Listen for when a tab is updated (e.g., reloaded, navigated)
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  
+
   // Check if the tab has finished loading and is a Bubble editor page
   if (changeInfo.status === "complete" && tab.url &&
       (tab.url.includes("bubble.io") || tab.url.includes("bubble.is"))) {
-    
+
     // Check if this is a Bubble editor page - only allowing /page paths
     let isBubbleEditor = false;
-    
+
     try {
       const urlObj = new URL(tab.url);
       // Only permit exact /page paths
@@ -134,13 +134,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       const regex = /bubble\.(io|is)\/page($|\?)/;
       isBubbleEditor = regex.test(tab.url);
     }
-    
+
     if (isBubbleEditor) {
       // Clear any existing debounce timeout for the tabId
       if (debounceTimeouts[tabId]) {
         clearTimeout(debounceTimeouts[tabId]);
       }
-      
+
       // Set a new timeout to trigger the function after 1 second (debouncing)
       debounceTimeouts[tabId] = setTimeout(() => {
         injectFeatures(tabId); // Inject features into the tab
@@ -148,4 +148,3 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
   }
 });
-

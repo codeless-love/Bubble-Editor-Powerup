@@ -1,16 +1,25 @@
 /* ❤️ */
 /* Checkbox Label Click Feature */
 
-/* Make field captions next to checkboxes have a pointer cursor to indicate they're clickable */
-❤️ codelesslove,
+❤️ codelesslove,/* Make field captions next to checkboxes have a pointer cursor to indicate they're clickable */
 .field-wrapper .field-caption,
 .permission-div .permission-caption {
   cursor: pointer;
 }
 
-/* Add a subtle hover effect to indicate labels are clickable */
-❤️ codelesslove,
+❤️ codelesslove,/* Add a subtle hover effect to indicate labels are clickable */
 .field-wrapper .field-caption:hover,
 .permission-div .permission-caption:hover {
   text-decoration: underline;
+  position: relative;/* give heart indicator something to position relative to */
+}
+
+❤️ codelesslove,/* Heart Indicator */
+.field-wrapper .field-caption:hover::after,
+.permission-div .permission-caption:hover::after {
+  content: "❤️";
+  font-size: 4px;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
