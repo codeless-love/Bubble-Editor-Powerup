@@ -9,12 +9,37 @@
     "default": false
   },
   {
+    "key": "checkbox_label_click",
+    "category": "Data View",
+    "name": "Clickable Checkbox Labels",
+    "description": "In Privacy Rules, make checkbox labels clickable, allowing you to toggle checkboxes by clicking on their labels instead of just the checkbox itself.",
+    "cssFile": "features/checkbox_label_click/checkbox_label_click.css",
+    "jsFile": "features/checkbox_label_click/checkbox_label_click.js",
+    "default": true
+  },
+  {
     "key": "expression_bad_practice_warning",
     "category": "Expressions",
     "name": "Bad Practice Warning",
     "description": "Highlights bad practices in expressions and provides a link to documentation explaining best practices.",
     "cssFile": "features/expression-bad-practice-warning/expression-bad-practice-warning.css",
     "jsFile": "features/expression-bad-practice-warning/expression-bad-practice-warning.js",
+    "default": true
+  },
+  {
+    "key": "expression_bad_practice_warning_count_is_zero",
+    "category": "Expressions",
+    "name": "Warn about ':count is 0' pattern",
+    "description": "Highlights when the ':count is 0' pattern is used instead of the more efficient 'is empty' check.",
+    "requires": "expression_bad_practice_warning",
+    "default": true
+  },
+  {
+    "key": "expression_bad_practice_warning_current_user_in_backend",
+    "category": "Expressions",
+    "name": "Warn about 'Current User' in backend workflows",
+    "description": "Highlights when 'Current User' is used in backend workflows, which can cause issues.",
+    "requires": "expression_bad_practice_warning",
     "default": true
   },
   {
@@ -170,6 +195,36 @@
     "name": "Color indicators when copying database",
     "description": "When copying the database, make the button and description different colors depending on which direction data is moving. Red for to live, green for to dev. The green color, importantly, prevents accidents if the plugin is unexpectedly turned off without realizing.",
     "cssFile": "features/data_copy_to_live_warning/style.css",
+    "default": true
+  },
+  {
+    "key": "elements_tree_height",
+    "category": "Design Canvas",
+    "name": "Elements Tree Row Height",
+    "description": "Customize the height of elements tree rows in the Bubble editor. Default is 32px, but you can set a custom height in pixels.",
+    "cssFile": "features/elements_tree_height/elements_tree_height.css",
+    "jsFile": "features/elements_tree_height/elements_tree_height.js",
+    "default": false,
+    "config": {
+      "inputs": [
+        {
+          "type": "number",
+          "key": "elements_tree_height_value",
+          "label": "Row height (px)",
+          "default": 32,
+          "min": 20,
+          "max": 100
+        }
+      ]
+    }
+  },
+  {
+    "key": "folder_click_toggle",
+    "category": "Workflow View",
+    "name": "Click Anywhere to Toggle Folders",
+    "description": "Allows clicking anywhere on a folder item to expand or collapse it, not just on the caret icon.",
+    "cssFile": "features/folder_click_toggle/folder_click_toggle.css",
+    "jsFile": "features/folder_click_toggle/folder_click_toggle.js",
     "default": true
   }
 ]

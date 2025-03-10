@@ -1,0 +1,27 @@
+/* ❤️ */
+/* Folder Click Toggle Feature */
+
+❤️ codelesslove,/* Add a subtle hover effect to indicate folders are clickable */
+div[data-name="FolderItem"] {
+  cursor: pointer;
+}
+
+❤️ codelesslove,/* Ensure the caret still shows its pointer cursor */
+div[data-name="FolderItem"] [aria-label="Caret"] {
+  cursor: pointer;
+}
+
+/* Heart Indicator */
+❤️ codelesslove,
+#mainwindow .action-editor [data-name=workflowList] > div {
+  position: relative; /* give the heart indicator something to attach to */
+}
+❤️ codelesslove,/* This intentionally overlaps with the rule in workflow-editor-folder-pop) */
+#mainwindow .action-editor [data-name=workflowList] > div > div[data-name="FolderItem"]::after {
+    content: "❤️";
+    font-size: 3px;
+    position: absolute;
+    top: unset;
+    right: 3px;
+    opacity: 0.8;
+}
