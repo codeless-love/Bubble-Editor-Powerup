@@ -51,6 +51,14 @@
     "default": true
   },
   {
+    "key": "style_drag_rearrange",
+    "category": "Style Tab",
+    "name": "Drag to rearrange colors and fonts",
+    "description": "Reorder your colors and fonts by dragging and dropping them",
+    "jsFile": "features/style-drag-rearrange/style-drag-rearrange.js",
+    "default": false
+  },
+  {
     "key": "top_menu_layout",
     "category": "Top Menubar",
     "name": "Maximize App Information Manager dropdown in top menubar",

@@ -148,3 +148,31 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
   }
 });
+
+// Listens to a message so that it loads the AppQueryScript for drag-rearrange colors
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "injectAppQueryScript") {
+    chrome.scripting
+      .executeScript({
+        target: { tabId: sender.tab.id },
+        files: ["features/style-drag-rearrange/appquery-scripts.js"],
+        world: "MAIN",
+      })
+      .then(() => {
+        console.log("Injected appquery script");
+        sendResponse({
+          success: true,
+          message: "Script injected successfully.",
+        });
+      })
+      .catch((err) => {
+        sendResponse({
+          success: false,
+          message: "Failed to inject script",
+          error: err.message,
+        });
+        console.error("Error injecting script:", err);
+      });
+    return true;
+  }
+});
