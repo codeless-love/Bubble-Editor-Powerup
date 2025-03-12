@@ -1,10 +1,18 @@
-window.loadedCodelessLoveScripts ||= {};
-(function() { console.log("❤️"+"Bad Practice Warning");
-let thisScriptKey = "expression_bad_practice_warning";
-console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
-if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} // Exit if the script has already been loaded
-window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
-console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
+/* */ window.loadedCodelessLoveScripts ||= {};(function() {
+
+
+
+const featureKey = "expression_bad_practice_warning";// Replace this with your feature's  key (same as what's in features.json)
+console.log("❤️"+"Bad Practice Warning");
+
+
+/* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
+/* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
+/* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+/* */     if (message.action === "loadScript") {
+/* */       console.log("❤️ Loaded feature ", message.featureKey);
+
+
 
 // Store warning preferences
 let warningPrefs = {
@@ -125,6 +133,7 @@ function detectBadPractices() {
     }
   });
   isProcessing = false; // Reset flag after processing
+  sendResponse({ success: true });
 }
 
 // Initial detection on page load
@@ -223,4 +232,7 @@ Element.prototype.closestAll = function(selector) {
   }
   return ancestors;
 };
-})();
+/* */       return true;  // Asynchronous response
+/* */     }
+/* */   });
+/* */ })();
