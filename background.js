@@ -110,3 +110,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     debounceTimeouts[tabId] = setTimeout(() => injectFeatures(tabId), 1000);
   }
 });
+
+// Clean up when tab is closed
+chrome.tabs.onRemoved.addListener((tabId) => {
+  clearTimeout(debounceTimeouts[tabId]); // Clear pending injections
+  delete debounceTimeouts[tabId];        // Clean up timeout reference
+  injectionInProgress.delete(tabId);     // Remove injection tracking
+});
