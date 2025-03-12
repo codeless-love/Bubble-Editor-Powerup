@@ -1,16 +1,25 @@
-window.loadedCodelessLoveScripts ||= {};
-(function() {
-  console.log("❤️"+"Name of feature goes here");
-  let thisScriptKey = "feature_key_goes_here";
-  /* You can ignore all the stuff on this line, but don't delete! */ console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} /*Exit if already loaded*/ window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
+/* */ window.loadedCodelessLoveScripts ||= {};
+/* */(function() {
 
-  /* ------------------------------------------------------------------- */
-  // INSTRUCTIONS
-  //
-  // 1. If your feature is CSS only, delete this file.
-  // 2. Replace the example text with the name of your feature on line 3 of this file.
-  // 3. Replace the example key with your feature's script (snake_case preferred) on line 4 of this file.
-  // 4. Insert any Javascript here. Don't put anything after the })(); at the end.
-  /* ------------------------------------------------------------------- */
+const featureKey = "feature_key_goes_here";// Replace this with your feature's  key (same as what's in features.json)
+console.log("❤️"+"Example Feature Name");// Replace this with your feature's name
 
-})();//👈👈 don't delete this, and don't put anything outside of this!!
+/* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
+/* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
+/* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+/* */     if (message.action === "loadScript") {
+/* */       console.log("❤️ Loaded feature ", message.featureKey);
+
+
+
+// Put your feature's JavaScript here
+
+
+// after your script is 100% done executing, run this:
+sendResponse({ success: true });
+
+
+/* */       return true;  // Asynchronous response
+/* */     }
+/* */   });
+/* */ })();

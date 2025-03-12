@@ -1,10 +1,14 @@
-window.loadedCodelessLoveScripts ||= {};
-(function() { console.log("❤️"+"Sidebar Link");
-let thisScriptKey = "sidebar_link_api_connector";
-console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
-if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} // Exit if the script has already been loaded
-window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
-console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
+/* */ window.loadedCodelessLoveScripts ||= {};
+/* */(function() {
+
+const featureKey = "sidebar_link_api_connector";// Replace this with your feature's  key (same as what's in features.json)
+console.log("❤️"+"Sidebar Link");// Replace this with your feature's name
+
+/* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
+/* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
+/* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+/* */     if (message.action === "loadScript") {
+/* */       console.log("❤️ Loaded feature ", message.featureKey);
 
 function waitForElement(selector, callback, timeout = 5000) {
   const startTime = Date.now();
@@ -201,5 +205,12 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
     // Add listeners for all menu buttons
     addMenuButtonListeners();
   });
+
+  // After all tasks are done, send the response
+  sendResponse({ success: true });
 });
-})();
+
+/* */       return true;  // Asynchronous response
+/* */     }
+/* */   });
+/* */ })();
