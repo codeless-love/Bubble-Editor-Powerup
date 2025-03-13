@@ -7,7 +7,7 @@ console.log("❤️"+"Elements Tree Height Feature");// Replace this with your f
 /* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
 /* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
 /* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-/* */     if (message.action === "loadScript") {
+/* */     if (message.action === "runScript") {
 /* */       console.log("❤️ Loaded feature ", message.featureKey);
 
 // Get the stored height value from chrome.storage

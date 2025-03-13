@@ -1,42 +1,32 @@
-window.loadedCodelessLoveScripts ||= {};
+/* */ window.loadedCodelessLoveScripts ||= {};
+/* */(function() {
 
-(function () {
-  let thisScriptKey = "style_drag_rearrange";
-  /* You can ignore all the stuff on this line, but don't delete! */
-  // console.log("❤️" + window.loadedCodelessLoveScripts[thisScriptKey]);
-  if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {
-    console.warn(
-      "❤️" +
-        thisScriptKey +
-        " tried to load, but it's value is already " +
-        window.loadedCodelessLoveScripts[thisScriptKey]
-    );
-    return;
-  }
+const featureKey = "style_drag_rearrange";// Replace this with your feature's  key (same as what's in features.json)
+console.log("❤️"+"Drag Styles to Rearrange");// Replace this with your feature's name
 
-  /* ------------------------------------------------------------------- */
-  // INSTRUCTIONS
-  //
-  // 1. If your feature is CSS only, delete this file.
-  // 2. Replace the example text with the name of your feature on line 3 of this file.
-  // 3. Replace the example key with your feature's script (snake_case preferred) on line 4 of this file.
-  // 4. Insert any Javascript here. Don't put anything after the })(); at the end.
-  /* ------------------------------------------------------------------- */
+/* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
+/* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
+/* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+/* */     if (message.action === "runScript") {
+/* */       console.log("❤️ Loaded feature ", message.featureKey);
 
-  chrome.runtime.sendMessage({ action: "injectAppQueryScript" }, (response) => {
-    if (response && response.success) {
-      window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
-      console.log("❤️" + "Drag to rearrange colors and fonts loaded");
-    } else {
-      console.error(
-        "❌ Script injection failed:",
-        response?.message || "No response received"
-      );
-    }
-  });
 
-  // Mark this script as loaded
 
-  /*Exit if already loaded*/
-  // window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
-})(); //👈👈 don't delete this, and don't put anything outside of this!!
+// Put your feature's JavaScript here. Scripts run here are in an isolated world separate from the main world of the tab.
+
+
+//if you need to inject a script into the "main world" (the actual tab context), do it like this:
+chrome.runtime.sendMessage({
+    action: "injectScriptIntoMainWorld",
+    jsFile: "features/style-drag-rearrange/style-drag-rearrange.js"
+});
+
+
+// after your script is 100% done executing, run this: (it might need to get moved into a function)
+sendResponse({ success: true });
+
+
+/* */       return true;  // Asynchronous response
+/* */     }
+/* */   });
+/* */ })();

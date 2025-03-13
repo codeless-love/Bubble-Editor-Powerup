@@ -5,7 +5,7 @@ console.log("❤️"+"Checkbox Label Click");// Replace this with your feature's
 /* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
 /* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
 /* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-/* */     if (message.action === "loadScript") {
+/* */     if (message.action === "runScript") {
 /* */       console.log("❤️ Loaded feature ", message.featureKey);
 
 // Function to add click handlers to checkbox labels

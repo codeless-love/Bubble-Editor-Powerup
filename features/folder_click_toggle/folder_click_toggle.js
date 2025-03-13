@@ -7,7 +7,7 @@ console.log("❤️"+"Folder Click Toggle");// Replace this with your feature's 
 /* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
 /* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
 /* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-/* */     if (message.action === "loadScript") {
+/* */     if (message.action === "runScript") {
 /* */       console.log("❤️ Loaded feature ", message.featureKey);
 
 // Function to add click handlers to folder items
@@ -59,7 +59,7 @@ observer.observe(document.body, {
   subtree: true
 });
 
-sendResponse({ success: true }); 
+sendResponse({ success: true });
 
 /* */       return true;  // Asynchronous response
 /* */     }

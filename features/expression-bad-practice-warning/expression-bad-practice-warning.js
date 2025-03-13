@@ -9,7 +9,7 @@ console.log("❤️"+"Bad Practice Warning");
 /* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
 /* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
 /* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-/* */     if (message.action === "loadScript") {
+/* */     if (message.action === "runScript") {
 /* */       console.log("❤️ Loaded feature ", message.featureKey);
 
 

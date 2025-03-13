@@ -7,7 +7,7 @@ console.log("❤️"+"Discorage editing in Main");// Replace this with your feat
 /* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
 /* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
 /* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-/* */     if (message.action === "loadScript") {
+/* */     if (message.action === "runScript") {
 /* */       console.log("❤️ Loaded feature ", message.featureKey);
 
 // Utility to extract query parameters from the URL
