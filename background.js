@@ -149,7 +149,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Clean up when tab is closed
 chrome.tabs.onRemoved.addListener((tabId) => {
-  clearTimeout(debounceTimeouts[tabId]); // Clear pending injections
-  delete debounceTimeouts[tabId];        // Clean up timeout reference
-  injectionInProgress.delete(tabId);     // Remove injection tracking
+  // Clear any pending timeouts
+  if (debounceTimeouts[tabId]) {
+    clearTimeout(debounceTimeouts[tabId]);
+    delete debounceTimeouts[tabId];
+  }
+  
+  // Clear injection progress flag
+  injectionInProgress.delete(tabId);
+  
+  // Notify content scripts to clean up
+  try {
+    chrome.tabs.sendMessage(tabId, { action: "cleanup" });
+  } catch (e) {
+    // Tab might be already closed, ignore errors
+  }
 });
