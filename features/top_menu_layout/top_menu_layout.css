@@ -1,16 +1,15 @@
 /* ❤️ */
-/* Top Menu Layout Improvementes */
+/* Top Menu Layout Improvements */
 
-❤️ codelesslove,/* Change layout strategy for top menubar */
+❤️ codelesslove top-menu-layout,/* Change layout strategy for top menubar */
 .menu-bar .menubar-style {
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto auto !important;
 }
 ❤️ codelesslove,/* Make the "trigger button" aka unopened AIM dropdown take up the max width */
 .menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u,
-.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child,
-.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child > div,
-.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child > div > div:not(.app-interface-manager-side-panel), /* When AIM is unexpanded, this is just a parent to .trigger-button. But when AIM expands, this becomes .app-interface-manager-side-panel */
-.menu-bar .menubar-style > ._1ql74v3h > ._1ql74v3u > div:first-child .trigger-button {
+#app-interface-manager-button,
+#app-interface-manager-button .menubar-page-search-input-container,
+#app-interface-manager-button .trigger-button {
   width: 100%;
   max-width: 100%;
 }
@@ -22,6 +21,12 @@
 .trigger-button {/* This is the unopened AIM dropdown */
   margin-right: 10px;
 }
+❤️ codelesslove,/* Don't truncate the page's or RU's name with ellipses */
+.menubar-style .element-label-wrapper.label-ellipsis {
+  max-width: 100% !important;
+}
+
+
 ❤️ codelesslove, /* ❤️ Heart Indicator */
 .trigger-button:after {
   content: "❤️";
