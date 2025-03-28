@@ -37,3 +37,29 @@ Bubble editor when they enable/disable a feature.
 Every CSS rule should start with the selector `❤️ codelesslove,`. This does
 nothing functionally, but helps with debugging as a searchable, filterable
 identifier to allow devs to easily see which CSS rules are from the extension.
+
+## UNDERSTANDING THE FEATURE SCRIPT ISOLATED CONTEXT
+
+Scripts from an extension run in what's called an "isolated world." The
+page/tab's context is called the "main world." In this isolated world:
+
+ * You can't access JavaScript variables in the main world, nor can the main
+   world reach vars from the isolated world.
+
+When the service worker (background.js) loads scripts, (called "content
+scripts") each content script runs in its own isolated world, which means:
+
+ * Content scripts can't access variables from other content scripts.
+
+However, all of these isolated scripts CAN:
+
+ * See and manipulate the page DOM
+ * Log to the page console
+ * Access long list of additional APIs like window.location, MutationObserver,
+   localStorage, sessionStorage, etc.
+
+There are rare situations where a feature may need to have access to the main
+world. In this case, a script can be injected via message passing. This is done
+by passing a message with the action name "injectScriptIntoMainWorld" from the
+content script to the background script. The background script can then inject
+the script into the main world where it can interact with the page's JS.
