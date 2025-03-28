@@ -8,18 +8,22 @@ console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
 // Store warning preferences
 let warningPrefs = {
   countIsZero: true,
-  currentUserInBackend: true
+  currentUserInBackend: true,
+  publicAPIChecked: true,
 };
 
 // Load user preferences for specific warning types
 chrome.storage.sync.get([
   'expression_bad_practice_warning_count_is_zero',
-  'expression_bad_practice_warning_current_user_in_backend'
+  'expression_bad_practice_warning_current_user_in_backend',
+  'expression_bad_practice_warning_public_api_checked'
 ], (result) => {
   warningPrefs.countIsZero = result.expression_bad_practice_warning_count_is_zero !== false; // Default to true if not set
   warningPrefs.currentUserInBackend = result.expression_bad_practice_warning_current_user_in_backend !== false; // Default to true if not set
+  warningPrefs.publicAPIChecked = result.expression_bad_practice_warning_public_api_checked !== false; // Default to true if not set
   console.log("❤️"+"Warning preferences loaded:", warningPrefs);
 });
+console.log(">2>"+warningPrefs.publicAPIChecked);
 
 let debounceTimeout;
 let isProcessing = false; // Flag to prevent redundant processing
@@ -124,8 +128,32 @@ function detectBadPractices() {
     }
   });
   isProcessing = false; // Reset flag after processing
-}
 
+
+  console.log(">3>"+warningPrefs.publicAPIChecked);
+
+
+  // WARNING PRACTICE: Public API Checkbox - Only check if this warning is enabled
+  if (warningPrefs.publicAPIChecked) {
+    // Find the expose checkbox contItainer
+    const exposeElement = document.querySelector("[prop_name=expose]");
+    if (exposeElement) {
+      const isChecked = exposeElement.querySelector('.component-checkbox.property-editor-control.checked');
+      
+      if (isChecked) {
+        console.log("❤️"+'Warning: "Public API workflow is checked"');
+        addWarning(
+          [exposeElement],
+          exposeElement,
+          "Public API is checked",
+          null,
+          "Warning"
+        );
+      }
+    }
+  }
+}
+console.log(">1>"+warningPrefs.publicAPIChecked);
 // Initial detection on page load
 detectBadPractices();
 

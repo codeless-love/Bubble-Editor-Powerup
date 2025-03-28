@@ -72,3 +72,39 @@
     font-size: 6px;
     line-height: 1;
 }
+
+
+/* Special CSS for checkboxes in Property Editors */
+❤️ codelesslove,/* Look specifically for the warning on the Public API checkbox */
+.property-editor-2 .viewport [prop_name=expose].❤️expression-warning {
+  /* Correct the box so when the border is added the checkbox doesn't move */
+  margin: -5px;
+  padding: 5px;
+  padding-top: 0;
+  margin-top: 10px;
+  width: -webkit-fill-available;
+
+  &:has(.body .component-checkbox.property-editor-control.checked) {
+    /* make the checkbox yellow */
+    .checked {
+      border: solid 2px yellow;
+    }
+  }
+
+  /* Prevent the checkbox wrapping onto another line */
+    .caption.Checkbox {
+    width: auto;
+  }
+  
+  /* Undo styling when warning is no longer applicable */
+  &:not(:has(.body .component-checkbox.property-editor-control.checked)) {
+    border: none;
+
+    &::before {
+      content: none;
+    }
+    .❤️expression-warning-tag {
+      display: none;
+    }
+  }
+}
