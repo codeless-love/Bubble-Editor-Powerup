@@ -229,9 +229,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   }
   
   // Notify content scripts to clean up
-  try {
-    chrome.tabs.sendMessage(tabId, { action: "cleanup" });
-  } catch (e) {
-    // Tab might be already closed, ignore errors
-  }
+  chrome.tabs.sendMessage(tabId, { action: "cleanup" }).catch(() => {
+    // Ignore errors - tab is likely already closed
+  });
 });
