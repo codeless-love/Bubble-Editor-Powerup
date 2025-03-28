@@ -52,8 +52,17 @@ async function injectFeatures(tabId) {
     const defaults = Object.fromEntries(featuresConfig.map(f => [f.key, f.default])); // get defaults from the json
     const prefs = await chrome.storage.sync.get(defaults);// Load user preferences from chrome storage
 
-    if (Object.keys(prefs).length === 0) {
-      await chrome.storage.sync.set(defaults);
+    // Check for any missing keys and set their defaults
+    const missingDefaults = {};
+    for (const [key, defaultValue] of Object.entries(defaults)) {
+      if (!(key in prefs)) {
+        missingDefaults[key] = defaultValue;
+      }
+    }
+    
+    if (Object.keys(missingDefaults).length > 0) {
+      await chrome.storage.sync.set(missingDefaults);
+      Object.assign(prefs, missingDefaults);
     }
 
     // reinitialize
