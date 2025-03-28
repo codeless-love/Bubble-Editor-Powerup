@@ -148,3 +148,90 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
   }
 });
+
+/* Facilitate feature's injecting their own scripts into the main world */
+
+/* Listen to feature scripts for a command to inject code into the page */
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "injectScriptIntoMainWorld") {
+    // First check if the tab is ready
+    chrome.tabs.get(sender.tab.id, (tab) => {
+      if (chrome.runtime.lastError || !tab.status || tab.status !== "complete") {
+        console.warn("❤️ Tab not ready for script injection, waiting for load");
+        // Wait for tab to be ready
+        chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
+          if (updatedTabId === sender.tab.id && changeInfo.status === "complete") {
+            chrome.tabs.onUpdated.removeListener(listener);
+            injectScriptIntoMainWorld(sender.tab.id, message.jsFile)
+              .then(result => sendResponse(result))
+              .catch(error => sendResponse({ error: error.message }));
+          }
+        });
+      } else {
+        // Tab is ready, inject immediately
+        injectScriptIntoMainWorld(sender.tab.id, message.jsFile)
+          .then(result => sendResponse(result))
+          .catch(error => sendResponse({ error: error.message }));
+      }
+    });
+    return true; // Keep message channel open for async response
+  }
+});
+
+// Injects a script directly into the tab's context (the "main world")
+function injectScriptIntoMainWorld(tabId, url) {
+  console.log("❤️ Injecting the script " + url);
+  const fullScriptUrl = chrome.runtime.getURL(url);
+  
+  // First fetch the script content
+  return fetch(fullScriptUrl)
+    .then(response => response.text())
+    .then(scriptContent => {
+      // Then execute it in the page context
+      return chrome.scripting.executeScript({
+        target: { tabId },
+        world: "MAIN", // Explicitly specify main world
+        func: (code) => {
+          // Create a blob URL from the code
+          const blob = new Blob([code], { type: 'text/javascript' });
+          const scriptUrl = URL.createObjectURL(blob);
+          
+          const script = document.createElement('script');
+          script.src = scriptUrl;  // Use blob URL instead of inline script
+          script.type = 'text/javascript';
+          script.className = '❤️injected-script';
+          
+          // Clean up the blob URL after the script loads
+          script.onload = () => URL.revokeObjectURL(scriptUrl);
+          
+          document.documentElement.appendChild(script);
+          return 'injected successfully';
+        },
+        args: [scriptContent]  // Pass the actual script content
+      });
+    })
+    .then(([result]) => {
+      console.log(`❤️ Script ${url} injection result:`, result.result);
+      return result.result;
+    })
+    .catch((error) => {
+      console.error("❤️ Error injecting script:", error);
+      throw error;
+    });
+}
+
+// Clean up when tab is closed
+chrome.tabs.onRemoved.addListener((tabId) => {
+  // Clear any pending timeouts
+  if (debounceTimeouts[tabId]) {
+    clearTimeout(debounceTimeouts[tabId]);
+    delete debounceTimeouts[tabId];
+  }
+  
+  // Notify content scripts to clean up
+  try {
+    chrome.tabs.sendMessage(tabId, { action: "cleanup" });
+  } catch (e) {
+    // Tab might be already closed, ignore errors
+  }
+});

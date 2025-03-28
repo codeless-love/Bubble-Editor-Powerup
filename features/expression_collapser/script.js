@@ -1,7 +1,6 @@
 window.loadedCodelessLoveScripts ||= {};
 (function() { console.log("❤️"+"Expression Collapser");
 let thisScriptKey = "expression_collapser";
-console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
 if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} // Exit if the script has already been loaded
 window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
 console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
