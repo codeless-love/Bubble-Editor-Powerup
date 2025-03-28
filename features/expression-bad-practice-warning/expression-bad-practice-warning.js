@@ -10,18 +10,21 @@ let warningPrefs = {
   countIsZero: true,
   currentUserInBackend: true,
   publicAPIChecked: true,
+  zeroWidth: true,
 };
 
   // Load preferences first, then initialize
   chrome.storage.sync.get([
     'expression_bad_practice_warning_count_is_zero',
     'expression_bad_practice_warning_current_user_in_backend',
-    'expression_bad_practice_warning_public_api_checked'
+    'expression_bad_practice_warning_public_api_checked',
+    'expression_bad_practice_warning_zero_width',
   ], (result) => {
     warningPrefs.countIsZero = result.expression_bad_practice_warning_count_is_zero === true;
     warningPrefs.currentUserInBackend = result.expression_bad_practice_warning_current_user_in_backend === true;
     warningPrefs.publicAPIChecked = result.expression_bad_practice_warning_public_api_checked === true;
-    
+    warningPrefs.zeroWidth = result.expression_bad_practice_warning_zero_width === true;
+
     // Only initialize after preferences are loaded
     initializeDetection();
   });
@@ -68,6 +71,23 @@ let warningPrefs = {
       }
       warningTagNode.appendChild(warningDiv);
     }
+  }
+
+  // Remove warning classes and tags from nodes
+  function removeWarning(nodes, warningTagNode) {
+    if (!Array.isArray(nodes) || nodes.length === 0) return;
+
+    // Remove classes from all nodes
+    nodes.forEach(node => {
+      if (!node) return;
+      node.classList.remove('❤️expression-warning');
+      node.classList.remove('❤️expression-warning-left');
+      node.classList.remove('❤️expression-warning-right');
+    });
+
+    // Remove warning tag
+    const warningTag = warningTagNode.querySelector('.❤️expression-warning-tag');
+    warningTag?.remove();
   }
 
   // Function to detect bad practices
@@ -148,6 +168,42 @@ let warningPrefs = {
             [exposeElement],
             exposeElement,
             "Public API is checked",
+            null,
+            "Warning"
+          );
+        }
+      }
+    }
+
+    // WARNING: Width set to zero
+    if (warningPrefs.zeroWidth) {
+      const widthElement = document.querySelector("[prop_name=max_width_css]");
+      if (widthElement) {
+        const input = widthElement.querySelector('input.composer-input.number-input');
+        
+        // Add input event listener for immediate response
+        input?.addEventListener('input', () => {
+          const isZero = input.value === "0";
+          if (isZero) {
+            addWarning(
+              [widthElement],
+              widthElement,
+              "Width is set to 0",
+              null,
+              "Warning"
+            );
+          } else {
+            removeWarning([widthElement], widthElement);
+          }
+        });
+
+        // Initial check
+        const isZero = input?.value === "0";
+        if (isZero) {
+          addWarning(
+            [widthElement],
+            widthElement,
+            "Width is set to 0",
             null,
             "Warning"
           );
