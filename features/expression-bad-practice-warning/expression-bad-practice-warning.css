@@ -1,5 +1,5 @@
-/* Expression Bad Practice Warning */
-❤️ codelesslove,/* yellow outline on bad practices in expressions */
+/* Expression Warning Base Styles (default to yellow) */
+❤️ codelesslove,
 .❤️expression-warning {
   border-top: dashed 1px yellow;
   border-bottom: dashed 1px yellow;
@@ -21,10 +21,33 @@
   border-radius: 5px 5px 5px 5px;
 }
 
+/* Warning Level Colors */
+❤️ codelesslove,
+.❤️expression-warning.level-bad,
+.❤️expression-warning-left.level-bad,
+.❤️expression-warning-right.level-bad,
+.❤️expression-warning-left.❤️expression-warning-right.level-bad {
+  border-color: #ff4444;
+}
+
+❤️ codelesslove,
+.❤️expression-warning.level-info,
+.❤️expression-warning-left.level-info,
+.❤️expression-warning-right.level-info,
+.❤️expression-warning-left.❤️expression-warning-right.level-info {
+  border-color: #3498db;
+}
+
 /* make borders and tag slightly transparent when other sub-expressions are focused, to match styles everywhere else */
 ❤️ codelesslove,
 .composer.hover_fade_out:hover .❤️expression-warning {
   border-color: rgba(256, 256, 0, 0.3);
+  &.level-info {
+    border-color: rgba(52, 152, 219, 0.3);
+  }
+  &.level-bad {
+    border-color: rgba(255, 68, 68, 0.3);
+  }
 }
 ❤️ codelesslove,
 .composer.hover_fade_out:hover .❤️expression-warning-tag {
@@ -33,16 +56,23 @@
 ❤️ codelesslove,
 .composer.hover_fade_out:hover .hovering .❤️expression-warning {
   border-color: rgba(256, 256, 0);
+  &.level-info {
+    border-color: rgba(52, 152, 219, 1);
+  }
+  &.level-bad {
+    border-color: rgba(255, 68, 68, 1);
+  }
 }
 ❤️ codelesslove,
 .composer.hover_fade_out:hover .hovering .❤️expression-warning-tag {
   opacity: .7;
 }
 
-❤️ codelesslove,/* Text "bad practice" with a link to the practice */
+/* Warning Tags */
+❤️ codelesslove,/* Base tag */
 .❤️expression-warning-tag {
     top: -6px;
-    content: "Bad Practice";
+    content: "Warning";
     position: absolute;
     background: yellow;
     width: max-content;
@@ -55,14 +85,29 @@
     line-height: 10px;
     padding: 0 4px;
     opacity: .7;
+
+    &.level-bad {
+      content: "Bad Practice";
+      background: #ff4444;
+      color: white;
+    }
+    &.level-info {
+      content: "Info";
+      background: #3498db;
+      color: white;
+    }
 }
-❤️ codelesslove,
+
+❤️ codelesslove,/* On hover, bring opacity back up*/
 .❤️expression-warning-tag:hover,
 .composer.hover_fade_out:hover .hovering .❤️expression-warning-tag:hover {
   opacity: 1 !important;
 }
+
+/* Heart indicators */
 ❤️ codelesslove,/* put a heart indicator in the top-left corner of the outlined expression fragment */
-.❤️expression-warning-left::before {
+.❤️expression-warning-left {
+  &::before {
     content: "💛";
     top: -2px;
     position: absolute;
@@ -71,6 +116,16 @@
     left: -3px;
     font-size: 6px;
     line-height: 1;
+  }
+
+  &.level-bad::before {
+      content: "❤️";
+      color: #ff4444;
+  }
+
+  &.level-info::before {
+      content: "💙";
+  }
 }
 
 

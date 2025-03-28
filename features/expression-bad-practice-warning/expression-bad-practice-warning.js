@@ -38,15 +38,15 @@ let warningPrefs = {
   let isProcessing = false; // Flag to prevent redundant processing
 
   // Outline and add a warning to detected bad practices
-  function addWarning(nodes, warningTagNode, practiceName, practiceURL, warningText) {
+  function addWarning(nodes, warningTagNode, practiceName, practiceURL, warningText = 'Warning', level = 'warning') {
     if (!Array.isArray(nodes) || nodes.length === 0) return;
 
     // Iterate through the list of nodes to add dashed outline classes
     nodes.forEach((node, index) => {
       if (!node) return; // Skip null or undefined nodes
 
-      // Add the general warning class to all
-      node.classList.add('❤️expression-warning');
+      // Add the general warning class and level class to all
+      node.classList.add('❤️expression-warning', `level-${level}`);
 
       // Add specific classes for the first/last nodes. if there's only one node, add both classes
       if (index === 0) {
@@ -61,7 +61,7 @@ let warningPrefs = {
     if (!warningTagNode.querySelector('.❤️expression-warning-tag')) {
       const warningDiv = document.createElement('div');
       warningDiv.textContent = warningText;
-      warningDiv.className = '❤️expression-warning-tag';
+      warningDiv.className = `❤️expression-warning-tag level-${level}`;
       if(practiceURL){
         warningDiv.dataset.codelessLovePractice = practiceURL;
         warningDiv.setAttribute(
@@ -83,6 +83,9 @@ let warningPrefs = {
       node.classList.remove('❤️expression-warning');
       node.classList.remove('❤️expression-warning-left');
       node.classList.remove('❤️expression-warning-right');
+      node.classList.remove('level-bad');
+      node.classList.remove('level-warning');
+      node.classList.remove('level-info');
     });
 
     // Remove warning tag
@@ -147,7 +150,8 @@ let warningPrefs = {
               firstItem,
               "Current User used in Backend",
               null,
-              "Warning"
+              "Warning",
+              "warning"
             );
           }
         }
