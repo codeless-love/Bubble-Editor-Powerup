@@ -1,10 +1,6 @@
 // Service worker initialization
-console.log("❤️ Loaded background.js");
-
-/* Load Features */
 
 let debounceTimeouts = {}; // Store timeouts for each tabId
-let injectionInProgress = new Set(); // Track which tabId has ongoing injection process
 
 // Load features dynamically from a JSON file
 async function loadFeatures() {
@@ -16,6 +12,10 @@ async function loadFeatures() {
     return []; // Return empty array to prevent further errors
   }
 }
+
+// Store injected features by tabId using a Map
+// Map key: tabId, value: Set of feature keys already injected
+const bubbleTabs = new Map();
 
 // check if a feature script has already been injected
 async function isFeatureInjected(tabId, featureKey) {
@@ -29,7 +29,7 @@ async function isFeatureInjected(tabId, featureKey) {
           window.loadedCodelessLoveScripts[key] === "loaded"
         );
       },
-      args: [featureKey],
+      args: [featureKey], // Pass the feature key to the tab context
     });
     // Return the result from the tab's execution context
     return response[0].result;
@@ -41,111 +41,193 @@ async function isFeatureInjected(tabId, featureKey) {
 
 // Injects enabled features (CSS/JS) into the specified tab
 async function injectFeatures(tabId) {
-  if (injectionInProgress.has(tabId)) {
-    console.log(`❤️ Injection already in progress for tabId ${tabId}, skipping.`);
-    return; // Skip injection if it's already in progress
-  }
-
-  injectionInProgress.add(tabId); // Mark injection as in progress for this tab
-
-  console.log("❤️ Starting feature injection for tabId:", tabId);
   try {
+    // Get the tab URL
     const featuresConfig = await loadFeatures(); // Load the list of all available features
     if (!featuresConfig || featuresConfig.length === 0) {
       console.warn("❤️ No features found to inject");
-      injectionInProgress.delete(tabId); // Reset the flag
       return;
     }
 
-    const defaults = Object.fromEntries(featuresConfig.map(f => [f.key, f.default])); // Get defaults from the JSON
-    const prefs = await chrome.storage.sync.get(defaults); // Load user preferences
+    const defaults = Object.fromEntries(featuresConfig.map(f => [f.key, f.default])); // get defaults from the json
+    const prefs = await chrome.storage.sync.get(defaults);// Load user preferences from chrome storage
 
-    if (Object.keys(prefs).length === 0) {
-      await chrome.storage.sync.set(defaults);
-      prefs = await chrome.storage.sync.get(defaults); // Ensure updated prefs are loaded
+    // Check for any missing keys and set their defaults
+    const missingDefaults = {};
+    for (const [key, defaultValue] of Object.entries(defaults)) {
+      if (!(key in prefs)) {
+        missingDefaults[key] = defaultValue;
+      }
+    }
+    
+    if (Object.keys(missingDefaults).length > 0) {
+      await chrome.storage.sync.set(missingDefaults);
+      Object.assign(prefs, missingDefaults);
     }
 
-    const injectedFeatures = new Set(); // Track injected features for this tab
+    // reinitialize
+    bubbleTabs.set(tabId, new Set()); // Create a new Set to track injected features for this tab
+    const injectedFeatures = bubbleTabs.get(tabId); // Get the Set of injected features for this tab
 
+    // Iterate through all features in the configuration
     for (const feature of featuresConfig) {
-      const isEnabled = prefs[feature.key] == true; // Check if the feature is enabled
+      const isEnabled = prefs[feature.key] == true; // Check if the feature is enabled in user preferences
+
+      // Inject the feature only if it's enabled and hasn't been injected already
       if (isEnabled && !injectedFeatures.has(feature.key)) {
         // Inject CSS if available
         if (feature.cssFile) {
-          await chrome.scripting.insertCSS({ target: { tabId }, files: [feature.cssFile] });
+          try {
+            await chrome.scripting.insertCSS({
+              target: { tabId }, // Specify the target tab
+              files: [feature.cssFile], // CSS file to inject
+            });
+          } catch (cssError) {
+            console.error(`❤️ Error injecting CSS for ${feature.key}:`, cssError);
+            // Continue to try JS injection even if CSS fails
+          }
         }
 
-        // Inject JS dynamically
+        // Inject JS if available
         if (feature.jsFile) {
           const alreadyInjected = await isFeatureInjected(tabId, feature.key);
           if (!alreadyInjected) {
-            await chrome.scripting.executeScript({
-              target: { tabId },
-              files: [feature.jsFile],
-            }).then(() => {
-              console.log(`❤️ Running JS for ${feature.key}`);
-              injectedFeatures.add(feature.key); // Mark feature as injected
-
-              // Send message to tell the content script to run after JS is injected. In the future we can use this to run scripts dynamically.
-              chrome.tabs.sendMessage(tabId, {
-                action: "runScript",
-                jsFile: feature.jsFile,
-                featureKey: feature.key,
+            try {
+              await chrome.scripting.executeScript({
+                target: { tabId },
+                files: [feature.jsFile],
               });
-            }).catch((error) => {
-                console.error(`❤️ Failed to inject JS for ${feature.key}:`, error);
-            });
+
+              // Verify injection was successful
+              const featureIsInjected = await isFeatureInjected(tabId, feature.key);
+              if (!featureIsInjected) {
+                console.warn(`❤️ JS injection for ${feature.key} may not have been successful`);
+              }
+            } catch (scriptError) {
+              console.error(`❤️ Error injecting JS for ${feature.key}:`, scriptError);
+              // Continue with other features even if this one fails
+            }
           }
         }
+
+        // Mark as injected regardless of success to avoid repeated injection attempts
+        injectedFeatures.add(feature.key);
       }
     }
   } catch (error) {
     console.error("❤️ Error in injectFeatures:", error);
-  } finally {
-    injectionInProgress.delete(tabId); // Reset the flag when done
   }
 }
+
+// Clean up injected features when a tab is closed
+chrome.tabs.onRemoved.addListener((tabId) => {
+  bubbleTabs.delete(tabId); // Remove the tab's entry from the Map
+});
+
+// Listen for when a tab is updated (e.g., reloaded, navigated)
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+
+  // Check if the tab has finished loading and is a Bubble editor page
+  if (changeInfo.status === "complete" && tab.url &&
+      (tab.url.includes("bubble.io") || tab.url.includes("bubble.is"))) {
+
+    // Check if this is a Bubble editor page - only allowing /page paths
+    let isBubbleEditor = false;
+
+    try {
+      const urlObj = new URL(tab.url);
+      // Only permit exact /page paths
+      isBubbleEditor = urlObj.pathname === "/page";
+    } catch (e) {
+      // Use regex check if URL parsing fails
+      const regex = /bubble\.(io|is)\/page($|\?)/;
+      isBubbleEditor = regex.test(tab.url);
+    }
+
+    if (isBubbleEditor) {
+      // Clear any existing debounce timeout for the tabId
+      if (debounceTimeouts[tabId]) {
+        clearTimeout(debounceTimeouts[tabId]);
+      }
+
+      // Set a new timeout to trigger the function after 1 second (debouncing)
+      debounceTimeouts[tabId] = setTimeout(() => {
+        injectFeatures(tabId); // Inject features into the tab
+      }, 1000); // 1 second debounce
+    }
+  }
+});
 
 /* Facilitate feature's injecting their own scripts into the main world */
 
-// When a feature's script needs to inject a script directly into the tab's context (the "main world"), it will send a message 'injectScriptFromFeature' via sendMessage, which will be picked up with this file's addListener below, which will execute this function to inject the passed file path.
-function injectScriptFromFeatureContentScript(url) {
-  return () => {
-    const script = document.createElement('script');
-    script.src = chrome.runtime.getURL(url);
-    script.type = 'text/javascript';
-    document.documentElement.appendChild(script);
-    script.onload = () => script.remove();
-  };
-}
-
-/* Message Listeners */
-
-// Listen for when a tab is updated
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete" && tab.url.includes("bubble.io")) {
-    // Ensure the content script is loaded correctly
-    chrome.scripting.executeScript({
-      target: { tabId },
-      func: injectScriptFromFeatureContentScript, // this function is correctly defined here
-      args: [message.jsFile], // Pass the necessary arguments to the content script
-    }).catch((error) => console.error("❤️ Error loading content script injector:", error));
-
-    // Debouncing injection of features
-    clearTimeout(debounceTimeouts[tabId]);
-    debounceTimeouts[tabId] = setTimeout(() => injectFeatures(tabId), 1000);
-  }
-});
-
+/* Listen to feature scripts for a command to inject code into the page */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "injectScriptIntoMainWorld") {
-    chrome.scripting.executeScript({
-      target: { tabId: sender.tab.id }, // Correctly use sender.tab.id here
-      func: injectScriptFromFeatureContentScript,
-      args: [message.jsFile],
-    }).catch((error) => console.error("❤️ Error injecting script:", error));
+    // First check if the tab is ready
+    chrome.tabs.get(sender.tab.id, (tab) => {
+      if (chrome.runtime.lastError || !tab.status || tab.status !== "complete") {
+        console.warn("❤️ Tab not ready for script injection, waiting for load");
+        // Wait for tab to be ready
+        chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
+          if (updatedTabId === sender.tab.id && changeInfo.status === "complete") {
+            chrome.tabs.onUpdated.removeListener(listener);
+            injectScriptIntoMainWorld(sender.tab.id, message.jsFile)
+              .then(result => sendResponse(result))
+              .catch(error => sendResponse({ error: error.message }));
+          }
+        });
+      } else {
+        // Tab is ready, inject immediately
+        injectScriptIntoMainWorld(sender.tab.id, message.jsFile)
+          .then(result => sendResponse(result))
+          .catch(error => sendResponse({ error: error.message }));
+      }
+    });
+    return true; // Keep message channel open for async response
   }
 });
+
+// Injects a script directly into the tab's context (the "main world")
+function injectScriptIntoMainWorld(tabId, url) {
+  console.log("❤️ Injecting the script " + url);
+  const fullScriptUrl = chrome.runtime.getURL(url);
+  
+  // First fetch the script content
+  return fetch(fullScriptUrl)
+    .then(response => response.text())
+    .then(scriptContent => {
+      // Then execute it in the page context
+      return chrome.scripting.executeScript({
+        target: { tabId },
+        world: "MAIN", // Explicitly specify main world
+        func: (code) => {
+          // Create a blob URL from the code
+          const blob = new Blob([code], { type: 'text/javascript' });
+          const scriptUrl = URL.createObjectURL(blob);
+          
+          const script = document.createElement('script');
+          script.src = scriptUrl;  // Use blob URL instead of inline script
+          script.type = 'text/javascript';
+          script.className = '❤️injected-script';
+          
+          // Clean up the blob URL after the script loads
+          script.onload = () => URL.revokeObjectURL(scriptUrl);
+          
+          document.documentElement.appendChild(script);
+          return 'injected successfully';
+        },
+        args: [scriptContent]  // Pass the actual script content
+      });
+    })
+    .then(([result]) => {
+      console.log(`❤️ Script ${url} injection result:`, result.result);
+      return result.result;
+    })
+    .catch((error) => {
+      console.error("❤️ Error injecting script:", error);
+      throw error;
+    });
+}
 
 // Clean up when tab is closed
 chrome.tabs.onRemoved.addListener((tabId) => {
@@ -155,13 +237,8 @@ chrome.tabs.onRemoved.addListener((tabId) => {
     delete debounceTimeouts[tabId];
   }
   
-  // Clear injection progress flag
-  injectionInProgress.delete(tabId);
-  
   // Notify content scripts to clean up
-  try {
-    chrome.tabs.sendMessage(tabId, { action: "cleanup" });
-  } catch (e) {
-    // Tab might be already closed, ignore errors
-  }
+  chrome.tabs.sendMessage(tabId, { action: "cleanup" }).catch(() => {
+    // Ignore errors - tab is likely already closed
+  });
 });

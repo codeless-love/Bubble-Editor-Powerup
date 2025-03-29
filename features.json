@@ -43,6 +43,22 @@
     "default": true
   },
   {
+    "key": "expression_bad_practice_warning_public_api_checked",
+    "name": "Public API Warning",
+    "description": "Shows a warning when a workflow is exposed as a public API",
+    "category": "Expressions",
+    "default": true,
+    "requires": "expression_bad_practice_warning"
+  },
+  {
+    "key": "expression_bad_practice_warning_zero_width",
+    "category": "Expressions",
+    "name": "Zero Width Warning",
+    "description": "Warn when an element's max-width is set to 0",
+    "requires": "expression_bad_practice_warning",
+    "default": true
+  },
+  {
     "key": "style_row_hover",
     "category": "Style Tab",
     "name": "Hi-light style variable rows on hover",

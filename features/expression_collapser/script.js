@@ -1,15 +1,9 @@
-/* */ window.loadedCodelessLoveScripts ||= {};
-/* */(function() {
-
-const featureKey = "expression_collapser";// Replace this with your feature's  key (same as what's in features.json)
-console.log("❤️"+"Expression Collapser");// Replace this with your feature's name
-
-/* */   if (window.loadedCodelessLoveScripts[featureKey] === "loaded") {console.warn("❤️ Feature already loaded:", featureKey);return;}
-/* */   window.loadedCodelessLoveScripts[featureKey] = "loaded";
-/* */   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-/* */     if (message.action === "runScript") {
-/* */       console.log("❤️ Loaded feature ", message.featureKey);
-
+window.loadedCodelessLoveScripts ||= {};
+(function() { console.log("❤️"+"Expression Collapser");
+let thisScriptKey = "expression_collapser";
+if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} // Exit if the script has already been loaded
+window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
+console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
 
 // Insert collapser when .nested element is added
 function insertCollapser(element) {
@@ -38,7 +32,6 @@ function insertCollapser(element) {
       });
     }
   }
-  sendResponse({ success: true });
 }
 
 // Initialize on page load
@@ -95,8 +88,4 @@ Element.prototype.closestAll = function(selector) {
   }
   return ancestors;
 };
-
-/* */       return true;  // Asynchronous response
-/* */     }
-/* */   });
-/* */ })();
+})();
