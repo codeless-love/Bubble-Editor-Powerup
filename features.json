@@ -234,5 +234,14 @@
     "cssFile": "features/folder_click_toggle/folder_click_toggle.css",
     "jsFile": "features/folder_click_toggle/folder_click_toggle.js",
     "default": true
+  },
+  {
+    "key": "search_palette_current",
+    "category": "Search Palette",
+    "name": "Highlight Current Search Result",
+    "description": "Adds visual feedback to show which search result was last clicked in the search palette.",
+    "cssFile": "features/search_palette_current/style.css",
+    "jsFile": "features/search_palette_current/script.js",
+    "default": true
   }
 ]
