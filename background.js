@@ -105,6 +105,25 @@ async function injectFeatures(tabId) {
               }
             } catch (scriptError) {
               console.error(`❤️ Error injecting JS for ${feature.key}:`, scriptError);
+              chrome.tabs.get(tabId).then(tab => 
+                console.error('❤️ Injection failed on URL:', tab.url)
+              );
+              // Add detailed error logging
+              console.error(`❤️ Error details:`, {
+                message: scriptError.message,
+                stack: scriptError.stack,
+                tabId: tabId,
+                featureFile: feature.jsFile,
+                // Get current tab URL
+                currentTab: await chrome.tabs.get(tabId).then(tab => ({
+                  url: tab.url,
+                  status: tab.status
+                })).catch(e => `Failed to get tab: ${e.message}`),
+                // Check if we have host permission
+                hasHostPermission: await chrome.permissions.contains({
+                  origins: [`https://*.bubble.io/*`]
+                }).catch(e => `Failed to check permissions: ${e.message}`)
+              });
               // Continue with other features even if this one fails
             }
           }
