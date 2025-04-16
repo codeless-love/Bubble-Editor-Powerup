@@ -20,21 +20,21 @@ window.loadedCodelessLoveScripts ||= {};
   function addResultDivClickHandlers() {
     console.log("❤️ Adding click handlers to result divs");
     const resultDivs = document.querySelectorAll('.result-area.overview .result-div');
-    
+
     resultDivs.forEach(div => {
       // Skip if we've already processed this div
       if (div.dataset.clickHandlerAdded) return;
-      
+
       // Mark this div as processed
       div.dataset.clickHandlerAdded = "true";
-      
+
       div.addEventListener('click', function() {
         console.log("❤️ Result div clicked");
         // Remove 'current' class from all result divs
-        document.querySelectorAll('.result-area.overview .result-div').forEach(d => 
+        document.querySelectorAll('.result-area.overview .result-div').forEach(d =>
           d.classList.remove('current')
         );
-        
+
         // Add 'current' class to clicked div
         this.classList.add('current');
       });
@@ -43,7 +43,7 @@ window.loadedCodelessLoveScripts ||= {};
 
   function initialize() {
     console.log("❤️ Initializing search palette current feature");
-    
+
     // Set up a MutationObserver to watch for new result divs
     const observer = new MutationObserver((mutations) => {
       const searchPalette = document.querySelector('.search-palette');
@@ -51,13 +51,13 @@ window.loadedCodelessLoveScripts ||= {};
         addResultDivClickHandlers();
       }
     });
-    
+
     // Find the search palette or wait for it
     const searchPalette = document.querySelector('.search-palette');
     if (searchPalette) {
-      observer.observe(searchPalette, { 
-        childList: true, 
-        subtree: true 
+      observer.observe(searchPalette, {
+        childList: true,
+        subtree: false
       });
     } else {
       // If search palette isn't available yet, watch for it to be added
@@ -66,16 +66,16 @@ window.loadedCodelessLoveScripts ||= {};
         if (searchPalette) {
           observer.disconnect();
           // Start observing the search palette
-          observer.observe(searchPalette, { 
-            childList: true, 
-            subtree: true 
+          observer.observe(searchPalette, {
+            childList: true,
+            subtree: false
           });
         }
       });
-      
-      parentObserver.observe(document.body, { 
-        childList: true, 
-        subtree: true 
+
+      parentObserver.observe(document.body, {
+        childList: true,
+        subtree: true
       });
     }
   }
