@@ -1,7 +1,7 @@
 window.loadedCodelessLoveScripts ||= {};
 (function() {
-  console.log("❤️"+"Name of feature goes here");
-  let thisScriptKey = "feature_key_goes_here";
+  console.log("❤️"+"Wrapped Backend Workflow View");
+  let thisScriptKey = "left_to_right_action_view";
 
   if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {
     console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]);

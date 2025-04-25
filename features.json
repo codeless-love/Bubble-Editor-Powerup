@@ -11,7 +11,7 @@
 {
     "key": "left_to_right_action_view",
     "category": "Workflow View",
-    "name": "Display Actions In Left-to-Right View",
+    "name": "Wrap Actions Left-to-Right",
     "description": "When viewing a workflow's actions, this displays the actions in a left-to-right view instead of a vertically stacked view. NOTE: This only works in the 'Default' view, and not with the 'Compact' view.",
     "jsFile": "features/left_to_right_action_view/left_to_right_action_view.js",
     "default": false
