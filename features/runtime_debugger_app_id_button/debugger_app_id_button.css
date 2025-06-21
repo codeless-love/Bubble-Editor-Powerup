@@ -1,0 +1,13 @@
+❤️ codelesslove, .codelesslove-appid-btn {
+  background: #fff0f6;
+  border: 1px solid #e0a0b0;
+  color: #b8004c;
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+❤️ codelesslove, .codelesslove-appid-btn:hover {
+  background: #ffe0ec;
+} 

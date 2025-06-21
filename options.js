@@ -1,4 +1,107 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  let candidateDomains = [];
+  let approvedDomains = [];
+
+  // Helper: Promisified chrome.storage.sync.get
+  function getCandidateDomains() {
+    return new Promise(resolve => {
+      chrome.storage.sync.get({ candidateDomains: [] }, (result) => {
+        resolve(result.candidateDomains || []);
+      });
+    });
+  }
+
+  // Helper: Promisified chrome.permissions.getAll
+  function getApprovedDomains() {
+    return new Promise(resolve => {
+      chrome.permissions.getAll((perms) => {
+        const domains = (perms.origins || [])
+          .map(origin => {
+            try {
+              return origin.replace(/^https?:\/\//, '').replace(/\/$|\*$/, '').replace(/\/$/, '');
+            } catch (e) { return origin; }
+          })
+          .filter(Boolean);
+        resolve(domains);
+      });
+    });
+  }
+
+  // Wait for both candidateDomains and approvedDomains
+  [candidateDomains, approvedDomains] = await Promise.all([
+    getCandidateDomains(),
+    getApprovedDomains()
+  ]);
+
+  // --- DOMAIN STATE LOGIC ---
+  let domainState = "Unrelated";
+  let currentDomain = "";
+  let currentPath = "";
+  chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+    if (!tabs || !tabs[0] || !tabs[0].url) return;
+    try {
+      const url = new URL(tabs[0].url);
+      currentDomain = url.hostname;
+      currentPath = url.pathname;
+      const isBubbleEditor = (currentDomain.endsWith("bubble.io")) && currentPath.startsWith("/page");
+      const isBubbleMain = currentDomain.endsWith("bubble.io");
+      const isBubbleApps = currentDomain.endsWith("bubbleapps.io");
+      const isCandidate = candidateDomains.includes(currentDomain) && !approvedDomains.includes(currentDomain);
+      const isApproved = approvedDomains.includes(currentDomain) || isBubbleApps;
+      if (isBubbleEditor) {
+        domainState = "Editor";
+      } else if (isCandidate) {
+        domainState = "Candidate";
+      } else if (isBubbleApps) {
+        domainState = "Approved";
+      } else if (isApproved) {
+        domainState = "Approved";
+      } else if (isBubbleMain) {
+        domainState = "Unrelated";
+      } else {
+        domainState = "Unrelated";
+      }
+    } catch (e) {
+      domainState = "Unrelated";
+    }
+
+    // Toggle <main> visibility based on domainState
+    const mainStates = ["Editor", "Candidate", "Approved", "Unrelated"];
+    mainStates.forEach(state => {
+      const main = document.getElementById(state);
+      if (main) main.hidden = (state !== domainState);
+    });
+
+    // --- Grant access button logic (moved here for correct scope) ---
+    const grantBtn = document.getElementById("grant-access-btn");
+    if (grantBtn) {
+      console.log("Grant access button found, adding listener");
+      grantBtn.addEventListener("click", async () => {
+        console.log("Grant access button clicked");
+        let domainToGrant = currentDomain;
+        console.log("Domain to grant:", domainToGrant);
+        if (!domainToGrant) {
+          alert("Could not determine current domain.");
+          return;
+        }
+        const origin = `https://${domainToGrant}/*`;
+        console.log("Requesting permission for origin:", origin);
+        chrome.permissions.request({ origins: [origin] }, (granted) => {
+          console.log("Permission granted?", granted);
+          if (granted) {
+            window.location.reload();
+          } else {
+            alert("Permission was not granted.");
+          }
+        });
+      });
+    } else {
+      console.log("Grant access button NOT found");
+    }
+    // --- End grant access logic ---
+  });
+
+
   // Default preferences in case nothing is saved yet
   const response = await fetch(chrome.runtime.getURL("features.json"));
   const features = await response.json();
@@ -19,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const container = document.getElementById("features-list");
 
-  const categories = ["Expressions", "Expression Composers", "Branches", "Top Menubar", "Sidebar", "Style Tab", "Design Canvas", "Data View", "Workflow View", "Search Palette","Example Feature"];
+  const categories = ["Runtime", "Expressions", "Expression Composers", "Branches", "Top Menubar", "Sidebar", "Style Tab", "Design Canvas", "Data View", "Workflow View", "Search Palette","Example Feature"];
 
   // Group features by categories
   const featuresByCategory = features.reduce((acc, feature) => {
@@ -155,7 +258,47 @@ document.addEventListener("DOMContentLoaded", async () => {
     const description = document.createElement("p");
     description.textContent = feature.description;
     div.appendChild(description);
-    
+
+    // Inject domains list for enable_runtime_features only
+    if (feature.key === "enable_runtime_features") {
+      const domainsContainer = document.createElement("div");
+      domainsContainer.className = "candidate-domains";
+      domainsContainer.textContent = "Loading domains...";
+      div.appendChild(domainsContainer);
+      if (candidateDomains.length === 0) {
+        domainsContainer.textContent = "No eligible domains.";
+      } else {
+        domainsContainer.textContent = "Domains waiting for approval:";
+        const container = document.createElement("div");
+        container.className = "candidate-domains-list";
+        candidateDomains.forEach(domain => {
+          const span = document.createElement("span");
+          span.textContent = domain;
+          container.appendChild(span);
+        });
+        domainsContainer.appendChild(container);
+      }
+      // --- Approved domains list ---
+      const approvedContainer = document.createElement("div");
+      approvedContainer.className = "candidate-domains";
+      approvedContainer.textContent = "Loading approved domains...";
+      div.appendChild(approvedContainer);
+
+      if (approvedDomains.length === 0) {
+        approvedContainer.style.display = "none";
+      } else {
+        approvedContainer.textContent = "Approved domains:";
+        const container = document.createElement("div");
+        container.className = "candidate-domains-list";
+        approvedDomains.forEach(domain => {
+          const span = document.createElement("span");
+          span.textContent = domain;
+          container.appendChild(span);
+        });
+        approvedContainer.appendChild(container);
+      }
+    }
+
     // Add event listeners to the checkbox
     if (!isDisabled) {
       // Make the card clickable
