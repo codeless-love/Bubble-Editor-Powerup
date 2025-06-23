@@ -124,7 +124,7 @@ async function injectFeatures(tabId, context = {}) {
                 })).catch(e => `Failed to get tab: ${e.message}`),
                 // Check if we have host permission
                 hasHostPermission: await chrome.permissions.contains({
-                  origins: [`https://*.bubble.io/*`]
+                  origins: [`https://*.bubble.io/*`, `https://*.bubble.is/*`]
                 }).catch(e => `Failed to check permissions: ${e.message}`)
               });
               // Continue with other features even if this one fails

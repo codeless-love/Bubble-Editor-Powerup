@@ -255,19 +255,19 @@
   {
     "key": "enable_runtime_features",
     "category": "Runtime",
-    "name": "Enable Runtime Features on Custom Domains",
-    "description": "Enable this to allow Codeless Love features to run on your app's custom domain (not on bubbleapps.io). You will need to grant permission for each custom domain from the extension in runtime.",
+    "name": "Enable Runtime Features",
+    "description": "Enable powerup features for runtime (a.k.a. preview mode). You will need to grant permission for each custom domain from the extension in runtime. Some features are only available in debug_mode.",
     "cssFile": "features/runtime_enable/runtime_enable.css",
     "jsFile": "features/runtime_enable/runtime_enable.js",
     "default": false
   },
   {
-    "key": "debugger_app_id_button",
+    "key": "runtime_element_explorer",
     "category": "Runtime",
-    "name": "Debugger App ID Button",
-    "description": "Adds a button to the Bubble app's debugger bar (when debug_mode=true) that alerts the app's ID.",
-    "cssFile": "features/runtime_debugger_app_id_button/debugger_app_id_button.css",
-    "jsFile": "features/runtime_debugger_app_id_button/debugger_app_id_button.js",
+    "name": "Element Explorer",
+    "description": "Click on any element on the page in Runtime (preview mode with debugger on) to see information about it, it's parent, children, and which reusable it is in. Navigate up and down the element tree, and open the editor directly to any given element. Note: only functions in debug_mode.",
+    "cssFile": "features/runtime_element_explorer/element_explorer.css",
+    "jsFile": "features/runtime_element_explorer/element_explorer.js",
     "default": false,
     "requires": "enable_runtime_features"
   }

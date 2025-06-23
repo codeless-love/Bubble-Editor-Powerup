@@ -43,8 +43,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       const url = new URL(tabs[0].url);
       currentDomain = url.hostname;
       currentPath = url.pathname;
-      const isBubbleEditor = (currentDomain.endsWith("bubble.io")) && currentPath.startsWith("/page");
-      const isBubbleMain = currentDomain.endsWith("bubble.io");
+      const isBubbleEditor = (currentDomain.endsWith("bubble.io") || currentDomain.endsWith("bubble.is")) && currentPath.startsWith("/page");
+      const isBubbleMain = (currentDomain.endsWith("bubble.io") || currentDomain.endsWith("bubble.is"));
       const isBubbleApps = currentDomain.endsWith("bubbleapps.io");
       const isCandidate = candidateDomains.includes(currentDomain) && !approvedDomains.includes(currentDomain);
       const isApproved = approvedDomains.includes(currentDomain) || isBubbleApps;
@@ -268,15 +268,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (candidateDomains.length === 0) {
         domainsContainer.textContent = "No eligible domains.";
       } else {
-        domainsContainer.textContent = "Domains waiting for approval:";
-        const container = document.createElement("div");
-        container.className = "candidate-domains-list";
-        candidateDomains.forEach(domain => {
-          const span = document.createElement("span");
-          span.textContent = domain;
-          container.appendChild(span);
-        });
-        domainsContainer.appendChild(container);
+        const unapprovedCandidateDomains = candidateDomains.filter(domain => !approvedDomains.includes(domain));
+        if (unapprovedCandidateDomains.length === 0) {
+          domainsContainer.style.display = "none";
+        } else {
+          domainsContainer.textContent = "Domains waiting for approval:";
+          const container = document.createElement("div");
+          container.className = "candidate-domains-list";
+          unapprovedCandidateDomains.forEach(domain => {
+            const span = document.createElement("span");
+            span.textContent = domain;
+            container.appendChild(span);
+          });
+          domainsContainer.appendChild(container);
+        }
       }
       // --- Approved domains list ---
       const approvedContainer = document.createElement("div");
@@ -551,7 +556,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     chrome.tabs.reload();
     closePopup(1500);
   });
-  // Reload all Bubble.io and Bubble.is tabs
+  // Reload all Bubble and Bubble.is tabs
   refreshAllButton.addEventListener("click", async () => {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
