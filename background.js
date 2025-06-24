@@ -40,42 +40,41 @@ async function isFeatureInjected(tabId, featureKey) {
 }
 
 // Injects enabled features (CSS/JS) into the specified tab
-async function injectFeatures(tabId) {
+async function injectFeatures(tabId, context = {}) {
   try {
-    // Get the tab URL
-    const featuresConfig = await loadFeatures(); // Load the list of all available features
+    const { isBubbleEditor = false, isApprovedDomain = false } = context;
+    const featuresConfig = await loadFeatures();
     if (!featuresConfig || featuresConfig.length === 0) {
       console.warn("❤️ No features found to inject");
       return;
     }
-
-    const defaults = Object.fromEntries(featuresConfig.map(f => [f.key, f.default])); // get defaults from the json
-    const prefs = await chrome.storage.sync.get(defaults);// Load user preferences from chrome storage
-
-    // Check for any missing keys and set their defaults
+    const defaults = Object.fromEntries(featuresConfig.map(f => [f.key, f.default]));
+    const prefs = await chrome.storage.sync.get(defaults);
     const missingDefaults = {};
     for (const [key, defaultValue] of Object.entries(defaults)) {
       if (!(key in prefs)) {
         missingDefaults[key] = defaultValue;
       }
     }
-    
     if (Object.keys(missingDefaults).length > 0) {
       await chrome.storage.sync.set(missingDefaults);
       Object.assign(prefs, missingDefaults);
     }
-
-    // reinitialize
-    bubbleTabs.set(tabId, new Set()); // Create a new Set to track injected features for this tab
-    const injectedFeatures = bubbleTabs.get(tabId); // Get the Set of injected features for this tab
-
-    // Iterate through all features in the configuration
+    bubbleTabs.set(tabId, new Set());
+    const injectedFeatures = bubbleTabs.get(tabId);
     for (const feature of featuresConfig) {
-      const isEnabled = prefs[feature.key] == true; // Check if the feature is enabled in user preferences
+      const isEnabled = prefs[feature.key] == true;
 
-      // Inject the feature only if it's enabled and hasn't been injected already
+      // --- RUNTIME/EDITOR INJECTION LOGIC ---
+      // If this is a runtime feature (`key` or `requires` is `enable_runtime_features`), never inject in editor
+      const isRuntimeFeature = feature.key === "enable_runtime_features" || feature.requires === "enable_runtime_features";
+      if (isBubbleEditor && isRuntimeFeature) continue;
+      // If not in editor, only inject runtime features
+      if (!isBubbleEditor && isApprovedDomain && !isRuntimeFeature) continue;
+      // If not in editor or approved domain, skip all
+      if (!isBubbleEditor && !isApprovedDomain) continue;
+
       if (isEnabled && !injectedFeatures.has(feature.key)) {
-        // Inject CSS if available
         if (feature.cssFile) {
           try {
             await chrome.scripting.insertCSS({
@@ -121,7 +120,7 @@ async function injectFeatures(tabId) {
                 })).catch(e => `Failed to get tab: ${e.message}`),
                 // Check if we have host permission
                 hasHostPermission: await chrome.permissions.contains({
-                  origins: [`https://*.bubble.io/*`]
+                  origins: [`https://*.bubble.io/*`, `https://*.bubble.is/*`]
                 }).catch(e => `Failed to check permissions: ${e.message}`)
               });
               // Continue with other features even if this one fails
@@ -148,31 +147,38 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
   // Check if the tab has finished loading and is a Bubble editor page
   if (changeInfo.status === "complete" && tab.url &&
-      (tab.url.includes("bubble.io") || tab.url.includes("bubble.is"))) {
-
-    // Check if this is a Bubble editor page - only allowing /page paths
+      (tab.url.includes("bubble.io") || tab.url.includes("bubble.is") || tab.url.match(/^https?:\/\//))) {
     let isBubbleEditor = false;
-
+    let isApprovedDomain = false;
+    let currentDomain = "";
     try {
       const urlObj = new URL(tab.url);
-      // Only permit exact /page paths
+      currentDomain = urlObj.hostname;
+      // Only permit exact /page paths for editor
       isBubbleEditor = urlObj.pathname === "/page";
+      // Check if domain is in approvedDomains
+      chrome.permissions.getAll((perms) => {
+        const approvedDomains = (perms.origins || [])
+          .map(origin => {
+            try {
+              return origin.replace(/^https?:\/\//, '').replace(/\/$|\*$/, '').replace(/\/$/, '');
+            } catch (e) { return origin; }
+          })
+          .filter(Boolean);
+        isApprovedDomain = approvedDomains.includes(currentDomain);
+        // Only proceed if in editor or approved domain
+        if (isBubbleEditor || isApprovedDomain) {
+          // Clear any existing debounce timeout for the tabId
+          if (debounceTimeouts[tabId]) {
+            clearTimeout(debounceTimeouts[tabId]);
+          }
+          debounceTimeouts[tabId] = setTimeout(() => {
+            injectFeatures(tabId, { isBubbleEditor, isApprovedDomain });
+          }, 1000);
+        }
+      });
     } catch (e) {
-      // Use regex check if URL parsing fails
-      const regex = /bubble\.(io|is)\/page($|\?)/;
-      isBubbleEditor = regex.test(tab.url);
-    }
-
-    if (isBubbleEditor) {
-      // Clear any existing debounce timeout for the tabId
-      if (debounceTimeouts[tabId]) {
-        clearTimeout(debounceTimeouts[tabId]);
-      }
-
-      // Set a new timeout to trigger the function after 1 second (debouncing)
-      debounceTimeouts[tabId] = setTimeout(() => {
-        injectFeatures(tabId); // Inject features into the tab
-      }, 1000); // 1 second debounce
+      // fallback: do nothing
     }
   }
 });

@@ -1,0 +1,169 @@
+❤️ codelesslove, .codelesslove-inspector-btn {
+  background: #fff0f6;
+  border: 1px solid #e0a0b0;
+  color: #b8004c;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+  padding: .5em 1em;
+  height: 2em;
+  padding-top: 0 !important;
+  margin: 0;
+  border-radius: 999px;
+  line-height: 2.5em;
+  align-self: center;
+}
+❤️ codelesslove, .codelesslove-inspector-btn:hover {
+  background: #ffe0ec;
+} 
+❤️ codelesslove, .codelesslove-properties-div {
+  position: fixed;
+  right: 0;
+  bottom: 50px;
+  background: #fff;
+  border-radius: 7px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  min-width: 300px;
+  z-index: 9999;
+  cursor: default !important; /* Hide crosshair when hovering inspector */
+
+  & a {
+    color: #0205d3;
+    text-decoration: underline;
+  }
+}
+.codelesslove-hidden {
+  display: none;
+}
+.codelesslove-prop-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 0;
+}
+.codelesslove-prop-label {
+  font-size: 9px;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: #333;
+}
+.codelesslove-prop-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.codelesslove-prop-name {
+  flex: 1 1 auto;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.codelesslove-prop-type {
+  flex: 0 0 auto;
+  text-align: right;
+  color: #888;
+  margin-left: 10px;
+}
+.codelesslove-prop-editor-link {
+  margin-top: 2px;
+  font-size: 13px;
+  text-align: left;
+}
+.codelesslove-inspector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: grab;
+  padding: 14px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-bottom: 1px solid #e9ecef;
+  border-radius: 7px 7px 1px 1px;
+  .codelesslove-header-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1px;
+  }
+}
+.codelesslove-inspector-header .codelesslove-inspector-close {
+  cursor: pointer;
+}
+.codelesslove-inspector-header.codelesslove-grabbing {
+  cursor: grabbing !important;
+}
+.codelesslove-inspector-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+}
+.codelesslove-inspector-dragging {
+  cursor: default !important;
+}
+.codelesslove-logo {
+  width: 20px;
+  height: 20px;
+}
+.codelesslove-inspector-title {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #3a3a3a;
+  opacity: 0.85;
+}
+.codelesslove-inspector-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  color: #888;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  border-radius: 3px;
+  transition: background 0.15s;
+}
+.codelesslove-inspector-close:hover {
+  background: #eee;
+  color: #c00;
+}
+.currentBubbleElement {
+  outline: 2px dashed #f00 !important;
+  z-index: 9999 !important;
+}
+
+body.crosshair-cursor {
+  cursor: crosshair !important;
+
+  *:not(.debugger-canvas):not(.debugger-canvas *):not(#codelessloveElementProperties):not(#codelessloveElementProperties *) {
+    cursor: crosshair !important;
+  }
+}
+
+.debugger-canvas #codelessloveElementProperties {
+  & * {
+    cursor: default !important;
+  }
+
+  .codelesslove-inspector-header,
+  .codelesslove-inspector-header * {
+    cursor: grab !important;
+
+    &.codelesslove-grabbing,
+    &.codelesslove-grabbing * {
+      cursor: grabbing !important;
+    }
+
+    .codelesslove-inspector-close {
+      cursor: pointer !important;
+    }
+  }
+}
