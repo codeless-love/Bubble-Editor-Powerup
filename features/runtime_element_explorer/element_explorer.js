@@ -70,7 +70,7 @@ window.loadedCodelessLoveScripts ||= {};
 
     // Always insert the inspector header
     const logoUrl = chrome.runtime.getURL('extension-icons/icon-21.png');
-    elProperties.innerHTML = `<div class="codelesslove-inspector-header"><img class="codelesslove-logo" src="${logoUrl}" alt="Codeless Love Icon" /><span class="codelesslove-inspector-title">Element Explorer</span><button class="codelesslove-inspector-close" title="Close">×</button></div>`;
+    elProperties.innerHTML = `<div class="codelesslove-inspector-header"><span class="codelesslove-header-group"><img class="codelesslove-logo" src="${logoUrl}" alt="Codeless Love Icon" />🐝</span><span class="codelesslove-inspector-title">Bubble Element Explorer</span><button class="codelesslove-inspector-close" title="Close">×</button></div>`;
     attachInspectorCloseHandler(elProperties);
 
     // Make the inspector draggable ONLY from the header, and ignore pointer events from inside the inspector
@@ -285,7 +285,16 @@ window.loadedCodelessLoveScripts ||= {};
 
         let html = '<section class="codelesslove-inspector-body">';
         if (info && info.parent && info.parent.id) {
-          html += `<div class="codelesslove-prop-group"><h4 class="codelesslove-prop-label">Parent</h4><div class="codelesslove-prop-row"><span class="codelesslove-prop-name">↑ <a href="#" class="codelesslove-inspect-element" data-element-id="${info.parent.id}">${info.parent.name || info.parent.default_name || '(no name)'}</a></span><span class="codelesslove-prop-type">[${getTypeDisplay(info.parent.type)}]</span></div></div>`;
+          const parentType = getTypeDisplay(info.parent.type);
+          const parentName = info.parent.name || info.parent.default_name || '(no name)';
+          let parentRow = '<div class="codelesslove-prop-row"><span class="codelesslove-prop-name">';
+          if (parentType === "Page" || parentType === "Reusable") {
+            parentRow += parentName;
+          } else {
+            parentRow += `↑ <a href="#" class="codelesslove-inspect-element" data-element-id="${info.parent.id}">${parentName}</a>`;
+          }
+          parentRow += `</span><span class="codelesslove-prop-type">[${parentType}]</span></div>`;
+          html += `<div class="codelesslove-prop-group"><h4 class="codelesslove-prop-label">Parent</h4>${parentRow}</div>`;
         }
         html += `<div class="codelesslove-prop-group"><h4 class="codelesslove-prop-label">Element</h4><div class="codelesslove-prop-row">→<a href="${editorURL}" target="_blank" class="codelesslove-prop-name">${info.element.name || info.element.default_name || '(no name)'}</a><span class="codelesslove-prop-type">[${getTypeDisplay(info.element.type)}]</span></div></div>`;
         if (info.element.elements) {

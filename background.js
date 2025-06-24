@@ -64,20 +64,16 @@ async function injectFeatures(tabId, context = {}) {
     const injectedFeatures = bubbleTabs.get(tabId);
     for (const feature of featuresConfig) {
       const isEnabled = prefs[feature.key] == true;
-      // --- NEW INJECTION LOGIC ---
-      if (isBubbleEditor) {
-        // In editor: do not inject features that require enable_runtime_features
-        console.log("❤️ We're in the Bubble editor. Injecting feature? ", feature.key, (feature.requires === "enable_runtime_features"));
-        if (feature.requires === "enable_runtime_features") continue;
-      } else if (isApprovedDomain) {
-        // On approved domain (not editor): only inject enable_runtime_features and features that require it
-        console.log("❤️ We're in runtime. Injecting feature? ", feature.key, (feature.key !== "enable_runtime_features" && feature.requires !== "enable_runtime_features"));
-        if (feature.key !== "enable_runtime_features" && feature.requires !== "enable_runtime_features") continue;
-      } else {
-        // Not in editor or approved domain: skip all
-        continue;
-      }
-      // --- END NEW INJECTION LOGIC ---
+
+      // --- RUNTIME/EDITOR INJECTION LOGIC ---
+      // If this is a runtime feature (`key` or `requires` is `enable_runtime_features`), never inject in editor
+      const isRuntimeFeature = feature.key === "enable_runtime_features" || feature.requires === "enable_runtime_features";
+      if (isBubbleEditor && isRuntimeFeature) continue;
+      // If not in editor, only inject runtime features
+      if (!isBubbleEditor && isApprovedDomain && !isRuntimeFeature) continue;
+      // If not in editor or approved domain, skip all
+      if (!isBubbleEditor && !isApprovedDomain) continue;
+
       if (isEnabled && !injectedFeatures.has(feature.key)) {
         if (feature.cssFile) {
           try {

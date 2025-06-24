@@ -85,6 +85,12 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
   border-bottom: 1px solid #e9ecef;
   border-radius: 7px 7px 1px 1px;
+  .codelesslove-header-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1px;
+  }
 }
 .codelesslove-inspector-header .codelesslove-inspector-close {
   cursor: pointer;
