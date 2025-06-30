@@ -122,7 +122,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const container = document.getElementById("features-list");
 
-  const categories = ["Runtime", "Expressions", "Expression Composers", "Branches", "Top Menubar", "Sidebar", "Style Tab", "Design Canvas", "Data View", "Workflow View", "Search Palette","Example Feature"];
+  const categories = [
+    "Runtime",
+    "Expressions",
+    "Expression Composers",
+    "Property Editor",
+    "Branches",
+    "Top Menubar",
+    "Sidebar",
+    "Style Tab",
+    "Design Canvas",
+    "Data View",
+    "Workflow View",
+    "Search Palette",
+    "Example Feature"
+  ];
 
   // Group features by categories
   const featuresByCategory = features.reduce((acc, feature) => {
