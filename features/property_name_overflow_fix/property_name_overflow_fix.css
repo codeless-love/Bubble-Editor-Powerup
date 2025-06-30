@@ -1,0 +1,57 @@
+/* Prevent the names of properties from overflowing onto the next item in the Element Property Editor */
+❤️ codelesslove,
+.section.first-visible {
+    &,
+    & *,
+    &.section.section.section.first-visible * {/* Boost specificity so this takes*/
+        float: none !important;
+    }
+
+    .prop-row-contents {
+        display: flex;
+
+        .caption,
+        .param,
+        .Basic,
+        .caption.param {
+            height: auto;
+            min-height: 24px;
+            overflow: visible;
+            word-break: normal;
+
+            .subcaption,
+            .subtitle {
+                position: relative;
+                font-size: .8em;
+
+                &:before {
+                    content: "❤️";
+                    font-size: 6px;
+                }
+            }
+        }
+
+        .composer-dropdown-button .main {
+            display: flex;
+        }
+
+        .entry.display-only.has-context {
+            border-bottom: 1px solid #6f6f6f;
+            padding-bottom: 10px !important;
+        }
+
+        .flyoutobjectlist { /* Reusable list of properties */
+
+            .entry.display-only.has-context {
+                border-bottom: 1px solid #6f6f6f; /* create a visual separator */
+                padding-bottom: 10px !important;
+            }
+
+            .title-container,
+            .title-container .caption,
+            .title-container .subtitle {
+                width: 100% !important; /* In a RU, let the properties take full width */
+            }
+        }
+    }
+}
