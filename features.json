@@ -272,7 +272,6 @@
     "requires": "enable_runtime_features"
   },
   {
-
     "key": "merge_stall_detector",
     "category": "Merge",
     "name": "Stalled Merge Detector",
