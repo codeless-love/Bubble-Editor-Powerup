@@ -43,7 +43,7 @@ window.loadedCodelessLoveScripts ||= {};
   function checkForStalledMerge() {
     console.log("Check for Stalled Merge")
     // If the merge window appears, always hide the stall message
-    if (document.querySelector('.merge-changes-window')) {
+    if (document.querySelector('.merge-changes-window') && !document.querySelector('.merge-conflict-window')) {
       hideStallMessage();
       stallMessageShown = false;
       if (stallTimeout) {
@@ -55,7 +55,7 @@ window.loadedCodelessLoveScripts ||= {};
     // If a merge is in progress and we haven't shown the message yet, set a timeout
     if (document.querySelector('.merge-progress-bar') && !stallMessageShown && !stallTimeout) {
       stallTimeout = setTimeout(() => {
-        if (!document.querySelector('.merge-changes-window')) {
+        if (!document.querySelector('.merge-changes-window') && !document.querySelector('.merge-conflict-window')) {
           showStallMessage();
           stallMessageShown = true;
         }
