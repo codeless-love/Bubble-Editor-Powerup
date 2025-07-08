@@ -67,7 +67,7 @@ async function injectFeatures(tabId, context = {}) {
 
       // --- RUNTIME/EDITOR INJECTION LOGIC ---
       // If this is a runtime feature (`key` or `requires` is `enable_runtime_features`), never inject in editor
-      const isRuntimeFeature = feature.key === "enable_runtime_features" || feature.requires === "enable_runtime_features";
+      const isRuntimeFeature = feature.requires === "enable_runtime_features";
       if (isBubbleEditor && isRuntimeFeature) continue;
       // If not in editor, only inject runtime features
       if (!isBubbleEditor && isApprovedDomain && !isRuntimeFeature) continue;
