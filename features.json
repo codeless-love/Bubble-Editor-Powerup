@@ -279,5 +279,13 @@
     "cssFile": "features/merge_stall_detector/merge_stall_detector.css",
     "jsFile": "features/merge_stall_detector/merge_stall_detector.js",
     "default": true
+},
+{
+    "key": "property_name_overflow_fix",
+    "category": "Property Editor - Unreleased",
+    "name": "Caption Overflow Fix",
+    "description": "Prevent the name ('caption') of properties in the Element Property Editor from overflowing onto the next item.",
+    "cssFile": "features/property_name_overflow_fix/property_name_overflow_fix.css",
+    "default": false
   }
 ]
