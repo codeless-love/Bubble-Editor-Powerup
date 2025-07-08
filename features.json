@@ -283,10 +283,10 @@
 },
 {
     "key": "property_name_overflow_fix",
-    "category": "Property Editor",
+    "category": "Property Editor - Unreleased",
     "name": "Caption Overflow Fix",
     "description": "Prevent the name ('caption') of properties in the Element Property Editor from overflowing onto the next item.",
     "cssFile": "features/property_name_overflow_fix/property_name_overflow_fix.css",
-    "default": true
+    "default": false
   }
 ]
