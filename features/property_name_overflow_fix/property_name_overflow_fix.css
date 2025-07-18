@@ -54,4 +54,18 @@
             }
         }
     }
+
+    .object-list-editor {/* object list editor is lists of deleteable properties, e.g. in the "Create a thing" dialog*/
+
+        .entry { /* make it so the trashcan can go on the right */
+            display: inline-block;
+            vertical-align: top;
+        }
+        .remover-entry-container { /* make it so the trashcan can go on the right */
+            display: inline-block;
+            vertical-align: top;
+            margin-left: 2px;
+            margin-right: -5px;
+        }
+    }
 }
