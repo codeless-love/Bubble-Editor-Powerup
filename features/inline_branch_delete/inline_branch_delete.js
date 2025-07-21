@@ -341,7 +341,8 @@ window.loadedCodelessLoveScripts ||= {};
     menuContainer.className = '❤️branch-menu-container';
     menuContainer.style.cssText = `
       position: relative;
-      margin-left: 8px;
+      margin: 0 0 0 8px;
+      padding: 0;
       display: inline-flex;
       align-items: center;
     `;
@@ -359,7 +360,8 @@ window.loadedCodelessLoveScripts ||= {};
     menuButton.style.cssText = `
       background: none;
       border: none;
-      padding: 4px;
+      padding: 0;
+      margin: 0;
       cursor: pointer;
       color: #6c757d;
       border-radius: 4px;
@@ -369,6 +371,8 @@ window.loadedCodelessLoveScripts ||= {};
       transition: all 0.2s;
       position: relative;
       z-index: 1;
+      width: 24px;
+      height: 24px;
     `;
     
     // Create the dropdown menu
@@ -550,22 +554,63 @@ window.loadedCodelessLoveScripts ||= {};
     document.querySelectorAll('.branch-env-row.branch').forEach(processBranchRow);
   }
   
+  // Function to cleanup removed menus
+  function cleanupRemovedMenus() {
+    // Find all dropdown menus that are orphaned (button no longer in DOM)
+    document.querySelectorAll('.❤️branch-menu-dropdown').forEach(dropdown => {
+      const button = Array.from(document.querySelectorAll('.❤️branch-menu-button')).find(btn => btn._dropdown === dropdown);
+      if (!button || !document.body.contains(button)) {
+        dropdown.remove();
+      }
+    });
+  }
+  
   // Set up MutationObserver to watch for branch rows
   const observer = new MutationObserver((mutations) => {
+    let hasChanges = false;
+    
     mutations.forEach((mutation) => {
+      // Check for added nodes
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
           // Check if it's a branch row
           if (node.classList && node.classList.contains('branch-env-row') && node.classList.contains('branch')) {
             processBranchRow(node);
+            hasChanges = true;
           }
           
           // Also check children
           const branchRows = node.querySelectorAll ? node.querySelectorAll('.branch-env-row.branch') : [];
-          branchRows.forEach(processBranchRow);
+          branchRows.forEach(row => {
+            processBranchRow(row);
+            if (branchRows.length > 0) hasChanges = true;
+          });
+        }
+      });
+      
+      // Check for removed nodes
+      mutation.removedNodes.forEach((node) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          // If branch rows were removed, clean up orphaned dropdowns
+          if (node.classList && (node.classList.contains('branch-env-row') || node.querySelector('.branch-env-row'))) {
+            cleanupRemovedMenus();
+            hasChanges = true;
+          }
         }
       });
     });
+    
+    // If we detected changes, update the branch mapping
+    if (hasChanges) {
+      updateBranchMapping();
+    }
+  });
+  
+  // Watch for changes to branch list visibility/content
+  const versionObserver = new MutationObserver(() => {
+    // Re-process all branch rows when the version panel updates
+    processAllBranchRows();
+    updateBranchMapping();
   });
   
   // Initial setup
@@ -573,14 +618,38 @@ window.loadedCodelessLoveScripts ||= {};
     // Process existing branch rows after mapping is ready
     processAllBranchRows();
     
-    // Start observing
+    // Start observing the entire document for branch row changes
     observer.observe(document.body, {
       childList: true,
       subtree: true
     });
+    
+    // Also observe the version panel specifically if we can find it
+    const versionPanel = document.querySelector('.versions-panel, [class*="version"], [class*="branch"]');
+    if (versionPanel) {
+      versionObserver.observe(versionPanel, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style']
+      });
+    }
   });
   
-  // Periodically update the mapping
-  setInterval(updateBranchMapping, 30000); // Update every 30 seconds
+  // Periodically update the mapping and re-process rows
+  const updateInterval = setInterval(() => {
+    updateBranchMapping();
+    processAllBranchRows();
+    cleanupRemovedMenus();
+  }, 10000); // Update every 10 seconds
+  
+  // Cleanup on unload
+  window.addEventListener('unload', () => {
+    observer.disconnect();
+    versionObserver.disconnect();
+    clearInterval(updateInterval);
+    // Remove all dropdowns
+    document.querySelectorAll('.❤️branch-menu-dropdown').forEach(dropdown => dropdown.remove());
+  });
   
 })(); // IIFE wrapper - don't put code outside
