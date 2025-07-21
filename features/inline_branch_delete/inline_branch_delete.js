@@ -212,43 +212,17 @@ window.loadedCodelessLoveScripts ||= {};
           createBtn.disabled = true;
           createBtn.textContent = 'Creating...';
           
-          // Override both alert and confirm to suppress all dialogs
-          const originalAlert = window.alert;
-          const originalConfirm = window.confirm;
-          let alertCount = 0;
-          
-          window.alert = (msg) => {
-            console.log('❤️ Suppressed alert:', msg);
-            alertCount++;
-          };
-          window.confirm = (msg) => {
-            console.log('❤️ Auto-confirmed:', msg);
-            return true; // Auto-confirm
-          };
-          
           console.log('❤️ Creating new branch:', branchName, 'from:', fromBranchId);
           
-          try {
-            await window.create_new_app_version(branchName, fromBranchId);
-            
-            // Keep overrides active for a bit longer to catch async alerts
-            setTimeout(() => {
-              window.alert = originalAlert;
-              window.confirm = originalConfirm;
-              console.log(`❤️ Restored alert/confirm functions. Suppressed ${alertCount} alerts.`);
-            }, 2000);
-            
-            // Update mapping after creation
-            setTimeout(updateBranchMapping, 1000);
-            
-            cleanup();
-            resolve(branchName);
-          } catch (innerError) {
-            // Restore immediately on error
-            window.alert = originalAlert;
-            window.confirm = originalConfirm;
-            throw innerError;
-          }
+          // Unfortunately, we can't auto-accept Bubble's alerts as they seem to require actual user interaction
+          // The user will need to manually accept the confirmation dialogs
+          await window.create_new_app_version(branchName, fromBranchId);
+          
+          // Update mapping after creation
+          setTimeout(updateBranchMapping, 1000);
+          
+          cleanup();
+          resolve(branchName);
         } catch (error) {
           console.error('❤️ Error creating branch:', error);
           alert(`Failed to create branch: ${error.message}`);
