@@ -13,14 +13,19 @@ let warningPrefs = {
 };
 
 // Load user preferences for specific warning types
-chrome.storage.sync.get([
-  'expression_bad_practice_warning_count_is_zero',
-  'expression_bad_practice_warning_current_user_in_backend'
-], (result) => {
-  warningPrefs.countIsZero = result.expression_bad_practice_warning_count_is_zero !== false; // Default to true if not set
-  warningPrefs.currentUserInBackend = result.expression_bad_practice_warning_current_user_in_backend !== false; // Default to true if not set
-  console.log("❤️"+"Warning preferences loaded:", warningPrefs);
-});
+if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+  chrome.storage.sync.get([
+    'expression_bad_practice_warning_count_is_zero',
+    'expression_bad_practice_warning_current_user_in_backend'
+  ], (result) => {
+    warningPrefs.countIsZero = result.expression_bad_practice_warning_count_is_zero !== false; // Default to true if not set
+    warningPrefs.currentUserInBackend = result.expression_bad_practice_warning_current_user_in_backend !== false; // Default to true if not set
+    console.log("❤️"+"Warning preferences loaded:", warningPrefs);
+  });
+} else {
+  // Use default values when chrome.storage is not available
+  console.log("❤️"+"Chrome storage not available, using default warning preferences:", warningPrefs);
+}
 
 let debounceTimeout;
 let isProcessing = false; // Flag to prevent redundant processing
