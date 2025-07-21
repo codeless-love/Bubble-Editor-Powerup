@@ -30,6 +30,7 @@ async function isFeatureInjected(tabId, featureKey) {
         );
       },
       args: [featureKey], // Pass the feature key to the tab context
+      world: 'MAIN' // Check in the page's context
     });
     // Return the result from the tab's execution context
     return response[0].result;
@@ -87,6 +88,7 @@ async function injectFeatures(tabId) {
               await chrome.scripting.executeScript({
                 target: { tabId },
                 files: [feature.jsFile],
+                world: 'MAIN' // Execute in the page's context, not isolated
               });
 
               // Verify injection was successful
