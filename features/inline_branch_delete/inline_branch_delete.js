@@ -6,12 +6,30 @@ window.loadedCodelessLoveScripts ||= {};
   // Injection prevention check (one-liner, don't modify)
   /* You can ignore all the stuff on this line, but don't delete! */ console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} /*Exit if already loaded*/ window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
   
+  // Constants
+  const BRANCH_NAME_WIDTH = 160;
+  const FETCH_INTERVAL = 5000; // Refresh mapping every 5 seconds
+  const UPDATE_INTERVAL = 10000; // Update every 10 seconds
+  const RETRY_MAX_ATTEMPTS = 10;
+  const RETRY_INTERVAL = 500; // Retry every 500ms
+  const UI_SETTLE_DELAY = 1500; // Wait for UI to settle
+  const BRANCH_CREATE_DELAY = 1000; // Wait after branch creation
+  const DEBOUNCE_DELAY = 100; // Debounce delay for aggressive observer
+  const DROPDOWN_Z_INDEX = 2147483647; // Maximum z-index
+  const MENU_BUTTON_SIZE = 24;
+  const DROPDOWN_OFFSET = 4; // Pixels between button and dropdown
+  const MODAL_Z_INDEX = 100000000;
+  const MODAL_WIDTH = 400;
+  const RESERVED_BRANCH_NAMES = ['test', 'live', 'main', 'development'];
+  const BRANCH_NAME_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9\-_]*$/;
+  const MAX_BRANCH_NAME_LENGTH = 255;
+  
   // Add CSS to adjust branch name container width
   const style = document.createElement('style');
   style.textContent = `
     .branch-name-icon-container {
-      width: 160px !important;
-      max-width: 160px !important;
+      width: ${BRANCH_NAME_WIDTH}px !important;
+      max-width: ${BRANCH_NAME_WIDTH}px !important;
     }
   `;
   document.head.appendChild(style);
@@ -19,9 +37,41 @@ window.loadedCodelessLoveScripts ||= {};
   // Store mapping of display names to IDs
   let branchNameToIdMap = {};
   let lastFetchTime = 0;
-  const FETCH_INTERVAL = 5000; // Refresh mapping every 5 seconds
   
-  // Function to fetch and update branch mapping
+  // Global event handlers management
+  const globalClickHandler = new WeakMap();
+  let processDebounceTimer = null;
+  
+  /**
+   * Validates a branch name according to Bubble's requirements
+   * @param {string} name - The branch name to validate
+   * @returns {{valid: boolean, error?: string}} Validation result
+   */
+  function validateBranchName(name) {
+    if (!name || name.trim().length === 0) {
+      return { valid: false, error: 'Branch name cannot be empty' };
+    }
+    
+    if (name.length > MAX_BRANCH_NAME_LENGTH) {
+      return { valid: false, error: `Branch name cannot exceed ${MAX_BRANCH_NAME_LENGTH} characters` };
+    }
+    
+    if (RESERVED_BRANCH_NAMES.includes(name.toLowerCase())) {
+      return { valid: false, error: `"${name}" is a reserved branch name` };
+    }
+    
+    if (!BRANCH_NAME_PATTERN.test(name)) {
+      return { valid: false, error: 'Branch name must start with a letter or number and contain only letters, numbers, hyphens, and underscores' };
+    }
+    
+    return { valid: true };
+  }
+  
+  /**
+   * Fetches and updates the mapping of branch display names to IDs
+   * @param {boolean} force - Force update even if recently fetched
+   * @returns {Promise<void>}
+   */
   async function updateBranchMapping(force = false) {
     try {
       const currentTime = Date.now();
@@ -51,14 +101,18 @@ window.loadedCodelessLoveScripts ||= {};
     }
   }
   
-  // Helper to extract branch ID from the DOM structure
+  /**
+   * Extracts branch information from a DOM row element
+   * @param {Element} branchRow - The branch row DOM element
+   * @returns {{displayName: string, id: string}|null} Branch info or null if not found
+   */
   function extractBranchInfo(branchRow) {
     // Try to find the branch name span
     const branchNameSpan = branchRow.querySelector('span._1nfonn86._1lkv1fw9:not(._1ij2r33)');
     if (branchNameSpan) {
       // Skip system branches
       const branchName = branchNameSpan.textContent.trim();
-      if (branchName === 'Live' || branchName === 'Test' || branchName === 'Main' || branchName === 'Development') {
+      if (RESERVED_BRANCH_NAMES.includes(branchName.toLowerCase())) {
         return null;
       }
       
@@ -72,6 +126,8 @@ window.loadedCodelessLoveScripts ||= {};
           if (branchNameToIdMap[branchName]) {
             processBranchRow(branchRow);
           }
+        }).catch(error => {
+          console.error('❤️ Error updating branch mapping:', error);
         });
         return null;
       }
@@ -84,7 +140,12 @@ window.loadedCodelessLoveScripts ||= {};
     return null;
   }
   
-  // Function to create the branch creation modal
+  /**
+   * Creates and displays a modal for branch creation
+   * @param {string} fromBranchId - ID of the branch to create from
+   * @param {string} fromBranchName - Display name of the branch to create from
+   * @returns {Promise<string|null>} Promise resolving to branch name or null if cancelled
+   */
   function createBranchModal(fromBranchId, fromBranchName) {
     // Create overlay
     const overlay = document.createElement('div');
@@ -99,7 +160,7 @@ window.loadedCodelessLoveScripts ||= {};
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 100000000;
+      z-index: ${MODAL_Z_INDEX};
     `;
     
     // Create modal
@@ -109,7 +170,7 @@ window.loadedCodelessLoveScripts ||= {};
       background: white;
       border-radius: 8px;
       padding: 24px;
-      width: 400px;
+      width: ${MODAL_WIDTH}px;
       max-width: 90vw;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     `;
@@ -219,9 +280,9 @@ window.loadedCodelessLoveScripts ||= {};
         }
         
         // Validate branch name
-        const lowerName = branchName.toLowerCase();
-        if (lowerName === 'test' || lowerName === 'live') {
-          alert(`Cannot use reserved name "${branchName}"`);
+        const validation = validateBranchName(branchName);
+        if (!validation.valid) {
+          alert(validation.error);
           input.style.borderColor = '#e74c3c';
           input.focus();
           return;
@@ -246,7 +307,7 @@ window.loadedCodelessLoveScripts ||= {};
           await window.create_new_app_version(branchName, fromBranchId);
           
           // Wait a moment for the branch to be created
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          await new Promise(resolve => setTimeout(resolve, BRANCH_CREATE_DELAY));
           
           // Force update mapping to get the new branch ID
           await updateBranchMapping(true);
@@ -259,7 +320,7 @@ window.loadedCodelessLoveScripts ||= {};
               await window.change_to_version(newBranchId);
               
               // Wait for the UI to update after switching
-              await new Promise(resolve => setTimeout(resolve, 1500));
+              await new Promise(resolve => setTimeout(resolve, UI_SETTLE_DELAY));
               
               // Force process all branch rows to ensure the new branch gets its menu
               processAllBranchRows();
@@ -268,7 +329,7 @@ window.loadedCodelessLoveScripts ||= {};
               let retries = 0;
               const retryInterval = setInterval(() => {
                 const found = ensureBranchHasMenu(branchName);
-                if (found || retries > 10) {
+                if (found || retries > RETRY_MAX_ATTEMPTS) {
                   if (!found) {
                     // Final attempt - process all rows
                     processAllBranchRows();
@@ -276,7 +337,7 @@ window.loadedCodelessLoveScripts ||= {};
                   clearInterval(retryInterval);
                 }
                 retries++;
-              }, 500);
+              }, RETRY_INTERVAL);
             } catch (switchError) {
               console.error('❤️ Error switching to new branch:', switchError);
             }
@@ -322,7 +383,12 @@ window.loadedCodelessLoveScripts ||= {};
     });
   }
   
-  // Function to delete a branch
+  /**
+   * Deletes a branch after user confirmation
+   * @param {string} branchId - The ID of the branch to delete
+   * @param {string} displayName - The display name of the branch
+   * @returns {Promise<void>}
+   */
   async function deleteBranch(branchId, displayName) {
     try {
       // Get app ID from URL
@@ -354,7 +420,7 @@ window.loadedCodelessLoveScripts ||= {};
           } else {
             console.log('❤️ Successfully deleted branch:', branchId);
             // Update mapping after deletion
-            setTimeout(() => updateBranchMapping(true), 1000);
+            setTimeout(() => updateBranchMapping(true), BRANCH_CREATE_DELAY);
             resolve(res);
           }
         });
@@ -365,7 +431,11 @@ window.loadedCodelessLoveScripts ||= {};
     }
   }
   
-  // Function to create the three-dot menu button
+  /**
+   * Creates a three-dot menu button with dropdown for branch actions
+   * @param {{id: string, displayName: string}} branchInfo - Branch information
+   * @returns {Element} The menu container element
+   */
   function createMenuButton(branchInfo) {
     const menuContainer = document.createElement('div');
     menuContainer.className = '❤️branch-menu-container';
@@ -401,8 +471,8 @@ window.loadedCodelessLoveScripts ||= {};
       transition: all 0.2s;
       position: relative;
       z-index: 1;
-      width: 24px;
-      height: 24px;
+      width: ${MENU_BUTTON_SIZE}px;
+      height: ${MENU_BUTTON_SIZE}px;
     `;
     
     // Create the dropdown menu
@@ -415,7 +485,7 @@ window.loadedCodelessLoveScripts ||= {};
       border-radius: 4px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: none;
-      z-index: 2147483647;
+      z-index: ${DROPDOWN_Z_INDEX};
       min-width: 120px;
       overflow: visible;
     `;
@@ -502,7 +572,7 @@ window.loadedCodelessLoveScripts ||= {};
         // Position the dropdown based on button location
         const rect = menuButton.getBoundingClientRect();
         dropdown.style.display = 'block';
-        dropdown.style.top = (rect.bottom + 4) + 'px';
+        dropdown.style.top = (rect.bottom + DROPDOWN_OFFSET) + 'px';
         // Align dropdown's right edge with button's right edge so it extends left
         dropdown.style.left = (rect.right - dropdown.offsetWidth) + 'px';
         menuButton.style.background = '#f0f0f0';
@@ -528,12 +598,18 @@ window.loadedCodelessLoveScripts ||= {};
       await deleteBranch(branchInfo.id, branchInfo.displayName);
     });
     
-    // Close dropdown when clicking outside
-    document.addEventListener('click', () => {
-      dropdown.style.display = 'none';
-      menuButton.style.background = 'none';
-      menuButton.style.color = '#6c757d';
-    });
+    // Close dropdown when clicking outside - store handler for cleanup
+    const closeDropdownHandler = (e) => {
+      if (!menuContainer.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = 'none';
+        menuButton.style.background = 'none';
+        menuButton.style.color = '#6c757d';
+      }
+    };
+    
+    // Store the handler for later cleanup
+    globalClickHandler.set(dropdown, closeDropdownHandler);
+    document.addEventListener('click', closeDropdownHandler);
     
     dropdown.appendChild(createOption);
     dropdown.appendChild(deleteOption);
@@ -548,7 +624,10 @@ window.loadedCodelessLoveScripts ||= {};
     return menuContainer;
   }
   
-  // Function to process branch rows
+  /**
+   * Processes a branch row element to add menu buttons
+   * @param {Element} branchRow - The branch row DOM element
+   */
   function processBranchRow(branchRow) {
     // Skip if already processed
     if (branchRow.querySelector('.❤️branch-menu-container')) {
@@ -579,12 +658,26 @@ window.loadedCodelessLoveScripts ||= {};
     innerContainer.appendChild(menuButton);
   }
   
-  // Function to process all branch rows
+  /**
+   * Processes all branch rows in the document
+   */
   function processAllBranchRows() {
     document.querySelectorAll('.branch-env-row.branch').forEach(processBranchRow);
   }
   
-  // Function to ensure a specific branch has a menu (by name)
+  /**
+   * Debounced version of processAllBranchRows to prevent excessive calls
+   */
+  function debouncedProcessAllBranchRows() {
+    clearTimeout(processDebounceTimer);
+    processDebounceTimer = setTimeout(() => processAllBranchRows(), DEBOUNCE_DELAY);
+  }
+  
+  /**
+   * Ensures a specific branch has a menu button by branch name
+   * @param {string} branchName - The name of the branch
+   * @returns {boolean} True if branch was found and processed
+   */
   function ensureBranchHasMenu(branchName) {
     // Try multiple selectors to find the branch row
     const selectors = [
@@ -605,12 +698,20 @@ window.loadedCodelessLoveScripts ||= {};
     return false;
   }
   
-  // Function to cleanup removed menus
+  /**
+   * Cleans up orphaned dropdown menus and their event listeners
+   */
   function cleanupRemovedMenus() {
     // Find all dropdown menus that are orphaned (button no longer in DOM)
     document.querySelectorAll('.❤️branch-menu-dropdown').forEach(dropdown => {
       const button = Array.from(document.querySelectorAll('.❤️branch-menu-button')).find(btn => btn._dropdown === dropdown);
       if (!button || !document.body.contains(button)) {
+        // Remove event listener if it exists
+        const handler = globalClickHandler.get(dropdown);
+        if (handler) {
+          document.removeEventListener('click', handler);
+          globalClickHandler.delete(dropdown);
+        }
         dropdown.remove();
       }
     });
@@ -669,17 +770,18 @@ window.loadedCodelessLoveScripts ||= {};
     // Check if any text content contains branch names that don't have menus yet
     for (const mutation of mutations) {
       if (mutation.type === 'characterData' || mutation.type === 'childList') {
-        // Small delay to let DOM settle
-        setTimeout(() => {
-          processAllBranchRows();
-        }, 100);
+        // Use debounced version to prevent excessive calls
+        debouncedProcessAllBranchRows();
         break;
       }
     }
   });
   
-  // Initial setup
-  updateBranchMapping().then(() => {
+  /**
+   * Initializes the inline branch delete feature
+   */
+  function initialize() {
+    updateBranchMapping().then(() => {
     // Process existing branch rows after mapping is ready
     processAllBranchRows();
     
@@ -710,14 +812,20 @@ window.loadedCodelessLoveScripts ||= {};
         characterDataOldValue: true
       });
     }
-  });
+    }).catch(error => {
+      console.error('❤️ Error during initialization:', error);
+    });
+  }
+  
+  // Start initialization
+  initialize();
   
   // Periodically update the mapping and re-process rows
   const updateInterval = setInterval(() => {
     updateBranchMapping();
     processAllBranchRows();
     cleanupRemovedMenus();
-  }, 10000); // Update every 10 seconds
+  }, UPDATE_INTERVAL);
   
   // Cleanup on unload
   window.addEventListener('unload', () => {
@@ -725,8 +833,15 @@ window.loadedCodelessLoveScripts ||= {};
     versionObserver.disconnect();
     aggressiveObserver.disconnect();
     clearInterval(updateInterval);
-    // Remove all dropdowns
-    document.querySelectorAll('.❤️branch-menu-dropdown').forEach(dropdown => dropdown.remove());
+    // Remove all dropdowns and their event listeners
+    document.querySelectorAll('.❤️branch-menu-dropdown').forEach(dropdown => {
+      const handler = globalClickHandler.get(dropdown);
+      if (handler) {
+        document.removeEventListener('click', handler);
+        globalClickHandler.delete(dropdown);
+      }
+      dropdown.remove();
+    });
   });
   
 })(); // IIFE wrapper - don't put code outside
