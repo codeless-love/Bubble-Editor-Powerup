@@ -74,6 +74,196 @@ window.loadedCodelessLoveScripts ||= {};
     return null;
   }
   
+  // Function to create the branch creation modal
+  function createBranchModal(fromBranchId, fromBranchName) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = '❤️branch-modal-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000000;
+    `;
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.className = '❤️branch-modal';
+    modal.style.cssText = `
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      width: 400px;
+      max-width: 90vw;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    `;
+    
+    modal.innerHTML = `
+      <h2 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 600; color: #333;">Create New Branch</h2>
+      <p style="margin: 0 0 20px 0; color: #666; font-size: 14px;">
+        Creating from: <strong>${fromBranchName}</strong>
+      </p>
+      <input 
+        type="text" 
+        id="❤️branch-name-input" 
+        placeholder="Enter branch name"
+        style="
+          width: 100%;
+          padding: 10px 12px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          font-size: 14px;
+          margin-bottom: 20px;
+          box-sizing: border-box;
+          outline: none;
+        "
+      />
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button 
+          id="❤️branch-cancel"
+          style="
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #666;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+          "
+        >Cancel</button>
+        <button 
+          id="❤️branch-create"
+          style="
+            padding: 8px 16px;
+            border: none;
+            background: #4361ee;
+            color: white;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+          "
+        >Create Branch</button>
+      </div>
+    `;
+    
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // Focus input
+    const input = modal.querySelector('#❤️branch-name-input');
+    input.focus();
+    
+    // Add hover effects
+    const cancelBtn = modal.querySelector('#❤️branch-cancel');
+    const createBtn = modal.querySelector('#❤️branch-create');
+    
+    cancelBtn.addEventListener('mouseenter', () => {
+      cancelBtn.style.background = '#f5f5f5';
+    });
+    cancelBtn.addEventListener('mouseleave', () => {
+      cancelBtn.style.background = 'white';
+    });
+    
+    createBtn.addEventListener('mouseenter', () => {
+      createBtn.style.background = '#3a56d4';
+    });
+    createBtn.addEventListener('mouseleave', () => {
+      createBtn.style.background = '#4361ee';
+    });
+    
+    // Handle input focus
+    input.addEventListener('focus', () => {
+      input.style.borderColor = '#4361ee';
+    });
+    input.addEventListener('blur', () => {
+      input.style.borderColor = '#ddd';
+    });
+    
+    // Return promise for branch creation
+    return new Promise((resolve, reject) => {
+      const cleanup = () => {
+        document.body.removeChild(overlay);
+      };
+      
+      // Cancel button
+      cancelBtn.addEventListener('click', () => {
+        cleanup();
+        resolve(null);
+      });
+      
+      // Create button
+      const createBranch = async () => {
+        const branchName = input.value.trim();
+        if (!branchName) {
+          input.style.borderColor = '#e74c3c';
+          input.focus();
+          return;
+        }
+        
+        try {
+          createBtn.disabled = true;
+          createBtn.textContent = 'Creating...';
+          
+          // Auto-confirm any alerts by overriding window.alert temporarily
+          const originalAlert = window.alert;
+          window.alert = () => {}; // No-op
+          
+          console.log('❤️ Creating new branch:', branchName, 'from:', fromBranchId);
+          await window.create_new_app_version(branchName, fromBranchId);
+          
+          // Restore original alert
+          window.alert = originalAlert;
+          
+          // Update mapping after creation
+          setTimeout(updateBranchMapping, 1000);
+          
+          cleanup();
+          resolve(branchName);
+        } catch (error) {
+          window.alert = originalAlert;
+          console.error('❤️ Error creating branch:', error);
+          alert(`Failed to create branch: ${error.message}`);
+          createBtn.disabled = false;
+          createBtn.textContent = 'Create Branch';
+        }
+      };
+      
+      createBtn.addEventListener('click', createBranch);
+      
+      // Enter key support
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          createBranch();
+        }
+      });
+      
+      // Escape key support
+      document.addEventListener('keydown', function escapeHandler(e) {
+        if (e.key === 'Escape') {
+          cleanup();
+          resolve(null);
+          document.removeEventListener('keydown', escapeHandler);
+        }
+      });
+      
+      // Click outside to close
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          cleanup();
+          resolve(null);
+        }
+      });
+    });
+  }
+  
   // Function to delete a branch
   async function deleteBranch(branchId, displayName) {
     try {
@@ -168,6 +358,23 @@ window.loadedCodelessLoveScripts ||= {};
       min-width: 120px;
     `;
     
+    // Create branch option
+    const createOption = document.createElement('button');
+    createOption.className = '❤️branch-menu-option';
+    createOption.textContent = 'Create Branch';
+    createOption.style.cssText = `
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      color: #4361ee;
+      font-size: 13px;
+      transition: background-color 0.2s;
+    `;
+    
     const deleteOption = document.createElement('button');
     deleteOption.className = '❤️branch-menu-option';
     deleteOption.textContent = 'Delete Branch';
@@ -182,6 +389,7 @@ window.loadedCodelessLoveScripts ||= {};
       color: #e74c3c;
       font-size: 13px;
       transition: background-color 0.2s;
+      border-top: 1px solid #f0f0f0;
     `;
     
     // Hover effects
@@ -195,6 +403,14 @@ window.loadedCodelessLoveScripts ||= {};
         menuButton.style.background = 'none';
         menuButton.style.color = '#6c757d';
       }
+    });
+    
+    createOption.addEventListener('mouseenter', () => {
+      createOption.style.backgroundColor = '#f0f5ff';
+    });
+    
+    createOption.addEventListener('mouseleave', () => {
+      createOption.style.backgroundColor = 'transparent';
     });
     
     deleteOption.addEventListener('mouseenter', () => {
@@ -225,6 +441,14 @@ window.loadedCodelessLoveScripts ||= {};
       }
     });
     
+    createOption.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      dropdown.style.display = 'none';
+      menuButton.style.background = 'none';
+      menuButton.style.color = '#6c757d';
+      await createBranchModal(branchInfo.id, branchInfo.displayName);
+    });
+    
     deleteOption.addEventListener('click', async (e) => {
       e.stopPropagation();
       dropdown.style.display = 'none';
@@ -240,6 +464,7 @@ window.loadedCodelessLoveScripts ||= {};
       menuButton.style.color = '#6c757d';
     });
     
+    dropdown.appendChild(createOption);
     dropdown.appendChild(deleteOption);
     menuContainer.appendChild(menuButton);
     menuContainer.appendChild(dropdown);
