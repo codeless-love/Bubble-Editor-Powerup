@@ -404,16 +404,23 @@
     <div class="tool-section">
       <h2>❤️ Fast Branch Delete</h2>
       <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 1em;">
-        Quickly delete a branch by entering its ID below. This will execute a soft delete on the specified branch.
+        Quickly delete a branch by selecting it from the dropdown. This will execute a soft delete on the selected branch.
       </p>
       <div class="branch-delete-container">
-        <input 
-          type="text" 
-          id="branch-delete-input" 
-          class="branch-delete-input" 
-          placeholder="Enter branch ID (e.g., my-feature-branch)"
-        />
-        <button id="branch-delete-button" class="branch-delete-button">
+        <div class="row" style="gap: 8px; margin-bottom: 1em;">
+          <select 
+            id="branch-delete-select" 
+            class="branch-delete-input" 
+            style="flex: 1;"
+            disabled
+          >
+            <option value="">Loading versions...</option>
+          </select>
+          <button id="branch-refresh-button" class="button-secondary" style="padding: 8px 12px;">
+            Refresh
+          </button>
+        </div>
+        <button id="branch-delete-button" class="branch-delete-button" disabled>
           Delete Branch
         </button>
         <div id="branch-delete-status" class="branch-delete-status"></div>

@@ -422,8 +422,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Fast Branch Delete functionality
-  const branchDeleteInput = document.getElementById("branch-delete-input");
+  const branchDeleteSelect = document.getElementById("branch-delete-select");
   const branchDeleteButton = document.getElementById("branch-delete-button");
+  const branchRefreshButton = document.getElementById("branch-refresh-button");
   const branchDeleteStatus = document.getElementById("branch-delete-status");
   
   // Function to execute branch deletion in the active tab
@@ -485,7 +486,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           throw new Error(results[0].error);
         } else {
           showStatus(`Successfully deleted branch: ${branchId}`, 'success');
-          branchDeleteInput.value = '';
+          // Refresh the versions list after successful deletion
+          await fetchVersions();
         }
       } else {
         throw new Error('No response from script execution');
@@ -510,27 +512,118 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
   
+  // Function to fetch versions from the active tab
+  async function fetchVersions() {
+    try {
+      // Get the active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      // Check if the active tab is a Bubble editor
+      if (!activeTab.url || (!activeTab.url.includes("bubble.io") && !activeTab.url.includes("bubble.is"))) {
+        branchDeleteSelect.innerHTML = '<option value="">Please open a Bubble editor tab</option>';
+        branchDeleteSelect.disabled = true;
+        branchDeleteButton.disabled = true;
+        return;
+      }
+      
+      // Execute the script to get versions
+      const results = await chrome.scripting.executeScript({
+        target: { tabId: activeTab.id },
+        world: 'MAIN',
+        func: () => {
+          try {
+            console.log('❤️ Fetching version metadata');
+            const versions = window.get_version_metadata(true);
+            console.log('❤️ Version metadata:', versions);
+            return versions;
+          } catch (error) {
+            console.error('❤️ Error fetching versions:', error);
+            throw error;
+          }
+        }
+      });
+      
+      if (results && results[0] && results[0].result) {
+        const versions = results[0].result;
+        
+        // Filter out deleted versions and system versions (live, test)
+        const availableVersions = Object.entries(versions)
+          .filter(([key, data]) => {
+            return key !== 'live' && 
+                   key !== 'test' && 
+                   !data.deleted &&
+                   data.access_permitted !== false;
+          })
+          .map(([key, data]) => ({
+            id: key,
+            display: data.display || key,
+            creator: data.user?.email || 'Unknown'
+          }));
+        
+        // Clear and populate the select dropdown
+        branchDeleteSelect.innerHTML = '';
+        
+        if (availableVersions.length === 0) {
+          branchDeleteSelect.innerHTML = '<option value="">No deletable branches found</option>';
+          branchDeleteSelect.disabled = true;
+          branchDeleteButton.disabled = true;
+        } else {
+          branchDeleteSelect.innerHTML = '<option value="">Select a branch to delete</option>';
+          
+          availableVersions.forEach(version => {
+            const option = document.createElement('option');
+            option.value = version.id;
+            option.textContent = `${version.display} (${version.id})`;
+            branchDeleteSelect.appendChild(option);
+          });
+          
+          branchDeleteSelect.disabled = false;
+          branchDeleteButton.disabled = false;
+        }
+      }
+    } catch (error) {
+      console.error('❤️ Error fetching versions:', error);
+      branchDeleteSelect.innerHTML = '<option value="">Error loading versions</option>';
+      branchDeleteSelect.disabled = true;
+      branchDeleteButton.disabled = true;
+      showStatus('Error loading versions: ' + error.message, 'error');
+    }
+  }
+  
   // Add click event listener to the delete button
   branchDeleteButton.addEventListener("click", async () => {
-    const branchId = branchDeleteInput.value.trim();
+    const branchId = branchDeleteSelect.value;
     
     if (!branchId) {
-      showStatus('Please enter a branch ID', 'error');
+      showStatus('Please select a branch to delete', 'error');
       return;
     }
     
+    // Get the selected option text for confirmation
+    const selectedOption = branchDeleteSelect.options[branchDeleteSelect.selectedIndex];
+    const branchName = selectedOption.textContent;
+    
     // Confirm deletion
-    if (confirm(`Are you sure you want to delete the branch "${branchId}"?`)) {
+    if (confirm(`Are you sure you want to delete the branch "${branchName}"?`)) {
       await deleteBranch(branchId);
     }
   });
   
-  // Add enter key support
-  branchDeleteInput.addEventListener("keypress", (event) => {
-    if (event.key === "Enter") {
-      branchDeleteButton.click();
-    }
+  // Add click event listener to the refresh button
+  branchRefreshButton.addEventListener("click", async () => {
+    branchDeleteSelect.innerHTML = '<option value="">Loading versions...</option>';
+    branchDeleteSelect.disabled = true;
+    branchDeleteButton.disabled = true;
+    await fetchVersions();
   });
+  
+  // Enable/disable delete button based on selection
+  branchDeleteSelect.addEventListener("change", () => {
+    branchDeleteButton.disabled = !branchDeleteSelect.value;
+  });
+  
+  // Fetch versions on initial load
+  fetchVersions();
 
   // click close button
   document.getElementById("close-button").addEventListener("click", async () => {
