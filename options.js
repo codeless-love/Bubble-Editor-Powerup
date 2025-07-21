@@ -422,13 +422,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Fast Branch Delete functionality
-  const branchDeleteSelect = document.getElementById("branch-delete-select");
+  const branchList = document.getElementById("branch-list");
   const branchDeleteButton = document.getElementById("branch-delete-button");
   const branchRefreshButton = document.getElementById("branch-refresh-button");
   const branchDeleteStatus = document.getElementById("branch-delete-status");
+  const branchSelectionCount = document.getElementById("branch-selection-count");
+  const branchSelectNone = document.getElementById("branch-select-none");
   
   // Function to execute branch deletion in the active tab
-  async function deleteBranch(branchId) {
+  async function deleteBranch(branchId, skipRefresh = false) {
     try {
       // Get the active tab
       const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -485,16 +487,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (results[0].error) {
           throw new Error(results[0].error);
         } else {
-          showStatus(`Successfully deleted branch: ${branchId}`, 'success');
-          // Refresh the versions list after successful deletion
-          await fetchVersions();
+          if (!skipRefresh) {
+            showStatus(`Successfully deleted branch: ${branchId}`, 'success');
+            // Refresh the versions list after successful deletion
+            await fetchVersions();
+          }
         }
       } else {
         throw new Error('No response from script execution');
       }
     } catch (error) {
-      showStatus(error.message || 'Error deleting branch', 'error');
+      if (!skipRefresh) {
+        showStatus(error.message || 'Error deleting branch', 'error');
+      }
       console.error('❤️ Branch deletion error:', error);
+      throw error; // Re-throw for batch handling
     }
   }
   
@@ -520,8 +527,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       
       // Check if the active tab is a Bubble editor
       if (!activeTab.url || (!activeTab.url.includes("bubble.io") && !activeTab.url.includes("bubble.is"))) {
-        branchDeleteSelect.innerHTML = '<option value="">Please open a Bubble editor tab</option>';
-        branchDeleteSelect.disabled = true;
+        branchList.innerHTML = '<div class="branch-list-loading">Please open a Bubble editor tab</div>';
         branchDeleteButton.disabled = true;
         return;
       }
@@ -560,66 +566,167 @@ document.addEventListener("DOMContentLoaded", async () => {
             creator: data.user?.email || 'Unknown'
           }));
         
-        // Clear and populate the select dropdown
-        branchDeleteSelect.innerHTML = '';
+        // Clear and populate the branch list
+        branchList.innerHTML = '';
         
         if (availableVersions.length === 0) {
-          branchDeleteSelect.innerHTML = '<option value="">No deletable branches found</option>';
-          branchDeleteSelect.disabled = true;
+          branchList.innerHTML = '<div class="branch-list-loading">No deletable branches found</div>';
           branchDeleteButton.disabled = true;
         } else {
-          branchDeleteSelect.innerHTML = '<option value="">Select a branch to delete</option>';
-          
           availableVersions.forEach(version => {
-            const option = document.createElement('option');
-            option.value = version.id;
-            option.textContent = `${version.display} (${version.id})`;
-            branchDeleteSelect.appendChild(option);
+            const item = document.createElement('div');
+            item.className = 'branch-item';
+            item.innerHTML = `
+              <input type="checkbox" id="branch-${version.id}" value="${version.id}">
+              <label for="branch-${version.id}" class="branch-item-content">
+                <div>
+                  <span class="branch-item-name">${version.display}</span>
+                  <span class="branch-item-id">(${version.id})</span>
+                </div>
+                <div class="branch-item-info">Created by: ${version.creator}</div>
+              </label>
+            `;
+            
+            // Add click handler for the entire item
+            item.addEventListener('click', (e) => {
+              if (e.target.tagName !== 'INPUT') {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change'));
+              }
+            });
+            
+            // Add change handler for checkbox
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.addEventListener('change', () => {
+              if (checkbox.checked) {
+                item.classList.add('selected');
+              } else {
+                item.classList.remove('selected');
+              }
+              updateSelectionCount();
+            });
+            
+            branchList.appendChild(item);
           });
           
-          branchDeleteSelect.disabled = false;
-          branchDeleteButton.disabled = false;
+          updateSelectionCount();
         }
       }
     } catch (error) {
       console.error('❤️ Error fetching versions:', error);
-      branchDeleteSelect.innerHTML = '<option value="">Error loading versions</option>';
-      branchDeleteSelect.disabled = true;
+      branchList.innerHTML = '<div class="branch-list-loading">Error loading versions</div>';
       branchDeleteButton.disabled = true;
       showStatus('Error loading versions: ' + error.message, 'error');
     }
   }
   
+  // Function to update selection count display
+  function updateSelectionCount() {
+    const selectedCheckboxes = branchList.querySelectorAll('input[type="checkbox"]:checked');
+    const count = selectedCheckboxes.length;
+    
+    if (count === 0) {
+      branchSelectionCount.textContent = '';
+      branchDeleteButton.disabled = true;
+      branchDeleteButton.textContent = 'Delete Selected Branches';
+    } else if (count === 1) {
+      branchSelectionCount.textContent = '1 branch selected';
+      branchDeleteButton.disabled = false;
+      branchDeleteButton.textContent = 'Delete Selected Branch';
+    } else {
+      branchSelectionCount.textContent = `${count} branches selected`;
+      branchDeleteButton.disabled = false;
+      branchDeleteButton.textContent = 'Delete Selected Branches';
+    }
+  }
+  
   // Add click event listener to the delete button
   branchDeleteButton.addEventListener("click", async () => {
-    const branchId = branchDeleteSelect.value;
+    const selectedCheckboxes = Array.from(branchList.querySelectorAll('input[type="checkbox"]:checked'));
     
-    if (!branchId) {
-      showStatus('Please select a branch to delete', 'error');
+    if (selectedCheckboxes.length === 0) {
+      showStatus('Please select at least one branch to delete', 'error');
       return;
     }
     
-    // Get the selected option text for confirmation
-    const selectedOption = branchDeleteSelect.options[branchDeleteSelect.selectedIndex];
-    const branchName = selectedOption.textContent;
+    // Build confirmation message
+    const selectedBranches = selectedCheckboxes.map(cb => {
+      const item = cb.closest('.branch-item');
+      const name = item.querySelector('.branch-item-name').textContent;
+      const id = cb.value;
+      return { id, name, fullText: `${name} (${id})` };
+    });
+    
+    let confirmMessage;
+    
+    if (selectedBranches.length === 1) {
+      confirmMessage = `Are you sure you want to delete the branch "${selectedBranches[0].fullText}"?`;
+    } else {
+      confirmMessage = `Are you sure you want to delete these ${selectedBranches.length} branches?\n\n` + 
+                      selectedBranches.map(b => b.fullText).join('\n');
+    }
     
     // Confirm deletion
-    if (confirm(`Are you sure you want to delete the branch "${branchName}"?`)) {
-      await deleteBranch(branchId);
+    if (confirm(confirmMessage)) {
+      // Disable controls during deletion
+      const checkboxes = branchList.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.disabled = true);
+      branchDeleteButton.disabled = true;
+      branchRefreshButton.disabled = true;
+      branchSelectNone.disabled = true;
+      
+      // Delete branches one by one
+      let successCount = 0;
+      let errorCount = 0;
+      
+      showStatus(`Deleting ${selectedBranches.length} branches...`, 'info');
+      
+      for (let i = 0; i < selectedBranches.length; i++) {
+        const branch = selectedBranches[i];
+        
+        // Update status
+        showStatus(`Deleting ${i + 1}/${selectedBranches.length}: ${branch.fullText}...`, 'info');
+        
+        try {
+          await deleteBranch(branch.id, true); // Skip individual refresh
+          successCount++;
+        } catch (error) {
+          errorCount++;
+          console.error(`❤️ Failed to delete branch ${branch.fullText}:`, error);
+        }
+      }
+      
+      // Show final status
+      if (errorCount === 0) {
+        showStatus(`Successfully deleted ${successCount} branch${successCount > 1 ? 'es' : ''}`, 'success');
+      } else {
+        showStatus(`Deleted ${successCount} branch${successCount > 1 ? 'es' : ''}, ${errorCount} failed`, 'error');
+      }
+      
+      // Re-enable controls
+      branchRefreshButton.disabled = false;
+      branchSelectNone.disabled = false;
+      
+      // Refresh the list
+      await fetchVersions();
     }
   });
   
   // Add click event listener to the refresh button
   branchRefreshButton.addEventListener("click", async () => {
-    branchDeleteSelect.innerHTML = '<option value="">Loading versions...</option>';
-    branchDeleteSelect.disabled = true;
+    branchList.innerHTML = '<div class="branch-list-loading">Loading versions...</div>';
     branchDeleteButton.disabled = true;
     await fetchVersions();
   });
   
-  // Enable/disable delete button based on selection
-  branchDeleteSelect.addEventListener("change", () => {
-    branchDeleteButton.disabled = !branchDeleteSelect.value;
+  // Add clear selection functionality
+  branchSelectNone.addEventListener("click", () => {
+    const checkboxes = branchList.querySelectorAll('input[type="checkbox"]:checked');
+    checkboxes.forEach(cb => {
+      cb.checked = false;
+      cb.dispatchEvent(new Event('change'));
+    });
   });
   
   // Fetch versions on initial load

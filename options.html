@@ -386,6 +386,113 @@
       border-left: 3px solid var(--danger-color);
       display: block;
     }
+    
+    .branch-delete-status.info {
+      background-color: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+      border-left: 3px solid #3b82f6;
+      display: block;
+    }
+    
+    /* Branch list styling */
+    .branch-list-container {
+      margin-bottom: 1em;
+    }
+    
+    .branch-list-header {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .branch-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: var(--background-color);
+    }
+    
+    .branch-list-loading {
+      padding: 2em;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    
+    .branch-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color var(--transition-speed);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    
+    .branch-item:last-child {
+      border-bottom: none;
+    }
+    
+    .branch-item:hover {
+      background-color: var(--secondary-color);
+    }
+    
+    .branch-item.selected {
+      background-color: rgba(67, 97, 238, 0.1);
+    }
+    
+    .branch-item input[type="checkbox"] {
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    
+    .branch-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .branch-item-name {
+      font-weight: 500;
+      color: var(--text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .branch-item-id {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-left: 8px;
+    }
+    
+    .branch-item-info {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    
+    .branch-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .branch-list::-webkit-scrollbar-track {
+      background: var(--secondary-color);
+      border-radius: 4px;
+    }
+    
+    .branch-list::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    
+    .branch-list::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
   </style>
   <script src="options.js" defer></script>
 </head>
@@ -404,24 +511,27 @@
     <div class="tool-section">
       <h2>❤️ Fast Branch Delete</h2>
       <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 1em;">
-        Quickly delete a branch by selecting it from the dropdown. This will execute a soft delete on the selected branch.
+        Quickly delete one or more branches by selecting them from the list. This will execute a soft delete on all selected branches.
       </p>
       <div class="branch-delete-container">
+        <div class="branch-list-container">
+          <div class="branch-list-header">
+            <button id="branch-select-none" class="button-secondary" style="padding: 4px 8px; font-size: 12px;">
+              Clear Selection
+            </button>
+          </div>
+          <div id="branch-list" class="branch-list">
+            <div class="branch-list-loading">Loading versions...</div>
+          </div>
+        </div>
         <div class="row" style="gap: 8px; margin-bottom: 1em;">
-          <select 
-            id="branch-delete-select" 
-            class="branch-delete-input" 
-            style="flex: 1;"
-            disabled
-          >
-            <option value="">Loading versions...</option>
-          </select>
           <button id="branch-refresh-button" class="button-secondary" style="padding: 8px 12px;">
             Refresh
           </button>
+          <span id="branch-selection-count" style="font-size: 13px; color: var(--text-secondary);"></span>
         </div>
         <button id="branch-delete-button" class="branch-delete-button" disabled>
-          Delete Branch
+          Delete Selected Branches
         </button>
         <div id="branch-delete-status" class="branch-delete-status"></div>
       </div>
