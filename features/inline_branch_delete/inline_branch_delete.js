@@ -12,10 +12,10 @@ window.loadedCodelessLoveScripts ||= {};
   const FETCH_INTERVAL = 5000; // Refresh mapping every 5 seconds
   
   // Function to fetch and update branch mapping
-  async function updateBranchMapping() {
+  async function updateBranchMapping(force = false) {
     try {
       const currentTime = Date.now();
-      if (currentTime - lastFetchTime < FETCH_INTERVAL) {
+      if (!force && currentTime - lastFetchTime < FETCH_INTERVAL) {
         return; // Don't fetch too frequently
       }
       
@@ -89,7 +89,7 @@ window.loadedCodelessLoveScripts ||= {};
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 10000000;
+      z-index: 100000000;
     `;
     
     // Create modal
@@ -208,6 +208,23 @@ window.loadedCodelessLoveScripts ||= {};
           return;
         }
         
+        // Validate branch name
+        const lowerName = branchName.toLowerCase();
+        if (lowerName === 'test' || lowerName === 'live') {
+          alert(`Cannot use reserved name "${branchName}"`);
+          input.style.borderColor = '#e74c3c';
+          input.focus();
+          return;
+        }
+        
+        // Check if branch already exists
+        if (branchNameToIdMap[branchName]) {
+          alert(`Branch "${branchName}" already exists`);
+          input.style.borderColor = '#e74c3c';
+          input.focus();
+          return;
+        }
+        
         try {
           createBtn.disabled = true;
           createBtn.textContent = 'Creating...';
@@ -218,8 +235,24 @@ window.loadedCodelessLoveScripts ||= {};
           // The user will need to manually accept the confirmation dialogs
           await window.create_new_app_version(branchName, fromBranchId);
           
-          // Update mapping after creation
-          setTimeout(updateBranchMapping, 1000);
+          // Wait a moment for the branch to be created
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Force update mapping to get the new branch ID
+          await updateBranchMapping(true);
+          
+          // Get the ID of the newly created branch
+          const newBranchId = branchNameToIdMap[branchName];
+          if (newBranchId) {
+            console.log('❤️ Switching to new branch:', newBranchId);
+            try {
+              await window.change_to_version(newBranchId);
+            } catch (switchError) {
+              console.error('❤️ Error switching to new branch:', switchError);
+            }
+          } else {
+            console.warn('❤️ Could not find ID for newly created branch:', branchName);
+          }
           
           cleanup();
           resolve(branchName);
@@ -291,7 +324,7 @@ window.loadedCodelessLoveScripts ||= {};
           } else {
             console.log('❤️ Successfully deleted branch:', branchId);
             // Update mapping after deletion
-            setTimeout(updateBranchMapping, 1000);
+            setTimeout(() => updateBranchMapping(true), 1000);
             resolve(res);
           }
         });
@@ -307,8 +340,10 @@ window.loadedCodelessLoveScripts ||= {};
     const menuContainer = document.createElement('div');
     menuContainer.className = '❤️branch-menu-container';
     menuContainer.style.cssText = `
-      position: relative;
-      margin-left: auto;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
       display: flex;
       align-items: center;
     `;
@@ -349,7 +384,7 @@ window.loadedCodelessLoveScripts ||= {};
       border-radius: 4px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: none;
-      z-index: 9999999;
+      z-index: 99999999;
       min-width: 120px;
     `;
     
@@ -492,6 +527,9 @@ window.loadedCodelessLoveScripts ||= {};
     if (!innerContainer) {
       return;
     }
+    
+    // Ensure the container has position relative for absolute positioning to work
+    innerContainer.style.position = 'relative';
     
     // Create and add the menu button
     const menuButton = createMenuButton(branchInfo);
