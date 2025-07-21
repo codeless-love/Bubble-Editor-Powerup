@@ -178,16 +178,6 @@
               </label>
             `;
             
-            // Add click handler to the entire item (except checkbox)
-            item.addEventListener('click', (e) => {
-              // Check if the click was on the checkbox itself
-              if (e.target.type !== 'checkbox') {
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                checkbox.checked = !checkbox.checked;
-                checkbox.dispatchEvent(new Event('change'));
-              }
-            });
-            
             // Add change handler to checkbox
             item.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
               if (e.target.checked) {
