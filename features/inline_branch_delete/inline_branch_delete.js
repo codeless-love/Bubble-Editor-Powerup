@@ -105,7 +105,6 @@ window.loadedCodelessLoveScripts ||= {};
             reject(err);
           } else {
             console.log('❤️ Successfully deleted branch:', branchId);
-            alert(`Successfully deleted branch "${displayName}"`);
             // Update mapping after deletion
             setTimeout(updateBranchMapping, 1000);
             resolve(res);
