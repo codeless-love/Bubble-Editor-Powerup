@@ -6,6 +6,16 @@ window.loadedCodelessLoveScripts ||= {};
   // Injection prevention check (one-liner, don't modify)
   /* You can ignore all the stuff on this line, but don't delete! */ console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} /*Exit if already loaded*/ window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
   
+  // Add CSS to adjust branch name container width
+  const style = document.createElement('style');
+  style.textContent = `
+    .branch-name-icon-container {
+      width: 160px !important;
+      max-width: 160px !important;
+    }
+  `;
+  document.head.appendChild(style);
+  
   // Store mapping of display names to IDs
   let branchNameToIdMap = {};
   let lastFetchTime = 0;
@@ -247,6 +257,26 @@ window.loadedCodelessLoveScripts ||= {};
             console.log('❤️ Switching to new branch:', newBranchId);
             try {
               await window.change_to_version(newBranchId);
+              
+              // Wait for the UI to update after switching
+              await new Promise(resolve => setTimeout(resolve, 1500));
+              
+              // Force process all branch rows to ensure the new branch gets its menu
+              processAllBranchRows();
+              
+              // Also set up an interval to retry processing for the new branch
+              let retries = 0;
+              const retryInterval = setInterval(() => {
+                const found = ensureBranchHasMenu(branchName);
+                if (found || retries > 10) {
+                  if (!found) {
+                    // Final attempt - process all rows
+                    processAllBranchRows();
+                  }
+                  clearInterval(retryInterval);
+                }
+                retries++;
+              }, 500);
             } catch (switchError) {
               console.error('❤️ Error switching to new branch:', switchError);
             }
@@ -554,6 +584,27 @@ window.loadedCodelessLoveScripts ||= {};
     document.querySelectorAll('.branch-env-row.branch').forEach(processBranchRow);
   }
   
+  // Function to ensure a specific branch has a menu (by name)
+  function ensureBranchHasMenu(branchName) {
+    // Try multiple selectors to find the branch row
+    const selectors = [
+      `.branch-env-row.branch span:contains("${branchName}")`,
+      `.branch-env-row.branch span[title="${branchName}"]`,
+      `.branch-env-row.branch`
+    ];
+    
+    // Find all branch rows and check their text content
+    const branchRows = document.querySelectorAll('.branch-env-row.branch');
+    for (const row of branchRows) {
+      const nameSpan = row.querySelector('span._1nfonn86._1lkv1fw9:not(._1ij2r33)');
+      if (nameSpan && nameSpan.textContent.trim() === branchName) {
+        processBranchRow(row);
+        return true;
+      }
+    }
+    return false;
+  }
+  
   // Function to cleanup removed menus
   function cleanupRemovedMenus() {
     // Find all dropdown menus that are orphaned (button no longer in DOM)
@@ -613,6 +664,20 @@ window.loadedCodelessLoveScripts ||= {};
     updateBranchMapping();
   });
   
+  // Aggressive observer for catching new branches
+  const aggressiveObserver = new MutationObserver((mutations) => {
+    // Check if any text content contains branch names that don't have menus yet
+    for (const mutation of mutations) {
+      if (mutation.type === 'characterData' || mutation.type === 'childList') {
+        // Small delay to let DOM settle
+        setTimeout(() => {
+          processAllBranchRows();
+        }, 100);
+        break;
+      }
+    }
+  });
+  
   // Initial setup
   updateBranchMapping().then(() => {
     // Process existing branch rows after mapping is ready
@@ -634,6 +699,17 @@ window.loadedCodelessLoveScripts ||= {};
         attributeFilter: ['class', 'style']
       });
     }
+    
+    // Set up aggressive observer for the branches container
+    const branchesContainer = document.querySelector('.branches-container, .branch-list-container');
+    if (branchesContainer) {
+      aggressiveObserver.observe(branchesContainer, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        characterDataOldValue: true
+      });
+    }
   });
   
   // Periodically update the mapping and re-process rows
@@ -647,6 +723,7 @@ window.loadedCodelessLoveScripts ||= {};
   window.addEventListener('unload', () => {
     observer.disconnect();
     versionObserver.disconnect();
+    aggressiveObserver.disconnect();
     clearInterval(updateInterval);
     // Remove all dropdowns
     document.querySelectorAll('.❤️branch-menu-dropdown').forEach(dropdown => dropdown.remove());
