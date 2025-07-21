@@ -218,5 +218,13 @@
     "cssFile": "features/folder_click_toggle/folder_click_toggle.css",
     "jsFile": "features/folder_click_toggle/folder_click_toggle.js",
     "default": true
+  },
+  {
+    "key": "fast_branch_delete",
+    "category": "Developer Tools",
+    "name": "Fast Branch Delete",
+    "description": "Provides a quick way to delete multiple branches at once from the extension popup. Access this feature by clicking the extension icon while in a Bubble editor.",
+    "jsFile": "features/fast_branch_delete/fast_branch_delete.js",
+    "default": true
   }
 ]

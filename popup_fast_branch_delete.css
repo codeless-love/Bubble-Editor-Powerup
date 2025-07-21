@@ -1,0 +1,160 @@
+/* Fast Branch Delete styles for the extension popup */
+
+/* Branch list container */
+.branch-list-container {
+  margin-bottom: 1em;
+}
+
+.branch-list-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Branch list */
+.branch-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--background-color);
+}
+
+.branch-list-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* Branch items */
+.branch-item {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color var(--transition-speed);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.branch-item:last-child {
+  border-bottom: none;
+}
+
+.branch-item:hover {
+  background-color: var(--hover-background);
+}
+
+.branch-item.selected {
+  background-color: rgba(67, 97, 238, 0.1);
+}
+
+.branch-item input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.branch-item-content {
+  flex: 1;
+  cursor: pointer;
+}
+
+.branch-item-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.branch-item-id {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-left: 4px;
+}
+
+.branch-item-info {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Branch delete button */
+.branch-delete-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color var(--transition-speed);
+  width: 100%;
+}
+
+.branch-delete-button:hover:not(:disabled) {
+  background-color: #c0392b;
+}
+
+.branch-delete-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Branch delete status */
+.branch-delete-status {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  font-size: 13px;
+  text-align: center;
+  display: none;
+}
+
+.branch-delete-status.success {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.branch-delete-status.error {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.branch-delete-status.info {
+  background-color: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+  border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+/* Custom scrollbar for branch list */
+.branch-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.branch-list::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+  border-radius: 4px;
+}
+
+.branch-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.branch-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Branch selection count */
+#branch-selection-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 32px;
+}
