@@ -70,7 +70,8 @@ window.loadedCodelessLoveScripts ||= {};
     menuContainer.style.cssText = `
       position: relative;
       margin-left: auto;
-      margin-right: 8px;
+      display: flex;
+      align-items: center;
     `;
     
     // Create the three-dot button
@@ -218,9 +219,18 @@ window.loadedCodelessLoveScripts ||= {};
       return;
     }
     
+    // Find the time span (e.g., "6d ago")
+    const timeSpan = innerContainer.querySelector('span._1nfonn86._1lkv1fw9._1ij2r33');
+    
     // Create and add the menu button
     const menuButton = createMenuButton(branchId);
-    innerContainer.appendChild(menuButton);
+    
+    // Insert before the time span if it exists, otherwise append
+    if (timeSpan) {
+      innerContainer.insertBefore(menuButton, timeSpan);
+    } else {
+      innerContainer.appendChild(menuButton);
+    }
   }
   
   // Set up MutationObserver to watch for branch rows
