@@ -340,11 +340,9 @@ window.loadedCodelessLoveScripts ||= {};
     const menuContainer = document.createElement('div');
     menuContainer.className = '❤️branch-menu-container';
     menuContainer.style.cssText = `
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
+      position: relative;
+      margin-left: 8px;
+      display: inline-flex;
       align-items: center;
     `;
     
@@ -361,7 +359,7 @@ window.loadedCodelessLoveScripts ||= {};
     menuButton.style.cssText = `
       background: none;
       border: none;
-      padding: 0;
+      padding: 4px;
       cursor: pointer;
       color: #6c757d;
       border-radius: 4px;
@@ -369,23 +367,23 @@ window.loadedCodelessLoveScripts ||= {};
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
+      position: relative;
+      z-index: 1;
     `;
     
     // Create the dropdown menu
     const dropdown = document.createElement('div');
     dropdown.className = '❤️branch-menu-dropdown';
     dropdown.style.cssText = `
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 4px;
+      position: fixed;
       background: white;
       border: 1px solid #e0e0e0;
       border-radius: 4px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: none;
-      z-index: 99999999;
+      z-index: 2147483647;
       min-width: 120px;
+      overflow: visible;
     `;
     
     // Create branch option
@@ -459,15 +457,23 @@ window.loadedCodelessLoveScripts ||= {};
       // Close all other dropdowns
       document.querySelectorAll('.❤️branch-menu-dropdown').forEach(d => {
         d.style.display = 'none';
-        d.parentElement.querySelector('.❤️branch-menu-button').style.background = 'none';
-        d.parentElement.querySelector('.❤️branch-menu-button').style.color = '#6c757d';
+      });
+      document.querySelectorAll('.❤️branch-menu-button').forEach(btn => {
+        btn.style.background = 'none';
+        btn.style.color = '#6c757d';
       });
       
       // Toggle this dropdown
-      dropdown.style.display = isOpen ? 'none' : 'block';
       if (!isOpen) {
+        // Position the dropdown based on button location
+        const rect = menuButton.getBoundingClientRect();
+        dropdown.style.top = (rect.bottom + 4) + 'px';
+        dropdown.style.left = (rect.right - dropdown.offsetWidth || rect.right - 120) + 'px';
+        dropdown.style.display = 'block';
         menuButton.style.background = '#f0f0f0';
         menuButton.style.color = '#333';
+      } else {
+        dropdown.style.display = 'none';
       }
     });
     
@@ -497,7 +503,12 @@ window.loadedCodelessLoveScripts ||= {};
     dropdown.appendChild(createOption);
     dropdown.appendChild(deleteOption);
     menuContainer.appendChild(menuButton);
-    menuContainer.appendChild(dropdown);
+    
+    // Append dropdown to body to avoid overflow issues
+    document.body.appendChild(dropdown);
+    
+    // Store reference to dropdown on button for cleanup
+    menuButton._dropdown = dropdown;
     
     return menuContainer;
   }
@@ -527,9 +538,6 @@ window.loadedCodelessLoveScripts ||= {};
     if (!innerContainer) {
       return;
     }
-    
-    // Ensure the container has position relative for absolute positioning to work
-    innerContainer.style.position = 'relative';
     
     // Create and add the menu button
     const menuButton = createMenuButton(branchInfo);
