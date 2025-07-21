@@ -6,8 +6,43 @@ window.loadedCodelessLoveScripts ||= {};
   // Injection prevention check (one-liner, don't modify)
   /* You can ignore all the stuff on this line, but don't delete! */ console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} /*Exit if already loaded*/ window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
   
+  // Store mapping of display names to IDs
+  let branchNameToIdMap = {};
+  let lastFetchTime = 0;
+  const FETCH_INTERVAL = 5000; // Refresh mapping every 5 seconds
+  
+  // Function to fetch and update branch mapping
+  async function updateBranchMapping() {
+    try {
+      const currentTime = Date.now();
+      if (currentTime - lastFetchTime < FETCH_INTERVAL) {
+        return; // Don't fetch too frequently
+      }
+      
+      lastFetchTime = currentTime;
+      console.log('❤️ Fetching version metadata for branch mapping');
+      
+      const versions = window.get_version_metadata(true);
+      branchNameToIdMap = {};
+      
+      // Build the mapping
+      Object.entries(versions).forEach(([id, data]) => {
+        if (id !== 'live' && id !== 'test' && !data.deleted && data.access_permitted !== false) {
+          const displayName = data.display || id;
+          branchNameToIdMap[displayName] = id;
+          // Also store the ID itself as a key (in case display name equals ID)
+          branchNameToIdMap[id] = id;
+        }
+      });
+      
+      console.log('❤️ Updated branch mapping:', branchNameToIdMap);
+    } catch (error) {
+      console.error('❤️ Error updating branch mapping:', error);
+    }
+  }
+  
   // Helper to extract branch ID from the DOM structure
-  function extractBranchId(branchRow) {
+  function extractBranchInfo(branchRow) {
     // Try to find the branch name span
     const branchNameSpan = branchRow.querySelector('span._1nfonn86._1lkv1fw9:not(._1ij2r33)');
     if (branchNameSpan) {
@@ -16,13 +51,31 @@ window.loadedCodelessLoveScripts ||= {};
       if (branchName === 'Live' || branchName === 'Test' || branchName === 'Main' || branchName === 'Development') {
         return null;
       }
-      return branchName;
+      
+      // Look up the actual ID from our mapping
+      const actualId = branchNameToIdMap[branchName];
+      if (!actualId) {
+        console.warn('❤️ Could not find ID for branch:', branchName);
+        // Try to update mapping
+        updateBranchMapping().then(() => {
+          // Re-process this row after updating mapping
+          if (branchNameToIdMap[branchName]) {
+            processBranchRow(branchRow);
+          }
+        });
+        return null;
+      }
+      
+      return {
+        displayName: branchName,
+        id: actualId
+      };
     }
     return null;
   }
   
   // Function to delete a branch
-  async function deleteBranch(branchId) {
+  async function deleteBranch(branchId, displayName) {
     try {
       // Get app ID from URL
       const urlParams = new URLSearchParams(window.location.search);
@@ -32,8 +85,8 @@ window.loadedCodelessLoveScripts ||= {};
         throw new Error('Could not find app ID in URL');
       }
       
-      // Show confirmation dialog
-      if (!confirm(`Are you sure you want to delete branch "${branchId}"?`)) {
+      // Show confirmation dialog with display name
+      if (!confirm(`Are you sure you want to delete branch "${displayName}" (ID: ${branchId})?`)) {
         return;
       }
       
@@ -52,7 +105,9 @@ window.loadedCodelessLoveScripts ||= {};
             reject(err);
           } else {
             console.log('❤️ Successfully deleted branch:', branchId);
-            alert(`Successfully deleted branch "${branchId}"`);
+            alert(`Successfully deleted branch "${displayName}"`);
+            // Update mapping after deletion
+            setTimeout(updateBranchMapping, 1000);
             resolve(res);
           }
         });
@@ -64,7 +119,7 @@ window.loadedCodelessLoveScripts ||= {};
   }
   
   // Function to create the three-dot menu button
-  function createMenuButton(branchId) {
+  function createMenuButton(branchInfo) {
     const menuContainer = document.createElement('div');
     menuContainer.className = '❤️branch-menu-container';
     menuContainer.style.cssText = `
@@ -176,7 +231,7 @@ window.loadedCodelessLoveScripts ||= {};
       dropdown.style.display = 'none';
       menuButton.style.background = 'none';
       menuButton.style.color = '#6c757d';
-      await deleteBranch(branchId);
+      await deleteBranch(branchInfo.id, branchInfo.displayName);
     });
     
     // Close dropdown when clicking outside
@@ -207,9 +262,9 @@ window.loadedCodelessLoveScripts ||= {};
       return;
     }
     
-    // Extract branch ID
-    const branchId = extractBranchId(branchRow);
-    if (!branchId) {
+    // Extract branch info
+    const branchInfo = extractBranchInfo(branchRow);
+    if (!branchInfo) {
       return;
     }
     
@@ -220,8 +275,13 @@ window.loadedCodelessLoveScripts ||= {};
     }
     
     // Create and add the menu button
-    const menuButton = createMenuButton(branchId);
+    const menuButton = createMenuButton(branchInfo);
     innerContainer.appendChild(menuButton);
+  }
+  
+  // Function to process all branch rows
+  function processAllBranchRows() {
+    document.querySelectorAll('.branch-env-row.branch').forEach(processBranchRow);
   }
   
   // Set up MutationObserver to watch for branch rows
@@ -242,13 +302,19 @@ window.loadedCodelessLoveScripts ||= {};
     });
   });
   
-  // Start observing
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
+  // Initial setup
+  updateBranchMapping().then(() => {
+    // Process existing branch rows after mapping is ready
+    processAllBranchRows();
+    
+    // Start observing
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
   });
   
-  // Process existing branch rows
-  document.querySelectorAll('.branch-env-row.branch').forEach(processBranchRow);
+  // Periodically update the mapping
+  setInterval(updateBranchMapping, 30000); // Update every 30 seconds
   
 })(); // IIFE wrapper - don't put code outside
