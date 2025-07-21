@@ -75,6 +75,17 @@ async function injectFeatures(tabId, context = {}) {
       if (!isBubbleEditor && !isApprovedDomain) continue;
 
       if (isEnabled && !injectedFeatures.has(feature.key)) {
+        // Check if the tab still exists before injecting
+        let tabExists = true;
+        try {
+          await chrome.tabs.get(tabId);
+        } catch (e) {
+          tabExists = false;
+        }
+        if (!tabExists) {
+          console.warn(`❤️ Skipping injection for ${feature.key}: tab ${tabId} no longer exists.`);
+          continue;
+        }
         if (feature.cssFile) {
           try {
             await chrome.scripting.insertCSS({
@@ -82,7 +93,7 @@ async function injectFeatures(tabId, context = {}) {
               files: [feature.cssFile], // CSS file to inject
             });
           } catch (cssError) {
-            console.error(`❤️ Error injecting CSS for ${feature.key}:`, cssError);
+            console.warn(`❤️ Error injecting CSS for ${feature.key}:`, cssError);
             // Continue to try JS injection even if CSS fails
           }
         }
