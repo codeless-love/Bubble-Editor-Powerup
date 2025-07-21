@@ -212,23 +212,44 @@ window.loadedCodelessLoveScripts ||= {};
           createBtn.disabled = true;
           createBtn.textContent = 'Creating...';
           
-          // Auto-confirm any alerts by overriding window.alert temporarily
+          // Override both alert and confirm to suppress all dialogs
           const originalAlert = window.alert;
-          window.alert = () => {}; // No-op
+          const originalConfirm = window.confirm;
+          let alertCount = 0;
+          
+          window.alert = (msg) => {
+            console.log('❤️ Suppressed alert:', msg);
+            alertCount++;
+          };
+          window.confirm = (msg) => {
+            console.log('❤️ Auto-confirmed:', msg);
+            return true; // Auto-confirm
+          };
           
           console.log('❤️ Creating new branch:', branchName, 'from:', fromBranchId);
-          await window.create_new_app_version(branchName, fromBranchId);
           
-          // Restore original alert
-          window.alert = originalAlert;
-          
-          // Update mapping after creation
-          setTimeout(updateBranchMapping, 1000);
-          
-          cleanup();
-          resolve(branchName);
+          try {
+            await window.create_new_app_version(branchName, fromBranchId);
+            
+            // Keep overrides active for a bit longer to catch async alerts
+            setTimeout(() => {
+              window.alert = originalAlert;
+              window.confirm = originalConfirm;
+              console.log(`❤️ Restored alert/confirm functions. Suppressed ${alertCount} alerts.`);
+            }, 2000);
+            
+            // Update mapping after creation
+            setTimeout(updateBranchMapping, 1000);
+            
+            cleanup();
+            resolve(branchName);
+          } catch (innerError) {
+            // Restore immediately on error
+            window.alert = originalAlert;
+            window.confirm = originalConfirm;
+            throw innerError;
+          }
         } catch (error) {
-          window.alert = originalAlert;
           console.error('❤️ Error creating branch:', error);
           alert(`Failed to create branch: ${error.message}`);
           createBtn.disabled = false;
