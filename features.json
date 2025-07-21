@@ -77,7 +77,7 @@
   {
     "key": "top_menu_layout",
     "category": "Top Menubar",
-    "name": "Maximize App Information Manager dropdown in top menubar",
+    "name": "Maximize App Interface Manager dropdown in top menubar",
     "description": "Make the unexpanded page dropdown take up the full width in the top menubar.",
     "cssFile": "features/top_menu_layout/top_menu_layout.css",
     "default": true
@@ -85,7 +85,7 @@
   {
     "key": "top_menu_aim",
     "category": "Top Menubar",
-    "name": "Maximize the expanded App Information Manager dropdown menu",
+    "name": "Maximize the expanded App Interface Manager dropdown menu",
     "description": "When the AIM menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
     "cssFile": "features/top_menu_layout/top_menu_aim.css",
     "default": true
