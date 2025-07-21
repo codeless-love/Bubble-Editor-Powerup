@@ -219,18 +219,9 @@ window.loadedCodelessLoveScripts ||= {};
       return;
     }
     
-    // Find the time span (e.g., "6d ago")
-    const timeSpan = innerContainer.querySelector('span._1nfonn86._1lkv1fw9._1ij2r33');
-    
     // Create and add the menu button
     const menuButton = createMenuButton(branchId);
-    
-    // Insert before the time span if it exists, otherwise append
-    if (timeSpan) {
-      innerContainer.insertBefore(menuButton, timeSpan);
-    } else {
-      innerContainer.appendChild(menuButton);
-    }
+    innerContainer.appendChild(menuButton);
   }
   
   // Set up MutationObserver to watch for branch rows
