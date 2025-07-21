@@ -226,5 +226,13 @@
     "description": "Provides a quick way to delete multiple branches at once from the extension popup. Access this feature by clicking the extension icon while in a Bubble editor.",
     "jsFile": "features/fast_branch_delete/fast_branch_delete.js",
     "default": true
+  },
+  {
+    "key": "inline_branch_delete",
+    "category": "Developer Tools",
+    "name": "Inline Branch Delete",
+    "description": "Adds a three-dot menu to each branch in the version control panel, allowing you to quickly delete branches directly from the Bubble editor interface.",
+    "jsFile": "features/inline_branch_delete/inline_branch_delete.js",
+    "default": true
   }
 ]
