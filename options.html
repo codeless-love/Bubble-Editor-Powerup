@@ -41,6 +41,10 @@
       line-height: 1.5;
       font-size: 14px;
     }
+
+    [hidden] {
+      display: none !important;
+    }
     
     body.full-page {
       margin: auto;
@@ -62,7 +66,7 @@
     
     main {
       margin: var(--base-padding);
-      padding: 0 var(--base-padding) var(--base-padding) var(--base-padding);
+      padding: 0 var(--base-padding);
     }
     
     footer {
@@ -332,6 +336,43 @@
       border-bottom: none;
       padding-bottom: 0;
     }
+    
+    .candidate-domains {
+      margin: 8px 0 0 28px;
+      font-weight: bold;
+      font-size: 10px;
+      color: #666666;
+    }
+    .candidate-domains-list {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 6px;
+      max-width: 100%;
+      margin-top: 6px;
+    }
+    .candidate-domains-list > span{
+      border: solid 1px var(--border-color);
+      border-radius: 20px;
+      padding: 2px 8px;
+      white-space: nowrap;
+      font-size: .8em;
+      font-family: math;
+    }
+    .emoji-row {
+      display: flex;
+      align-items: flex-start;
+      gap: calc(var(--base-padding) * 2);
+      align-items: center;
+    }
+    .emoji-row p,
+    .emoji-row .emoji  {
+      margin: var(--base-padding) 0;
+      line-height: 1.5em;
+    }
+    .emoji-row .emoji {
+      font-size: 1.5em;
+    }
   </style>
   <link rel="stylesheet" href="popup_fast_branch_delete.css">
   <script src="popup_fast_branch_delete.js" defer></script>
@@ -345,7 +386,7 @@
     </div>
     <button class="button-close" id="close-button" aria-label="Close">&times;</button>
   </header>
-  <main>
+  <main id="Editor">
     <p>Select which features you want to enable:</p>
     <div id="features-list" class="features-container"></div>
     
@@ -377,6 +418,16 @@
         <div id="branch-delete-status" class="branch-delete-status"></div>
       </div>
     </div>
+  </main>
+  <main id="Candidate" hidden>
+    <div class="emoji-row"><span class="emoji">☑️</span><p>Powerup needs your permission to run on this domain.</p></div>
+    <button id="grant-access-btn">Grant access to this domain</button>
+  </main>
+  <main id="Approved" hidden>
+    <div class="emoji-row"><span class="emoji">✅</span><p>Powerup extension is approved for this site! Use debug_mode to see features.</p></div>
+  </main>
+  <main id="Unrelated" hidden>
+    <div class="emoji-row"><span class="emoji">🫠</span><p>Powerup extension is not enabled for this site.</p></div>
   </main>
   <footer>
     <div id="status"></div>
