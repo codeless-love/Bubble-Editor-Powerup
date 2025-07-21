@@ -87,7 +87,7 @@ window.loadedCodelessLoveScripts ||= {};
     menuButton.style.cssText = `
       background: none;
       border: none;
-      padding: 4px;
+      padding: 0;
       cursor: pointer;
       color: #6c757d;
       border-radius: 4px;
