@@ -467,9 +467,10 @@ window.loadedCodelessLoveScripts ||= {};
       if (!isOpen) {
         // Position the dropdown based on button location
         const rect = menuButton.getBoundingClientRect();
-        dropdown.style.top = (rect.bottom + 4) + 'px';
-        dropdown.style.left = rect.left + 'px';
         dropdown.style.display = 'block';
+        dropdown.style.top = (rect.bottom + 4) + 'px';
+        // Align dropdown's right edge with button's right edge so it extends left
+        dropdown.style.left = (rect.right - dropdown.offsetWidth) + 'px';
         menuButton.style.background = '#f0f0f0';
         menuButton.style.color = '#333';
       } else {
