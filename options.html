@@ -315,6 +315,77 @@
       border-color: var(--primary-color);
       outline: none;
     }
+    
+    /* Fast Branch Delete styling */
+    .tool-section {
+      margin-top: 2em;
+      padding: 1em;
+      background-color: var(--secondary-color);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+    }
+    
+    .tool-section h2 {
+      margin-top: 0;
+      font-size: 1.1em;
+      color: var(--text-color);
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    .branch-delete-container {
+      margin-top: 1em;
+    }
+    
+    .branch-delete-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      margin-bottom: 1em;
+    }
+    
+    .branch-delete-input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+    
+    .branch-delete-button {
+      background-color: var(--danger-color);
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .branch-delete-button:hover {
+      background-color: #dc2626;
+    }
+    
+    .branch-delete-status {
+      margin-top: 1em;
+      padding: 8px 12px;
+      border-radius: var(--border-radius);
+      font-size: 13px;
+      display: none;
+    }
+    
+    .branch-delete-status.success {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success-color);
+      border-left: 3px solid var(--success-color);
+      display: block;
+    }
+    
+    .branch-delete-status.error {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger-color);
+      border-left: 3px solid var(--danger-color);
+      display: block;
+    }
   </style>
   <script src="options.js" defer></script>
 </head>
@@ -329,6 +400,25 @@
   <main>
     <p>Select which features you want to enable:</p>
     <div id="features-list" class="features-container"></div>
+    
+    <div class="tool-section">
+      <h2>❤️ Fast Branch Delete</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 1em;">
+        Quickly delete a branch by entering its ID below. This will execute a soft delete on the specified branch.
+      </p>
+      <div class="branch-delete-container">
+        <input 
+          type="text" 
+          id="branch-delete-input" 
+          class="branch-delete-input" 
+          placeholder="Enter branch ID (e.g., my-feature-branch)"
+        />
+        <button id="branch-delete-button" class="branch-delete-button">
+          Delete Branch
+        </button>
+        <div id="branch-delete-status" class="branch-delete-status"></div>
+      </div>
+    </div>
   </main>
   <footer>
     <div id="status"></div>

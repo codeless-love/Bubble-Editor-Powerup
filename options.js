@@ -421,6 +421,117 @@ document.addEventListener("DOMContentLoaded", async () => {
     closePopup(1500);
   });
 
+  // Fast Branch Delete functionality
+  const branchDeleteInput = document.getElementById("branch-delete-input");
+  const branchDeleteButton = document.getElementById("branch-delete-button");
+  const branchDeleteStatus = document.getElementById("branch-delete-status");
+  
+  // Function to execute branch deletion in the active tab
+  async function deleteBranch(branchId) {
+    try {
+      // Get the active tab
+      const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      
+      // Check if the active tab is a Bubble editor
+      if (!activeTab.url || (!activeTab.url.includes("bubble.io") && !activeTab.url.includes("bubble.is"))) {
+        throw new Error("Please open a Bubble editor tab first");
+      }
+      
+      // Extract app ID from the URL
+      const urlParams = new URLSearchParams(new URL(activeTab.url).search);
+      const appId = urlParams.get('id');
+      
+      if (!appId) {
+        throw new Error("No app ID found in the current tab URL");
+      }
+      
+      // Execute the deletion script in the active tab
+      const results = await chrome.scripting.executeScript({
+        target: { tabId: activeTab.id },
+        world: 'MAIN',  // This ensures the script runs in the page's main world where Lib() is available
+        func: (appId, branchId) => {
+          return new Promise((resolve, reject) => {
+            console.log('❤️ Executing branch deletion for version:', branchId);
+            
+            // Now we can directly access Lib() since we're in the MAIN world
+            try {
+              Lib().location.post("server://appeditor/delete_app_version", {
+                appname: appId,
+                app_version: branchId,
+                soft_delete: true
+              }, (err, res) => {
+                const message = err ? `Error: ${err}` : `Successfully deleted version ${branchId}`;
+                console.log('❤️', message);
+                
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(res);
+                }
+              });
+            } catch (error) {
+              console.error('❤️ Error calling Lib():', error);
+              reject(error.toString());
+            }
+          });
+        },
+        args: [appId, branchId]
+      });
+      
+      console.log('❤️ Script execution results:', results);
+      
+      if (results && results[0]) {
+        if (results[0].error) {
+          throw new Error(results[0].error);
+        } else {
+          showStatus(`Successfully deleted branch: ${branchId}`, 'success');
+          branchDeleteInput.value = '';
+        }
+      } else {
+        throw new Error('No response from script execution');
+      }
+    } catch (error) {
+      showStatus(error.message || 'Error deleting branch', 'error');
+      console.error('❤️ Branch deletion error:', error);
+    }
+  }
+  
+  // Function to show status messages
+  function showStatus(message, type) {
+    branchDeleteStatus.textContent = message;
+    branchDeleteStatus.className = `branch-delete-status ${type}`;
+    
+    // Auto-hide success messages after 5 seconds
+    if (type === 'success') {
+      setTimeout(() => {
+        branchDeleteStatus.className = 'branch-delete-status';
+        branchDeleteStatus.textContent = '';
+      }, 5000);
+    }
+  }
+  
+  // Add click event listener to the delete button
+  branchDeleteButton.addEventListener("click", async () => {
+    const branchId = branchDeleteInput.value.trim();
+    
+    if (!branchId) {
+      showStatus('Please enter a branch ID', 'error');
+      return;
+    }
+    
+    // Confirm deletion
+    if (confirm(`Are you sure you want to delete the branch "${branchId}"?`)) {
+      await deleteBranch(branchId);
+    }
+  });
+  
+  // Add enter key support
+  branchDeleteInput.addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      branchDeleteButton.click();
+    }
+  });
+
   // click close button
   document.getElementById("close-button").addEventListener("click", async () => {
     closePopup();
