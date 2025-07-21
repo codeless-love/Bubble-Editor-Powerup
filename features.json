@@ -8,6 +8,14 @@
     "jsFile": "features/feature_key_goes_here/feature_key_goes_here.js",
     "default": false
   },
+{
+    "key": "left_to_right_action_view",
+    "category": "Workflow View",
+    "name": "Wrap Actions Left-to-Right",
+    "description": "When viewing a workflow's actions, this displays the actions in a left-to-right view instead of a vertically stacked view. NOTE: This only works in the 'Default' view, and not with the 'Compact' view.",
+    "jsFile": "features/left_to_right_action_view/left_to_right_action_view.js",
+    "default": false
+  },
   {
     "key": "checkbox_label_click",
     "category": "Data View",
@@ -43,6 +51,22 @@
     "default": true
   },
   {
+    "key": "expression_bad_practice_warning_public_api_checked",
+    "name": "Public API Warning",
+    "description": "Shows a warning when a workflow is exposed as a public API",
+    "category": "Expressions",
+    "default": true,
+    "requires": "expression_bad_practice_warning"
+  },
+  {
+    "key": "expression_bad_practice_warning_zero_width",
+    "category": "Expressions",
+    "name": "Zero Width Warning",
+    "description": "Warn when an element's max-width is set to 0",
+    "requires": "expression_bad_practice_warning",
+    "default": true
+  },
+  {
     "key": "style_row_hover",
     "category": "Style Tab",
     "name": "Hi-light style variable rows on hover",
@@ -53,7 +77,7 @@
   {
     "key": "top_menu_layout",
     "category": "Top Menubar",
-    "name": "Maximize App Information Manager dropdown in top menubar",
+    "name": "Maximize App Interface Manager dropdown in top menubar",
     "description": "Make the unexpanded page dropdown take up the full width in the top menubar.",
     "cssFile": "features/top_menu_layout/top_menu_layout.css",
     "default": true
@@ -61,7 +85,7 @@
   {
     "key": "top_menu_aim",
     "category": "Top Menubar",
-    "name": "Maximize the expanded App Information Manager dropdown menu",
+    "name": "Maximize the expanded App Interface Manager dropdown menu",
     "description": "When the AIM menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
     "cssFile": "features/top_menu_layout/top_menu_aim.css",
     "default": true
@@ -218,5 +242,50 @@
     "cssFile": "features/folder_click_toggle/folder_click_toggle.css",
     "jsFile": "features/folder_click_toggle/folder_click_toggle.js",
     "default": true
+  },
+  {
+    "key": "search_palette_current",
+    "category": "Search Palette",
+    "name": "Highlight Current Search Result",
+    "description": "Adds visual feedback to show which search result was last clicked in the search palette.",
+    "cssFile": "features/search_palette_current/style.css",
+    "jsFile": "features/search_palette_current/script.js",
+    "default": true
+  },
+  {
+    "key": "enable_runtime_features",
+    "category": "Runtime",
+    "name": "Enable Runtime Features (Beta)",
+    "description": "Enable powerup features for runtime (a.k.a. preview mode). You will need to grant permission for each custom domain from the extension in runtime. Some features are only available in debug_mode. Note: this feature is in Beta. Please report bugs on the Codeless Love slack group or GitHub repository!",
+    "cssFile": "features/runtime_enable/runtime_enable.css",
+    "jsFile": "features/runtime_enable/runtime_enable.js",
+    "default": false
+  },
+  {
+    "key": "runtime_element_explorer",
+    "category": "Runtime",
+    "name": "Element Explorer (Beta)",
+    "description": "Click on any element on the page in Runtime (preview mode with debugger on) to see information about it, it's parent, children, and which reusable it is in. Navigate up and down the element tree, and open the editor directly to any given element. Note: only functions in debug_mode.  Note: this feature is in Beta. Please report bugs on the Codeless Love slack group or GitHub repository!",
+    "cssFile": "features/runtime_element_explorer/element_explorer.css",
+    "jsFile": "features/runtime_element_explorer/element_explorer.js",
+    "default": false,
+    "requires": "enable_runtime_features"
+  },
+  {
+    "key": "merge_stall_detector",
+    "category": "Merge",
+    "name": "Stalled Merge Detector",
+    "description": "Sometimes merges stall on load. This detects that and provides help for fixing the issue.",
+    "cssFile": "features/merge_stall_detector/merge_stall_detector.css",
+    "jsFile": "features/merge_stall_detector/merge_stall_detector.js",
+    "default": true
+},
+{
+    "key": "property_name_overflow_fix",
+    "category": "Property Editor - Unreleased",
+    "name": "Caption Overflow Fix",
+    "description": "Prevent the name ('caption') of properties in the Element Property Editor from overflowing onto the next item.",
+    "cssFile": "features/property_name_overflow_fix/property_name_overflow_fix.css",
+    "default": false
   }
 ]

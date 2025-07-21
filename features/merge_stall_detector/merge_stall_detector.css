@@ -1,0 +1,67 @@
+/* Stalled Merge Detector - no CSS needed, but file present for convention. */
+
+/* Stalled Merge Detector message styling */
+#codelesslove_stall_detected {
+  position: fixed;
+  top: 200px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  max-width: 450px;
+  transform: translateX(-50%);
+  border-radius: 8px;
+  z-index: 99999;
+  font-size: 1.1em;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  background: #fff;
+
+  .codelesslove-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: grab;
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 7px 7px 1px 1px;
+    gap: 5px;
+
+        .codelesslove-logo {
+            width: 20px;
+            height: 20px;
+        }
+        .codelesslove-title {
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            color: #3a3a3a;
+            opacity: 0.85;
+        }
+        .codelesslove-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            font-weight: 700;
+            color: #888;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            border-radius: 3px;
+            transition: background 0.15s;
+        }
+        .codelesslove-close:hover {
+            background: #eee;
+            color: #c00;
+        }
+    }
+    .codelesslove-body {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 1em 2em;
+    }
+}

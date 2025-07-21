@@ -1,7 +1,7 @@
 window.loadedCodelessLoveScripts ||= {};
 (function() {
-  console.log("❤️"+"Name of feature goes here");
-  let thisScriptKey = "feature_key_goes_here";
+  console.log("❤️Enable Runtime Features");
+  let thisScriptKey = "runtime_enable";
 
   /* ------------------------------------------------ */
   /* ⬇️ ⬇️ ⬇️ ⬇️ ⬇️ Don't mess with this  ⬇️ ⬇️ ⬇️ ⬇️ ⬇️ */
@@ -27,12 +27,37 @@ window.loadedCodelessLoveScripts ||= {};
   /* ------------------------------------------------------------------- */
 
     // This is the isolated content script context. This is the ideal place to run all your feature scripts. Even though this content script is "isolated", it still has access to the page's DOM. However, it can't run JavaScript that is running in the main world (the page's context).
-    console.log("❤️ This executes in the context of the feature script!;")
-    
+    console.log("❤️ This executes in the context of the runtime_enable feature script!");
+
     // In the very rare event that you MUST run JavaScript in the main world, you can inject a script into the "main world" (the actual tab context), like this:
     chrome.runtime.sendMessage({
         action: "injectScriptIntoMainWorld",
-        jsFile: "features/feature_key_goes_here/example_script_that_must_execute_in_the_main_world.js"
+        jsFile: "features/runtime_enable/get_app_info.js"
     });
 
-})();//👈👈 don't delete this, and don't put anything outside of this!!
+    // Listen for messages from the main world
+    window.addEventListener('message', (event) => {
+      if (
+        event.source === window &&
+        event.data &&
+        event.data.source === 'main-world-script' &&
+        event.data.action === 'appDomainResult'
+      ) {
+        const domain = event.data.payload?.domain;
+        if (domain) {
+          chrome.storage.sync.get({ candidateDomains: [] }, (result) => {
+            const candidateDomains = result.candidateDomains || [];
+            if (!candidateDomains.includes(domain)) {
+              candidateDomains.push(domain);
+              chrome.storage.sync.set({ candidateDomains });
+              console.log("🌍 Added candidate domain:", domain);
+            }
+          });
+        }
+      }
+    });
+
+})(); //👈👈 don't delete this, and don't put anything outside of this!!
+
+
+

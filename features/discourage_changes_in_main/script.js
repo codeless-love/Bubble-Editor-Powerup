@@ -1,7 +1,6 @@
 window.loadedCodelessLoveScripts ||= {};
 (function () { console.log("❤️"+"Discorage editing in Main");
   let thisScriptKey = "discourage_changes_in_main";
-  console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
   if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} // Exit if the script has already been loaded
   window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
   console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);

@@ -1,6 +1,6 @@
-# Codeless Love Bubble Editor Powerup
+# Bubble Editor Powerup by Codeless Love
 
-This Chrome extension enhances your Bubble.io editor and improves the UI. It's
+This Chrome extension enhances your Bubble editor and improves the UI. It's
 free to use and maintained by the Bubble community! You can contribute by:
 
  * Being an alpha tester

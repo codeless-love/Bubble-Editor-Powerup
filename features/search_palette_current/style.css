@@ -1,0 +1,16 @@
+/* ❤️ Hilight Most Recent Item */
+.search-palette .result-div.current {
+  background-color: aliceblue;
+  position: relative;
+  &:hover {
+    background-color: #bbdfff;
+  }
+}
+
+.search-palette .result-div.current::after {
+  content: "❤️";
+  font-size: 4px;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}

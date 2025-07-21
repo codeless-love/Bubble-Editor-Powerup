@@ -30,3 +30,12 @@
     top: 2px;
     right: -13px;
 }
+❤️ codelesslove, /* Make sure buttons don't break into two lines */
+.menu-bar.menu-bar button {
+  width: max-content;
+}
+❤️ codelesslove, /* Except this one needs to be full width (that's the whole point) */
+.menu-bar.menu-bar .trigger-button > button {
+  width: inherit;
+  width: -webkit-fill-available;
+}
