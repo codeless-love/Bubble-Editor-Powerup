@@ -468,7 +468,7 @@ window.loadedCodelessLoveScripts ||= {};
         // Position the dropdown based on button location
         const rect = menuButton.getBoundingClientRect();
         dropdown.style.top = (rect.bottom + 4) + 'px';
-        dropdown.style.left = (rect.right - dropdown.offsetWidth || rect.right - 120) + 'px';
+        dropdown.style.left = rect.left + 'px';
         dropdown.style.display = 'block';
         menuButton.style.background = '#f0f0f0';
         menuButton.style.color = '#333';
