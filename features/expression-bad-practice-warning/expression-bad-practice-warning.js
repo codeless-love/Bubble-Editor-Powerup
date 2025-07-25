@@ -14,20 +14,26 @@ let warningPrefs = {
 };
 
   // Load preferences first, then initialize
-  chrome.storage.sync.get([
-    'expression_bad_practice_warning_count_is_zero',
-    'expression_bad_practice_warning_current_user_in_backend',
-    'expression_bad_practice_warning_public_api_checked',
-    'expression_bad_practice_warning_zero_width',
-  ], (result) => {
-    warningPrefs.countIsZero = result.expression_bad_practice_warning_count_is_zero === true;
-    warningPrefs.currentUserInBackend = result.expression_bad_practice_warning_current_user_in_backend === true;
-    warningPrefs.publicAPIChecked = result.expression_bad_practice_warning_public_api_checked === true;
-    warningPrefs.zeroWidth = result.expression_bad_practice_warning_zero_width === true;
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+    chrome.storage.sync.get([
+      'expression_bad_practice_warning_count_is_zero',
+      'expression_bad_practice_warning_current_user_in_backend',
+      'expression_bad_practice_warning_public_api_checked',
+      'expression_bad_practice_warning_zero_width',
+    ], (result) => {
+      warningPrefs.countIsZero = result.expression_bad_practice_warning_count_is_zero === true;
+      warningPrefs.currentUserInBackend = result.expression_bad_practice_warning_current_user_in_backend === true;
+      warningPrefs.publicAPIChecked = result.expression_bad_practice_warning_public_api_checked === true;
+      warningPrefs.zeroWidth = result.expression_bad_practice_warning_zero_width === true;
 
-    // Only initialize after preferences are loaded
+      // Only initialize after preferences are loaded
+      initializeDetection();
+    });
+  } else {
+    // Use default values when chrome.storage is not available
+    console.log("❤️"+"Chrome storage not available, using default warning preferences:", warningPrefs);
     initializeDetection();
-  });
+  }
 
   function initializeDetection() {
     detectBadPractices();
