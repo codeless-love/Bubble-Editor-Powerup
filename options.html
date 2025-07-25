@@ -319,6 +319,24 @@
       border-color: var(--primary-color);
       outline: none;
     }
+    
+    /* Fast Branch Delete styling */
+    .tool-section {
+      margin-top: 2em;
+      padding: 1em;
+      background-color: var(--secondary-color);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+    }
+    
+    .tool-section h2 {
+      margin-top: 0;
+      font-size: 1.1em;
+      color: var(--text-color);
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
     .candidate-domains {
       margin: 8px 0 0 28px;
       font-weight: bold;
@@ -356,6 +374,8 @@
       font-size: 1.5em;
     }
   </style>
+  <link rel="stylesheet" href="popup_fast_branch_delete.css">
+  <script src="popup_fast_branch_delete.js" defer></script>
   <script src="options.js" defer></script>
 </head>
 <body>
@@ -369,6 +389,35 @@
   <main id="Editor">
     <p>Select which features you want to enable:</p>
     <div id="features-list" class="features-container"></div>
+    
+    <div class="tool-section">
+      <h2>❤️ Fast Branch Delete</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 1em;">
+        Quickly delete one or more branches by selecting them from the list. This will execute a soft delete on all selected branches.
+      </p>
+      <div class="branch-delete-container">
+        <div class="branch-list-container">
+          <div class="branch-list-header">
+            <button id="branch-select-none" class="button-secondary" style="padding: 4px 8px; font-size: 12px;">
+              Clear Selection
+            </button>
+          </div>
+          <div id="branch-list" class="branch-list">
+            <div class="branch-list-loading">Loading versions...</div>
+          </div>
+        </div>
+        <div class="row" style="gap: 8px; margin-bottom: 1em;">
+          <button id="branch-refresh-button" class="button-secondary" style="padding: 8px 12px;">
+            Refresh
+          </button>
+          <span id="branch-selection-count" style="font-size: 13px; color: var(--text-secondary);"></span>
+        </div>
+        <button id="branch-delete-button" class="branch-delete-button" disabled>
+          Delete Selected Branches
+        </button>
+        <div id="branch-delete-status" class="branch-delete-status"></div>
+      </div>
+    </div>
   </main>
   <main id="Candidate" hidden>
     <div class="emoji-row"><span class="emoji">☑️</span><p>Powerup needs your permission to run on this domain.</p></div>
