@@ -298,9 +298,10 @@
   },
   {
     "key": "inline_branch_delete",
-    "category": "Developer Tools",
-    "name": "Inline Branch Delete",
-    "description": "Adds a three-dot menu to each branch in the version control panel, allowing you to quickly delete branches directly from the Bubble editor interface.",
+    "category": "Branches",
+    "name": "Create and delete branches inline.",
+    "description": "Adds a three-dot menu to each branch in the version control panel, allowing you to quickly create or delete branches directly from the Bubble editor interface without leaving the current branch.",
+    "cssFile": "features/inline_branch_delete/inline_branch_delete.css",
     "jsFile": "features/inline_branch_delete/inline_branch_delete.js",
     "default": true
   }
