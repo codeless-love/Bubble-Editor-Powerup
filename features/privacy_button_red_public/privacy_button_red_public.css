@@ -1,0 +1,66 @@
+/* ❤️ */
+/* Privacy Button Badge Feature */
+
+❤️ codelesslove,/* Style privacy elements that contain "Publicly visible" text as a red badge */
+.privacy-setting-btn.bubble-ui.light-grey-btn.is-public-visible,
+.privacy-setting-text.is-public-visible {
+  background-color: #ffebee !important;
+  color: #c62828 !important;
+  border: 1px solid #ef5350 !important;
+  font-weight: 600;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+❤️ codelesslove,/* Enhanced badge appearance on hover */
+.privacy-setting-btn.bubble-ui.light-grey-btn.is-public-visible:hover,
+.privacy-setting-text.is-public-visible:hover {
+  position: relative;
+  background-color: #ffcdd2 !important;
+  border-color: #e53935 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(229, 57, 53, 0.2) !important;
+}
+
+❤️ codelesslove,/* Heart Indicator on hover */
+.privacy-setting-btn.bubble-ui.light-grey-btn.is-public-visible:hover::after,
+.privacy-setting-text.is-public-visible:hover::after {
+  content: "❤️";
+  font-size: 4px;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+❤️ codelesslove,/* Style privacy elements that contain "Privacy rules applied" text as a green badge */
+.privacy-setting-btn.bubble-ui.light-grey-btn.is-privacy-applied,
+.privacy-setting-text.is-privacy-applied {
+  background-color: #e8f5e8 !important;
+  color: #2e7d32 !important;
+  border: 1px solid #4caf50 !important;
+  font-weight: 600;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+❤️ codelesslove,/* Enhanced green badge appearance on hover */
+.privacy-setting-btn.bubble-ui.light-grey-btn.is-privacy-applied:hover,
+.privacy-setting-text.is-privacy-applied:hover {
+  position: relative;
+  background-color: #c8e6c9 !important;
+  border-color: #388e3c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(56, 142, 60, 0.2) !important;
+}
+
+❤️ codelesslove,/* Heart Indicator on hover for green badge */
+.privacy-setting-btn.bubble-ui.light-grey-btn.is-privacy-applied:hover::after,
+.privacy-setting-text.is-privacy-applied:hover::after {
+  content: "❤️";
+  font-size: 4px;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
