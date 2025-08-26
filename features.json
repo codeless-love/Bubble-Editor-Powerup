@@ -8,6 +8,15 @@
     "jsFile": "features/feature_key_goes_here/feature_key_goes_here.js",
     "default": false
   },
+  {
+    "key": "privacy_button_red_public",
+    "category": "Privacy",
+    "name": "Privacy Status Badges",
+    "description": "Styles privacy buttons and text elements as colored badges: red badge for 'Publicly visible' and green badge for 'Privacy rules applied' to clearly indicate privacy status.",
+    "cssFile": "features/privacy_button_red_public/privacy_button_red_public.css",
+    "jsFile": "features/privacy_button_red_public/privacy_button_red_public.js",
+    "default": true
+  },
 {
     "key": "left_to_right_action_view",
     "category": "Workflow View",
