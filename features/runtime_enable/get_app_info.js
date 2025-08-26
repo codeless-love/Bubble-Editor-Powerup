@@ -1,3 +1,4 @@
+console.log("❤️Get App Info script injected into MAIN WORLD");
 (function () {
   let result = {status: (window.appquery || window.app) ? "ok" : "error"};
   if (window.appquery) {

@@ -1,8 +1,8 @@
 window.loadedCodelessLoveScripts ||= {};
 (function() {
-  console.log("❤️"+"Inline Branch Delete");
+  console.log("❤️"+"Inline Branch Delete - ISOLATED WORLD script");
   let thisScriptKey = "inline_branch_delete";
-  
+
   /* ------------------------------------------------ */
   /* ⬇️ ⬇️ ⬇️ ⬇️ ⬇️ Don't mess with this  ⬇️ ⬇️ ⬇️ ⬇️ ⬇️ */
   /* ------------------------------------------------ */

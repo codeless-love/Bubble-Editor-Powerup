@@ -13,10 +13,19 @@
   border-radius: 999px;
   line-height: 2.5em;
   align-self: center;
+
+  &:hover {
+    background: #ffe0ec;
+  } 
+
+  &::after {
+    content: "❤️";
+    font-size: 6px;
+    position: absolute;
+    top: 1px;
+    right: 7px;
+  }
 }
-❤️ codelesslove, .codelesslove-inspector-btn:hover {
-  background: #ffe0ec;
-} 
 ❤️ codelesslove, .codelesslove-properties-div {
   position: fixed;
   right: 0;
