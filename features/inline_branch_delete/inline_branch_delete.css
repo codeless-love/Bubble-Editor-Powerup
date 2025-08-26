@@ -6,8 +6,13 @@
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   display: none;
-  min-width: 120px;
   overflow: visible;
+
+  &.branch-menu-dropdown { /* boosting specificity */
+    height: unset;
+    min-width: 128px;
+    width: 128px;
+  }
 
 .❤️ codelesslove,
 .branch-menu-option {

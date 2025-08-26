@@ -17,7 +17,7 @@ window.loadedCodelessLoveScripts ||= {};
   const DEBOUNCE_DELAY = 100; // Debounce delay for aggressive observer
   const DROPDOWN_Z_INDEX = 2147483647; // Maximum z-index
   const MENU_BUTTON_SIZE = 24;
-  const DROPDOWN_OFFSET = 4; // Pixels between button and dropdown
+  const DROPDOWN_OFFSET = -4; // Pixels between button and dropdown
   const MODAL_Z_INDEX = 100000000;
   const MODAL_WIDTH = 400;
   const RESERVED_BRANCH_NAMES = ['test', 'live', 'main', 'development'];
@@ -108,7 +108,7 @@ window.loadedCodelessLoveScripts ||= {};
    */
   function extractBranchInfo(branchRow) {
     // Try to find the branch name span
-    const branchNameSpan = branchRow.querySelector('span._1nfonn86._1lkv1fw9:not(._1ij2r33)');
+    const branchNameSpan = branchRow.querySelector('.branch-name-icon-container ._1nfonn86._1lkv1fwa');
     if (branchNameSpan) {
       // Skip system branches
       const branchName = branchNameSpan.textContent.trim();
@@ -418,7 +418,7 @@ window.loadedCodelessLoveScripts ||= {};
         // Position the dropdown based on button location
         const rect = menuButton.getBoundingClientRect();
         dropdown.style.display = 'block';
-        dropdown.style.top = (rect.bottom + DROPDOWN_OFFSET) + 'px';
+        dropdown.style.top = (rect.top + DROPDOWN_OFFSET) + 'px';
         // Align dropdown's right edge with button's right edge so it extends left
         dropdown.style.left = (rect.right - dropdown.offsetWidth) + 'px';
         menuButton.style.background = '#f0f0f0';
@@ -492,9 +492,8 @@ window.loadedCodelessLoveScripts ||= {};
     if (!branchInfo) {
       return;
     }
-
     // Find the container to add the menu to
-    const innerContainer = branchRow.querySelector('._1ql74v32._1ql74v30._1ql74v39._1ql74v3b._1ql74v3h');
+    const innerContainer = branchRow.querySelector('.branches-container .branch-env-row ._1ql74v32._1ql74v30._1ql74v39._1ql74v3b._1ql74v3h');
     if (!innerContainer) {
       return;
     }
