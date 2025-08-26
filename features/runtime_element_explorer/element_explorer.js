@@ -114,7 +114,7 @@ window.loadedCodelessLoveScripts ||= {};
     if (topBar.querySelector('.codelesslove-inspector-btn')) return;
     insertPropertiesDiv(topBar);
     const btn = document.createElement('button');
-    btn.textContent = '❤️ Inspect Element';
+    btn.textContent = '🐝';
     btn.className = 'codelesslove-inspector-btn';
     btn.onclick = toggleInspector;
     topBar.appendChild(btn);
@@ -214,6 +214,7 @@ window.loadedCodelessLoveScripts ||= {};
   }
 
   function onClickElement(e) {
+    console.log("----------------------");
     const propDiv = document.getElementById('codelessloveElementProperties');
     if (propDiv && propDiv.contains(e.target)) return;
     const el = e.target;

@@ -66,13 +66,22 @@ async function injectFeatures(tabId, context = {}) {
       const isEnabled = prefs[feature.key] == true;
 
       // --- RUNTIME/EDITOR INJECTION LOGIC ---
+      const isRuntimeFeature = feature.requires === "enable_runtime_features" || feature.key === "enable_runtime_features";
       // If this is a runtime feature (`key` or `requires` is `enable_runtime_features`), never inject in editor
-      const isRuntimeFeature = feature.requires === "enable_runtime_features";
-      if (isBubbleEditor && isRuntimeFeature) continue;
+      if (isBubbleEditor && isRuntimeFeature) {
+        console.log(`❤️💉 Skipping injection of runtime feature  ${feature.key} because this is the editor.`);
+        continue;
+      }
       // If not in editor, only inject runtime features
-      if (!isBubbleEditor && isApprovedDomain && !isRuntimeFeature) continue;
+      if (!isBubbleEditor && isApprovedDomain && !isRuntimeFeature) {
+        console.log(`❤️💉 Skipping injection of non-runtime feature  ${feature.key} because this is runtime.`);
+        continue;
+      }
       // If not in editor or approved domain, skip all
-      if (!isBubbleEditor && !isApprovedDomain) continue;
+      if (!isBubbleEditor && !isApprovedDomain) {
+        console.log(`❤️💉 Skipping injection of feature  ${feature.key} because this domain is not approved.`);
+        continue;
+      }
 
       if (isEnabled && !injectedFeatures.has(feature.key)) {
         // Check if the tab still exists before injecting
