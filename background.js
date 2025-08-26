@@ -30,7 +30,6 @@ async function isFeatureInjected(tabId, featureKey) {
         );
       },
       args: [featureKey], // Pass the feature key to the tab context
-      world: 'MAIN' // Check in the page's context
     });
     // Return the result from the tab's execution context
     return response[0].result;
@@ -104,10 +103,10 @@ async function injectFeatures(tabId, context = {}) {
           const alreadyInjected = await isFeatureInjected(tabId, feature.key);
           if (!alreadyInjected) {
             try {
+              console.log(`❤️💉 Injecting into ISOLATED world: ${feature.key}`);
               await chrome.scripting.executeScript({
                 target: { tabId },
                 files: [feature.jsFile],
-                world: 'MAIN' // Execute in the page's context, not isolated
               });
 
               // Verify injection was successful
@@ -227,7 +226,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Injects a script directly into the tab's context (the "main world")
 function injectScriptIntoMainWorld(tabId, url) {
-  console.log("❤️ Injecting the script " + url);
+  console.log(`❤️💉 Injecting into   MAIN   world: ${url}`);
   const fullScriptUrl = chrome.runtime.getURL(url);
   
   // First fetch the script content
