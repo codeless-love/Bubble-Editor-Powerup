@@ -584,6 +584,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     closePopup(1500);
   });
 
+
   // click close button
   document.getElementById("close-button").addEventListener("click", async () => {
     closePopup();

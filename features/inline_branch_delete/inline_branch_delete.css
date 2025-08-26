@@ -1,0 +1,149 @@
+.❤️branch-menu-dropdown {
+  position: fixed;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: none;
+  min-width: 120px;
+  overflow: visible;
+
+  .❤️branch-menu-option {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s;
+
+    &.❤️create {
+      color: #4361ee;
+
+      &:hover {
+        background-color: #f0f5ff;
+      }
+    }
+
+    &.❤️delete {
+      color: #e74c3c;
+      border-top: 1px solid #f0f0f0;
+
+      &:hover {
+        background-color: #fff5f5;
+      }
+    }
+
+    &:before {
+      content: "❤️";
+      font-size: 8px;
+      line-height: 100%;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+  }
+}
+
+.❤️branch-menu-container {
+  position: relative;
+  margin: 0 0 0 8px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+
+  .❤️branch-menu-button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      color: #6c757d;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      position: relative;
+      z-index: 1;
+
+      &:hover {
+        backround-color: #f0f0f0;
+        color: #333;
+      }
+  }
+}
+
+.❤️branch-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .❤️branch-modal {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    max-width: 90vw;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+    & h2 {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+    & p {
+      margin: 0 0 20px 0;
+      color: #666;
+      font-size: 14px;
+    }
+    #❤️branch-name-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      outline: none;
+
+      :focus {
+        border-color: #4361ee;
+      }
+    }
+    #❤️branch-cancel {
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      background: white;
+      color: #666;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      :hover {
+        background-color: #f5f5f5;
+      }
+    }
+    #❤️branch-create {
+      padding: 8px 16px;
+      border: none;
+      background: #4361ee;
+      color: white;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: #3a56d4;
+      }
+    }
+  }
+}
