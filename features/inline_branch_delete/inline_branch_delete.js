@@ -149,12 +149,12 @@ window.loadedCodelessLoveScripts ||= {};
   function createBranchModal(fromBranchId, fromBranchName) {
     // Create overlay
     const overlay = document.createElement('div');
-    overlay.className = '❤️branch-modal-overlay';
+    overlay.className = 'branch-modal-overlay';
     overlay.style.cssText = `z-index: ${MODAL_Z_INDEX};`;
 
     // Create modal
     const modal = document.createElement('div');
-    modal.className = '❤️branch-modal';
+    modal.className = 'branch-modal';
     modal.style.cssText = `width: ${MODAL_WIDTH}px;`;
 
     modal.innerHTML = `
@@ -164,15 +164,15 @@ window.loadedCodelessLoveScripts ||= {};
       </p>
       <input
         type="text"
-        id="❤️branch-name-input"
+        id="branch-name-input"
         placeholder="Enter branch name"
       />
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
         <button
-          id="❤️branch-cancel"
+          id="branch-cancel"
         >Cancel</button>
         <button
-          id="❤️branch-create"
+          id="branch-create"
         >Create Branch</button>
       </div>
     `;
@@ -181,12 +181,12 @@ window.loadedCodelessLoveScripts ||= {};
     document.body.appendChild(overlay);
 
     // Focus input
-    const input = modal.querySelector('#❤️branch-name-input');
+    const input = modal.querySelector('#branch-name-input');
     input.focus();
 
     // Add hover effects
-    const cancelBtn = modal.querySelector('#❤️branch-cancel');
-    const createBtn = modal.querySelector('#❤️branch-create');
+    const cancelBtn = modal.querySelector('#branch-cancel');
+    const createBtn = modal.querySelector('#branch-create');
 
     // Return promise for branch creation
     return new Promise((resolve, reject) => {
@@ -368,11 +368,11 @@ window.loadedCodelessLoveScripts ||= {};
    */
   function createMenuButton(branchInfo) {
     const menuContainer = document.createElement('div');
-    menuContainer.className = '❤️branch-menu-container';
+    menuContainer.className = 'branch-menu-container';
 
     // Create the three-dot button
     const menuButton = document.createElement('button');
-    menuButton.className = '❤️branch-menu-button';
+    menuButton.className = 'branch-menu-button';
     menuButton.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="8" cy="3" r="1.5" fill="currentColor"/>
@@ -387,16 +387,16 @@ window.loadedCodelessLoveScripts ||= {};
 
     // Create the dropdown menu
     const dropdown = document.createElement('div');
-    dropdown.className = '❤️branch-menu-dropdown';
+    dropdown.className = 'branch-menu-dropdown';
     dropdown.style.cssText = `z-index: ${DROPDOWN_Z_INDEX};`;
 
     // Create branch option
     const createOption = document.createElement('button');
-    createOption.setAttribute("class", '❤️branch-menu-option ❤️create');
+    createOption.setAttribute("class", 'branch-menu-option create');
     createOption.textContent = 'Create Branch';
 
     const deleteOption = document.createElement('button');
-    deleteOption.setAttribute("class", '❤️branch-menu-option ❤️delete');
+    deleteOption.setAttribute("class", 'branch-menu-option delete');
     deleteOption.textContent = 'Delete Branch';
 
     // Click handlers
@@ -405,10 +405,10 @@ window.loadedCodelessLoveScripts ||= {};
       const isOpen = dropdown.style.display === 'block';
 
       // Close all other dropdowns
-      document.querySelectorAll('.❤️branch-menu-dropdown').forEach(d => {
+      document.querySelectorAll('.branch-menu-dropdown').forEach(d => {
         d.style.display = 'none';
       });
-      document.querySelectorAll('.❤️branch-menu-button').forEach(btn => {
+      document.querySelectorAll('.branch-menu-button').forEach(btn => {
         btn.style.background = 'none';
         btn.style.color = '#6c757d';
       });
@@ -476,7 +476,7 @@ window.loadedCodelessLoveScripts ||= {};
    */
   function processBranchRow(branchRow) {
     // Skip if already processed
-    if (branchRow.querySelector('.❤️branch-menu-container')) {
+    if (branchRow.querySelector('.branch-menu-container')) {
       return;
     }
 
@@ -549,8 +549,8 @@ window.loadedCodelessLoveScripts ||= {};
    */
   function cleanupRemovedMenus() {
     // Find all dropdown menus that are orphaned (button no longer in DOM)
-    document.querySelectorAll('.❤️branch-menu-dropdown').forEach(dropdown => {
-      const button = Array.from(document.querySelectorAll('.❤️branch-menu-button')).find(btn => btn._dropdown === dropdown);
+    document.querySelectorAll('.branch-menu-dropdown').forEach(dropdown => {
+      const button = Array.from(document.querySelectorAll('.branch-menu-button')).find(btn => btn._dropdown === dropdown);
       if (!button || !document.body.contains(button)) {
         // Remove event listener if it exists
         const handler = globalClickHandler.get(dropdown);
@@ -680,7 +680,7 @@ window.loadedCodelessLoveScripts ||= {};
     aggressiveObserver.disconnect();
     clearInterval(updateInterval);
     // Remove all dropdowns and their event listeners
-    document.querySelectorAll('.❤️branch-menu-dropdown').forEach(dropdown => {
+    document.querySelectorAll('.branch-menu-dropdown').forEach(dropdown => {
       const handler = globalClickHandler.get(dropdown);
       if (handler) {
         document.removeEventListener('click', handler);
