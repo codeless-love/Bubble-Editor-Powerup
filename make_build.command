@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # In MacOS, this script creates a compressed ZIP of the project suitable for uploading to the Google Chrome web store or manually loading into your browser. The default compressor on the latest MacOS versions makes a ZIP which won't work. 
+# To run this script, simply open the directory in finder and double-click this file. No need to use a terminal.
 
 # Move to the folder this script is in
 cd "$(dirname "$0")"
