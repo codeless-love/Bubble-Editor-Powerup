@@ -19,18 +19,18 @@
       --background-color: #ffffff;
       --card-background: #ffffff;
       --shadow-color: rgba(0, 0, 0, 0.08);
-      
+
       /* Spacing variables */
       --close-button-width: 40px;
       --base-padding: 12px;
       --border-radius: 8px;
       --transition-speed: 0.2s;
     }
-    
+
     * {
       box-sizing: border-box;
     }
-    
+
     body {
       width: 450px;
       margin: 0;
@@ -45,7 +45,7 @@
     [hidden] {
       display: none !important;
     }
-    
+
     body.full-page {
       margin: auto;
       border: solid 1px var(--border-color);
@@ -53,7 +53,7 @@
       box-shadow: 0 10px 25px var(--shadow-color);
       margin-top: calc(var(--base-padding) * 2);
     }
-    
+
     header {
       position: sticky;
       top: 0;
@@ -63,12 +63,12 @@
       border-bottom: 1px solid var(--border-color);
       z-index: 10;
     }
-    
+
     main {
       margin: var(--base-padding);
       padding: 0 var(--base-padding);
     }
-    
+
     footer {
       position: sticky;
       bottom: 0;
@@ -78,13 +78,13 @@
       border-top: 1px solid var(--border-color);
       z-index: 10;
     }
-    
+
     h1 {
       margin: 0;
       font-size: 1.5em;
       font-weight: 600;
     }
-    
+
     h2 {
       font-size: 1.2em;
       margin-top: 1.5em;
@@ -93,7 +93,7 @@
       border-bottom: 1px solid var(--border-color);
       color: var(--primary-color);
     }
-    
+
     button {
       padding: var(--base-padding) calc(var(--base-padding) * 2);
       border: none;
@@ -103,57 +103,57 @@
       transition: all var(--transition-speed) ease;
       font-size: 14px;
     }
-    
+
     button#save-button {
       background-color: var(--primary-color);
       color: white;
     }
-    
+
     button#save-button:hover {
       background-color: var(--primary-hover);
     }
-    
+
     .button-secondary {
       background-color: var(--secondary-color);
       color: var(--text-color);
       padding: 8px 12px;
       font-size: 13px;
     }
-    
+
     .button-secondary:hover {
       background-color: var(--border-color);
     }
-    
+
     .row {
       display: flex;
       align-items: center;
       gap: var(--base-padding);
     }
-    
+
     .space-between {
       justify-content: space-between;
     }
-    
+
     .justify-center {
       justify-content: center;
     }
-    
+
     .fill-available {
       width: -webkit-fill-available;
       width: -moz-available;
       width: stretch;
     }
-    
+
     .space-for-close-button {
       padding-right: calc(var(--close-button-width) + var(--base-padding) + var(--base-padding))
     }
-    
+
     .logo {
       height: 36px;
       width: 36px;
       border-radius: 8px;
     }
-    
+
     .button-close {
       position: absolute;
       top: 8px;
@@ -173,22 +173,22 @@
       color: var(--text-secondary);
       transition: all var(--transition-speed) ease;
     }
-    
+
     .top-margin {
       margin-top: calc(var(--base-padding) * 2);
     }
-    
+
     .button-close:hover {
       background-color: var(--secondary-color);
       color: var(--text-color);
     }
-    
+
     .column {
       display: flex;
       flex-direction: column;
       gap: var(--base-padding);
     }
-    
+
     /* Feature styling */
     .feature {
       padding: 12px;
@@ -197,19 +197,19 @@
       transition: all var(--transition-speed) ease;
       border: 1px solid transparent;
     }
-    
+
     .feature:hover {
       background-color: var(--secondary-color);
       border-color: var(--border-color);
     }
-    
+
     .feature label {
       display: flex;
       align-items: center;
       font-weight: 500;
       cursor: pointer;
     }
-    
+
     /* Custom checkbox styling */
     .feature input[type="checkbox"] {
       -webkit-appearance: none;
@@ -223,12 +223,12 @@
       place-content: center;
       transition: all var(--transition-speed) ease;
     }
-    
+
     .feature input[type="checkbox"]:checked {
       border-color: var(--primary-color);
       background-color: var(--primary-color);
     }
-    
+
     .feature input[type="checkbox"]::before {
       content: "";
       width: 10px;
@@ -239,45 +239,45 @@
       transform-origin: center;
       clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
     }
-    
+
     .feature input[type="checkbox"]:checked::before {
       transform: scale(1);
     }
-    
+
     .feature input[disabled] {
       border-color: var(--border-color);
       background-color: var(--secondary-color);
     }
-    
+
     .feature input[disabled] + span {
       color: var(--text-secondary);
       cursor: not-allowed;
     }
-    
+
     .feature.disabled {
       opacity: 0.7;
       background-color: var(--secondary-color);
       cursor: not-allowed;
     }
-    
+
     .feature p {
       margin: 8px 0 0 28px;
       color: var(--text-secondary);
       font-size: 13px;
     }
-    
+
     .sub-features {
       margin-left: 28px;
       padding-left: 12px;
       border-left: 2px solid var(--border-color);
       margin-bottom: 16px;
     }
-    
+
     .sub-feature {
       margin-top: 8px;
       padding-top: 8px;
     }
-    
+
     #status {
       display: none;
       font-size: 14px;
@@ -288,11 +288,11 @@
       border-radius: var(--border-radius);
       border-left: 3px solid var(--success-color);
     }
-    
+
     #refreshSection {
       display: none;
     }
-    
+
     /* Feature input field styling */
     .input-container {
       margin-left: 28px;
@@ -300,13 +300,13 @@
       display: flex;
       align-items: center;
     }
-    
+
     .input-label {
       margin-right: 8px;
       font-size: 13px;
       color: var(--text-secondary);
     }
-    
+
     .input-field {
       width: 60px;
       padding: 4px 8px;
@@ -314,12 +314,12 @@
       border-radius: 4px;
       font-size: 13px;
     }
-    
+
     .input-field:focus {
       border-color: var(--primary-color);
       outline: none;
     }
-    
+
     /* Fast Branch Delete styling */
     .tool-section {
       margin-top: 2em;
@@ -328,7 +328,7 @@
       border-radius: var(--border-radius);
       border: 1px solid var(--border-color);
     }
-    
+
     .tool-section h2 {
       margin-top: 0;
       font-size: 1.1em;
@@ -336,7 +336,7 @@
       border-bottom: none;
       padding-bottom: 0;
     }
-    
+
     .candidate-domains {
       margin: 8px 0 0 28px;
       font-weight: bold;
@@ -374,8 +374,8 @@
       font-size: 1.5em;
     }
   </style>
-  <link rel="stylesheet" href="popup_fast_branch_delete.css">
-  <script src="popup_fast_branch_delete.js" defer></script>
+  <link rel="stylesheet" href="features/bulk_branch_delete/bulk_branch_delete.css">
+  <script src="features/bulk_branch_delete/bulk_branch_delete.js" defer></script>
   <script src="options.js" defer></script>
 </head>
 <body>
@@ -389,7 +389,7 @@
   <main id="Editor">
     <p>Select which features you want to enable:</p>
     <div id="features-list" class="features-container"></div>
-    
+
     <div class="tool-section">
       <h2>❤️ Fast Branch Delete</h2>
       <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 1em;">
