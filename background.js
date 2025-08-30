@@ -62,11 +62,13 @@ async function injectFeatures(tabId, context = {}) {
     }
     bubbleTabs.set(tabId, new Set());
     const injectedFeatures = bubbleTabs.get(tabId);
+    console.log("❤️💉 Injecting following features: ", featuresConfig);
+    console.group();
     for (const feature of featuresConfig) {
       const isEnabled = prefs[feature.key] == true;
 
       // --- RUNTIME/EDITOR INJECTION LOGIC ---
-      const isRuntimeFeature = feature.requires === "enable_runtime_features" || feature.key === "enable_runtime_features";
+      const isRuntimeFeature = feature.requires === "enable_runtime_features";//enable_runtime_features itself is needed in the editor to load domain candidates to be granted permission. All other features which require this feature are themselves only to run in runtime, though.
       // If this is a runtime feature (`key` or `requires` is `enable_runtime_features`), never inject in editor
       if (isBubbleEditor && isRuntimeFeature) {
         console.log(`❤️💉 Skipping injection of runtime feature  ${feature.key} because this is the editor.`);
@@ -153,6 +155,7 @@ async function injectFeatures(tabId, context = {}) {
         injectedFeatures.add(feature.key);
       }
     }
+    console.groupEnd();
   } catch (error) {
     console.error("❤️ Error in injectFeatures:", error);
   }
