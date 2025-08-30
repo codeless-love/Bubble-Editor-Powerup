@@ -338,12 +338,18 @@ function injectScriptIntoExtensionUIWorld(tabId, jsURL, cssURL) {
   chrome.tabs.get(optionsPopupTabID, (tab) => {
     if (!tab?.url?.startsWith(`chrome-extension://${chrome.runtime.id}/options.html`) ) {
       console.warn("❤️ Not injecting: Tab is missing or not the extension options page.");
-      sendResponse({ error: "Tab is not the extension options page." });
       return;
     }
   });
 
   console.log(`❤️💉 Injecting into EXTENSION UI world: ${jsURL}`);
+
+  //inject CSS
+  chrome.scripting.insertCSS({
+    target: { tabId: optionsPopupTabID },
+    files: [cssURL]
+  });
+
   const fullScriptUrl = chrome.runtime.getURL(jsURL);
   
   // First fetch the script content
@@ -353,7 +359,7 @@ function injectScriptIntoExtensionUIWorld(tabId, jsURL, cssURL) {
       // Then execute it in the popup context
       return chrome.scripting.executeScript({
         target: { tabId },
-        //world: "MAIN", // Explicitly specify extension UI world
+        // Remove world specification - extension pages run in extension context by default
         func: (code) => {
           // Create a blob URL from the code
           const blob = new Blob([code], { type: 'text/javascript' });
