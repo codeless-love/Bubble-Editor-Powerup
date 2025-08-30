@@ -589,4 +589,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("close-button").addEventListener("click", async () => {
     closePopup();
   });
+
+  // notify background.js that the Extension UI world is ready to receive injected scripts
+  document.addEventListener("DOMContentLoaded", () => {
+    chrome.runtime.sendMessage({ action: "optionsPageReady" });
+  });
 });

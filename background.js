@@ -1,6 +1,7 @@
 // Service worker initialization
 
 let debounceTimeouts = {}; // Store timeouts for each tabId
+let optionsPopupReady = false;
 
 // Load features dynamically from a JSON file
 async function loadFeatures() {
@@ -215,7 +216,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // First check if the tab is ready
     chrome.tabs.get(sender.tab.id, (tab) => {
       if (chrome.runtime.lastError || !tab.status || tab.status !== "complete") {
-        console.warn("❤️ Tab not ready for script injection, waiting for load");
+        console.log("❤️ Tab not ready for script injection, waiting for load");
         // Wait for tab to be ready
         chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
           if (updatedTabId === sender.tab.id && changeInfo.status === "complete") {
@@ -249,6 +250,101 @@ function injectScriptIntoMainWorld(tabId, url) {
       return chrome.scripting.executeScript({
         target: { tabId },
         world: "MAIN", // Explicitly specify main world
+        func: (code) => {
+          // Create a blob URL from the code
+          const blob = new Blob([code], { type: 'text/javascript' });
+          const scriptUrl = URL.createObjectURL(blob);
+          
+          const script = document.createElement('script');
+          script.src = scriptUrl;  // Use blob URL instead of inline script
+          script.type = 'text/javascript';
+          script.className = '❤️injected-script';
+          
+          // Clean up the blob URL after the script loads
+          script.onload = () => URL.revokeObjectURL(scriptUrl);
+          
+          document.documentElement.appendChild(script);
+          return 'injected successfully';
+        },
+        args: [scriptContent]  // Pass the actual script content
+      });
+    })
+    .then(([result]) => {
+      console.log(`❤️ Script ${url} injection result:`, result.result);
+      return result.result;
+    })
+    .catch((error) => {
+      console.error("❤️ Error injecting script:", error);
+      throw error;
+    });
+}
+
+/* Facilitate feature's injecting their own scripts into the Extension UI world */
+
+/* Listen for options to tell us it's done loading */
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "optionsPageReady") {
+    console.log("❤️ Options page is ready!");
+    optionsPageReady = true;
+  }
+});
+
+/* Listen to feature scripts for a command to inject code into the options popup */
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "injectScriptIntoExtensionUIWorld") {
+  
+    // Check if the options page is ready
+    if(!optionsPopupReady) {
+      console.log("❤️ Options popup not ready yet for script injection, waiting for load");
+      // Wait for tab to be ready
+      chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
+        if (updatedTabId === sender.tab.id && changeInfo.status === "complete") {
+          chrome.tabs.onUpdated.removeListener(listener);
+          injectScriptIntoMainWorld(sender.tab.id, message.jsFile)
+            .then(result => sendResponse(result))
+            .catch(error => sendResponse({ error: error.message }));
+        }
+      });
+    }
+    chrome.tabs.get(sender.tab.id, (tab) => {
+      // Check that the tab exists and is the options page
+      if (
+        !tab ||
+        !tab.url ||
+        !tab.url.startsWith(`chrome-extension://${chrome.runtime.id}/options.html`)
+      ) {
+        console.warn("❤️ Not injecting: Tab is missing or not the extension options page.");
+        sendResponse({ error: "Tab is not the extension options page." });
+        return;
+      }
+      // Optionally check tab status
+      if (tab.status !== "complete") {
+        console.warn("❤️ Not injecting: Options page not fully loaded.");
+        sendResponse({ error: "Options page not fully loaded." });
+        return;
+      }
+      // Proceed with injection
+      injectScriptIntoExtensionUIWorld(sender.tab.id, message.jsFile)
+        .then(result => sendResponse(result))
+        .catch(error => sendResponse({ error: error.message }));
+    });
+    return true; // Keep message channel open for async response
+  }
+});
+
+// Injects a script directly into the option popup's context (the "Extension UI world")
+function injectScriptIntoExtensionUIWorld(tabId, url) {
+  console.log(`❤️💉 Injecting into   MAIN   world: ${url}`);
+  const fullScriptUrl = chrome.runtime.getURL(url);
+  
+  // First fetch the script content
+  return fetch(fullScriptUrl)
+    .then(response => response.text())
+    .then(scriptContent => {
+      // Then execute it in the page context
+      return chrome.scripting.executeScript({
+        target: { tabId },
+        //world: "MAIN", // Explicitly specify extension UI world
         func: (code) => {
           // Create a blob URL from the code
           const blob = new Blob([code], { type: 'text/javascript' });

@@ -35,4 +35,10 @@ window.loadedCodelessLoveScripts ||= {};
         jsFile: "features/feature_key_goes_here/example_script_that_must_execute_in_the_main_world.js"
     });
 
+    // If your feature uses the options menu, you can inject a script into the "main world" (the actual tab context), like this:
+    chrome.runtime.sendMessage({
+        action: "injectScriptIntoExtensionUIWorld",
+        jsFile: "features/feature_key_goes_here/example_script_that_must_execute_in_the_main_world.js"
+    });
+
 })();//👈👈 don't delete this, and don't put anything outside of this!!
