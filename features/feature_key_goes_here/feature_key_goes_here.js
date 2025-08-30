@@ -35,7 +35,7 @@ window.loadedCodelessLoveScripts ||= {};
         jsFile: "features/feature_key_goes_here/example_script_that_must_execute_in_the_main_world.js"
     });
 
-    // If your feature needs to run something in the options menu, you can inject a script into the "Extension UI world" (the options popup), like this:
+    // If your feature needs to run something in the popup, you can inject a script into the "Extension UI world" (the options popup), like this:
     chrome.runtime.sendMessage({
         action: "injectScriptIntoExtensionUIWorld",
         jsFile: "features/feature_key_goes_here/example_script_that_must_execute_in_the_extension_ui_world.js",

@@ -284,7 +284,7 @@
     "key": "runtime_enter_debug",
     "category": "Runtime",
     "name": "Enter Debug Mode",
-    "description": "During runtime, easily enter Debug Mode from the options menu.",
+    "description": "During runtime, easily enter Debug Mode from the popup menu.",
     "jsFile": "features/runtime_enter_debug/runtime_enter_debug.js",
     "default": true,
     "requires": "enable_runtime_features"

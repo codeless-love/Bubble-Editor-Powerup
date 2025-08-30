@@ -1,6 +1,6 @@
-console.log("❤️ Enter Debug Feature Loaded in Options World");
+console.log("❤️ Enter Debug Feature Loaded in Popup");
 
-// This script runs in the extension's options.html page.
+// This script runs in the extension's popup.html page.
 // It handles creating and inserting the "debugModePopup" button,
 // and then adds the event listener to modify the URL of the current active tab.
 

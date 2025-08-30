@@ -2,12 +2,8 @@
   "version": "2.26.0",
   "name": "Bubble Editor Powerup from Codeless Love",
   "description": "Enhances the Bubble Editor with toggleable features (not affiliated with Bubble).",
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": true
-  },
   "action": {
-    "default_popup": "options.html",
+    "default_popup": "popup.html",
     "default_title": "Bubble Editor Powerup from Codeless Love"
   },
   "permissions": [
