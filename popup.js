@@ -593,4 +593,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Notify background.js that the Extension UI world is ready to receive injected scripts
   console.log("❤️ Sending message to background.js that the popup is ready");
   chrome.runtime.sendMessage({ action: "popupReady" });
+
+  // Listen for features to be loaded into the popup
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "loadFeatureInPopup") {
+      // Load CSS if provided
+      if (message.cssFile) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = chrome.runtime.getURL(message.cssFile);
+        document.head.appendChild(link);
+      }
+      
+      // Load JS if provided
+      if (message.jsFile) {
+        const script = document.createElement('script');
+        script.src = chrome.runtime.getURL(message.jsFile);
+        script.type = 'text/javascript';
+        script.className = '❤️injected-script';
+        document.head.appendChild(script);
+      }
+      
+      sendResponse({ success: true });
+    }
+  });
 });

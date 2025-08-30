@@ -286,121 +286,47 @@ function injectScriptIntoMainWorld(tabId, url) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "popupReady") {
     console.log("❤️ Popup is ready to receive injected scripts.");
-    popupTabID = sender?.tab?.id;
-    console.log("0: " + popupTabID);
-
-    chrome.tabs.query({url: `chrome-extension://${chrome.runtime.id}/popup.html`}, (tabs) => {
-      if (tabs.length > 0) {
-        popupTabID = tabs[0].id;
-        console.log("0: " + popupTabID);
-      } else {
-        console.error("❤️ Popup not found");
-      }
+    
+    // For popups, we don't have a tabId - we communicate via messages
+    // Process any pending injections by sending them to the popup
+    featuresToInjectInPopup.forEach(({ sender: originalSender, message: originalMessage, sendResponse: originalSendResponse }) => {
+      // Send the script/CSS info to the popup for it to load itself
+      chrome.runtime.sendMessage({
+        action: "loadFeatureInPopup",
+        jsFile: originalMessage.jsFile,
+        cssFile: originalMessage.cssFile
+      }, (response) => {
+        originalSendResponse(response);
+      });
     });
-
-    /* Listen for popup unloading */
-    chrome.tabs.onRemoved.addListener((tabId) => {
-      if (tabId === popupTabID) {
-        popupTabID = null;
-      }
-      bubbleTabs.delete(tabId); // Existing cleanup
-    });
-
-    // Process any pending injections
-    featuresToInjectInPopup.forEach(({ sender, message, sendResponse }) => {
-      console.log("1: " + sender.tab.id, popupTabID);
-      injectScriptIntoExtensionUIWorld(sender.tab.id, message.jsFile, message.cssFile)
-        .then(result => sendResponse(result))
-        .catch(error => sendResponse({ error: error.message }));
-    });
-    featuresToInjectInPopup = [];
   }
 });
-
-
 
 /* Listen to feature scripts for a command to inject code into the popup */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "injectScriptIntoExtensionUIWorld") {
 
     // Add the feature to the list so that every time the popup is loaded, we can re-inject everything.
+    console.log("❤️ Added ${message.jsfile} to the list of features to inject in the popup.");
     featuresToInjectInPopup.push({ sender, message, sendResponse });
 
-    // Exit if the popup is not loaded yet
-    if (!popupTabID) {
-      console.log("❤️ Popup not ready yet for script injection, queuing request");
-      return true; // Keep message channel open for async response
-    }
+    // If the popup is currently loaded, inject now (Note: this is an unlikely case. Usually the popup won't load until later and all scrips will be loaded at that point.)
+    // chrome.runtime.sendMessage({
+    //   action: "loadFeatureInPopup",
+    //   jsFile: message.jsFile,
+    //   cssFile: message.cssFile
+    // }, (response) => {
+    //   if (!chrome.runtime.lastError) {
+    //     // Popup is open and received the message
+    //     console.log("❤️ Injected ${message.jsFile} into currently open popup");
+    //     sendResponse(response);
+    //   }
+    // });
 
-    // If the popup has already loaded, inject now (Note: this is an unlikely case. Usually the popup won't load until later and all scrips will be loaded at that point.)
-    chrome.tabs.get(popupTabID, (tab) => {
-      injectScriptIntoExtensionUIWorld(popupTabID, message.jsFile, message.cssFile)
-        .then(result => sendResponse(result))
-        .catch(error => sendResponse({ error: error.message }));
-    });
     return true; // Keep message channel open for async response
   }
 });
 
-// Injects a script directly into the option popup's context (the "Extension UI world")
-function injectScriptIntoExtensionUIWorld(tabId, jsURL, cssURL) {
-
-
-  console.log("2: " + tabId, popupTabID);
-  // log tab url
-  chrome.tabs.get(tabId, (tab) => {
-      console.log(tab.url);
-  });
-
-  console.log(`❤️💉 Injecting into EXTENSION UI world: ${jsURL}`);
-
-  // Inject CSS if provided
-  if (cssURL) {
-    chrome.scripting.insertCSS({
-      target: { tabId: tabId },
-      files: [cssURL]
-    }).catch(error => {
-      console.error(`❤️ Error injecting CSS ${cssURL}:`, error);
-    });
-  }
-
-  const fullScriptUrl = chrome.runtime.getURL(jsURL);
-  
-  // First fetch the script content
-  return fetch(fullScriptUrl)
-    .then(response => response.text())
-    .then(scriptContent => {
-      // Then execute it in the popup context
-      return chrome.scripting.executeScript({
-        target: { tabId },
-        func: (code) => {
-          // Create a blob URL from the code
-          const blob = new Blob([code], { type: 'text/javascript' });
-          const scriptUrl = URL.createObjectURL(blob);
-          
-          const script = document.createElement('script');
-          script.src = scriptUrl;
-          script.type = 'text/javascript';
-          script.className = '❤️injected-script';
-          
-          // Clean up the blob URL after the script loads
-          script.onload = () => URL.revokeObjectURL(scriptUrl);
-          
-          document.documentElement.appendChild(script);
-          return 'injected successfully';
-        },
-        args: [scriptContent]  // Pass the actual script content
-      });
-    })
-    .then(([result]) => {
-      console.log(`❤️ Script ${jsURL} injection result:`, result.result);
-      return result.result;
-    })
-    .catch((error) => {
-      console.error("❤️ Error injecting script:", error);
-      throw error;
-    });
-}
 
 // Clean up when tab is closed
 chrome.tabs.onRemoved.addListener((tabId) => {

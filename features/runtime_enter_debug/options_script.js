@@ -4,11 +4,12 @@ console.log("❤️ Enter Debug Feature Loaded in Popup");
 // It handles creating and inserting the "debugModePopup" button,
 // and then adds the event listener to modify the URL of the current active tab.
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Get the main container where the button will be inserted.
-    const approvedMain = document.getElementById('Approved');
-    if (!approvedMain) { return; }
 
+// Get the main container where the button will be inserted.
+const approvedMain = document.getElementById('Approved');
+if (!approvedMain) {
+    console.error("Approved main not found");
+} else {
     // Create the HTML for the button as a string.
     const buttonHtml = `
         <button 
@@ -19,8 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
         </button>
     `;
 
-    // Insert the button HTML into the designated container.
-    approvedMain.innerHTML = buttonHtml;
+    // Append the button HTML into the designated container.
+    approvedMain.insertAdjacentHTML('beforeend',buttonHtml);
 
     // Now that the button exists in the DOM, get a reference to it.
     const debugButton = document.getElementById('debugModePopup');
@@ -49,9 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Use the chrome.tabs.update method to change the URL of the active tab.
             chrome.tabs.update(activeTab.id, { url: newUrl });
+            //window.close();
         } else {
             console.error("The active tab's URL is not a valid HTTP/HTTPS page.");
         }
         });
     });
-});
+}
