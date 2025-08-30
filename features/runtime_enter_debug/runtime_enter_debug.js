@@ -17,10 +17,10 @@ window.loadedCodelessLoveScripts ||= {};
   /* ------------------------------------------------ */
 
   // Only activate if debug_mode=true is not in the URL
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("debug_mode") === "true") {
-    return;
-  }
+  // const params = new URLSearchParams(window.location.search);
+  // if (params.get("debug_mode") === "true") {
+  //   return;
+  // }
 
   // Inject a script into the "Extension UI world" (the options popup)
   chrome.runtime.sendMessage({

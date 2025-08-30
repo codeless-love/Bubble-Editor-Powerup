@@ -50,7 +50,9 @@ if (!approvedMain) {
 
             // Use the chrome.tabs.update method to change the URL of the active tab.
             chrome.tabs.update(activeTab.id, { url: newUrl });
-            //window.close();
+
+            // Close the popup after updating the tab
+            window.close();
         } else {
             console.error("The active tab's URL is not a valid HTTP/HTTPS page.");
         }
