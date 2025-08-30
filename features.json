@@ -281,6 +281,15 @@
     "requires": "enable_runtime_features"
   },
   {
+    "key": "runtime_enter_debug",
+    "category": "Runtime",
+    "name": "Enter Debug Mode",
+    "description": "During runtime, easily enter Debug Mode from the options menu.",
+    "jsFile": "features/runtime_enter_debug/runtime_enter_debug.js",
+    "default": true,
+    "requires": "enable_runtime_features"
+  },
+  {
     "key": "merge_stall_detector",
     "category": "Merge",
     "name": "Stalled Merge Detector",

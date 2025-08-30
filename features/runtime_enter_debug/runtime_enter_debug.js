@@ -22,6 +22,12 @@ window.loadedCodelessLoveScripts ||= {};
     return;
   }
 
+  // Inject a script into the "Extension UI world" (the options popup)
+  chrome.runtime.sendMessage({
+      action: "injectScriptIntoExtensionUIWorld",
+      jsFile: "features/runtime_enter_debug/options_script.js",
+  });
+
   
 })(); //👈👈 don't delete this, and don't put anything outside of this!!
 

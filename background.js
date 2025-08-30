@@ -285,7 +285,7 @@ function injectScriptIntoMainWorld(tabId, url) {
 /* Listen for options to tell us it's done loading */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "optionsPopupReady") {
-    console.log("❤️ Options popup is ready!");
+    console.log("❤️ Options popup is ready to receive injected scripts.");
     optionsPopupTabID = sender?.tab?.id;
 
     /* Listen for options popup unloading */

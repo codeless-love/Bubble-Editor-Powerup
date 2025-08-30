@@ -590,8 +590,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     closePopup();
   });
 
-  // notify background.js that the Extension UI world is ready to receive injected scripts
-  document.addEventListener("DOMContentLoaded", () => {
-    chrome.runtime.sendMessage({ action: "optionsPageReady" });
-  });
+  // Notify background.js that the Extension UI world is ready to receive injected scripts
+  console.log("❤️ Sending message to background.js that options page is ready");
+  chrome.runtime.sendMessage({ action: "optionsPopupReady" });
 });
