@@ -68,14 +68,14 @@ async function injectFeatures(tabId, context = {}) {
       const isEnabled = prefs[feature.key] == true;
 
       // --- RUNTIME/EDITOR INJECTION LOGIC ---
-      const isRuntimeFeature = feature.requires === "enable_runtime_features";//enable_runtime_features itself is needed in the editor to load domain candidates to be granted permission. All other features which require this feature are themselves only to run in runtime, though.
+      const isRuntimeOnlyFeature = feature.requires === "enable_runtime_features";//enable_runtime_features itself is needed in the editor to load domain candidates to be granted permission. All other features which require this feature are themselves only to run in runtime, though.
       // If this is a runtime feature (`key` or `requires` is `enable_runtime_features`), never inject in editor
-      if (isBubbleEditor && isRuntimeFeature) {
+      if (isBubbleEditor && isRuntimeOnlyFeature) {
         console.log(`❤️💉 Skipping injection of runtime feature  ${feature.key} because this is the editor.`);
         continue;
       }
-      // If not in editor, only inject runtime features
-      if (!isBubbleEditor && isApprovedDomain && !isRuntimeFeature) {
+      // In runtime, (on approved domains) only inject runtime features
+      if (!isBubbleEditor && isApprovedDomain && !isRuntimeOnlyFeature && feature.key !== "enable_runtime_features") {
         console.log(`❤️💉 Skipping injection of non-runtime feature  ${feature.key} because this is runtime.`);
         continue;
       }
