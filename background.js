@@ -324,7 +324,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "injectScriptIntoExtensionUIWorld") {
 
     // Add the feature to the list so that every time the popup is loaded, we can re-inject everything.
-    featuresToInjectInpopup.push({ sender, message, sendResponse });
+    featuresToInjectInPopup.push({ sender, message, sendResponse });
 
     // Exit if the popup is not loaded yet
     if (!popupTabID) {
