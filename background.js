@@ -1,7 +1,8 @@
 // Service worker initialization
 
 let debounceTimeouts = {}; // Store timeouts for each tabId
-let optionsPopupReady = false;
+let optionsPopupTabID = null;
+let featuresToInjectInOptionsPopup = [];
 
 // Load features dynamically from a JSON file
 async function loadFeatures() {
@@ -283,48 +284,46 @@ function injectScriptIntoMainWorld(tabId, url) {
 
 /* Listen for options to tell us it's done loading */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "optionsPageReady") {
-    console.log("❤️ Options page is ready!");
-    optionsPageReady = true;
+  if (message.action === "optionsPopupReady") {
+    console.log("❤️ Options popup is ready!");
+    optionsPopupTabID = sender?.tab?.id;
+
+    /* Listen for options popup unloading */
+    chrome.tabs.onRemoved.addListener((tabId) => {
+      if (tabId === optionsPopupTabID) {
+        optionsPopupTabID = null;
+      }
+      bubbleTabs.delete(tabId); // Existing cleanup
+    });
+
+    // Process any pending injections
+    featuresToInjectInOptionsPopup.forEach(({ sender, message, sendResponse }) => {
+      injectScriptIntoExtensionUIWorld(sender.tab.id, message.jsFile, message.cssFile)
+        .then(result => sendResponse(result))
+        .catch(error => sendResponse({ error: error.message }));
+    });
+    featuresToInjectInOptionsPopup = [];
   }
 });
+
+
 
 /* Listen to feature scripts for a command to inject code into the options popup */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "injectScriptIntoExtensionUIWorld") {
-  
-    // Check if the options page is ready
-    if(!optionsPopupReady) {
-      console.log("❤️ Options popup not ready yet for script injection, waiting for load");
-      // Wait for tab to be ready
-      chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
-        if (updatedTabId === sender.tab.id && changeInfo.status === "complete") {
-          chrome.tabs.onUpdated.removeListener(listener);
-          injectScriptIntoMainWorld(sender.tab.id, message.jsFile)
-            .then(result => sendResponse(result))
-            .catch(error => sendResponse({ error: error.message }));
-        }
-      });
+
+    // Add the feature to the list so that every time the options popup is loaded, we can re-inject everything.
+    featuresToInjectInOptionsPopup.push({ sender, message, sendResponse });
+
+    // Exit if the options popup is not loaded yet
+    if (!optionsPopupTabID) {
+      console.log("❤️ Options popup not ready yet for script injection, queuing request");
+      return true; // Keep message channel open for async response
     }
-    chrome.tabs.get(sender.tab.id, (tab) => {
-      // Check that the tab exists and is the options page
-      if (
-        !tab ||
-        !tab.url ||
-        !tab.url.startsWith(`chrome-extension://${chrome.runtime.id}/options.html`)
-      ) {
-        console.warn("❤️ Not injecting: Tab is missing or not the extension options page.");
-        sendResponse({ error: "Tab is not the extension options page." });
-        return;
-      }
-      // Optionally check tab status
-      if (tab.status !== "complete") {
-        console.warn("❤️ Not injecting: Options page not fully loaded.");
-        sendResponse({ error: "Options page not fully loaded." });
-        return;
-      }
-      // Proceed with injection
-      injectScriptIntoExtensionUIWorld(sender.tab.id, message.jsFile)
+
+    // If the popup has already loaded, inject now (Note: this is an unlikely case. Usually the popup won't load until later and all scrips will be loaded at that point.)
+    chrome.tabs.get(optionsPopupTabID, (tab) => {
+      injectScriptIntoExtensionUIWorld(optionsPopupTabID, message.jsFile, message.cssFile)
         .then(result => sendResponse(result))
         .catch(error => sendResponse({ error: error.message }));
     });
@@ -333,15 +332,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Injects a script directly into the option popup's context (the "Extension UI world")
-function injectScriptIntoExtensionUIWorld(tabId, url) {
-  console.log(`❤️💉 Injecting into   MAIN   world: ${url}`);
-  const fullScriptUrl = chrome.runtime.getURL(url);
+function injectScriptIntoExtensionUIWorld(tabId, jsURL, cssURL) {
+
+  // Exit if the option popup page isn't loaded or is the wrong url
+  chrome.tabs.get(optionsPopupTabID, (tab) => {
+    if (!tab?.url?.startsWith(`chrome-extension://${chrome.runtime.id}/options.html`) ) {
+      console.warn("❤️ Not injecting: Tab is missing or not the extension options page.");
+      sendResponse({ error: "Tab is not the extension options page." });
+      return;
+    }
+  });
+
+  console.log(`❤️💉 Injecting into EXTENSION UI world: ${jsURL}`);
+  const fullScriptUrl = chrome.runtime.getURL(jsURL);
   
   // First fetch the script content
   return fetch(fullScriptUrl)
     .then(response => response.text())
     .then(scriptContent => {
-      // Then execute it in the page context
+      // Then execute it in the popup context
       return chrome.scripting.executeScript({
         target: { tabId },
         //world: "MAIN", // Explicitly specify extension UI world
@@ -365,7 +374,7 @@ function injectScriptIntoExtensionUIWorld(tabId, url) {
       });
     })
     .then(([result]) => {
-      console.log(`❤️ Script ${url} injection result:`, result.result);
+      console.log(`❤️ Script ${jsURL} injection result:`, result.result);
       return result.result;
     })
     .catch((error) => {
