@@ -344,11 +344,15 @@ function injectScriptIntoExtensionUIWorld(tabId, jsURL, cssURL) {
 
   console.log(`❤️💉 Injecting into EXTENSION UI world: ${jsURL}`);
 
-  //inject CSS
-  chrome.scripting.insertCSS({
-    target: { tabId: optionsPopupTabID },
-    files: [cssURL]
-  });
+  // Inject CSS if provided
+  if (cssURL) {
+    chrome.scripting.insertCSS({
+      target: { tabId: optionsPopupTabID },
+      files: [cssURL]
+    }).catch(error => {
+      console.error(`❤️ Error injecting CSS ${cssURL}:`, error);
+    });
+  }
 
   const fullScriptUrl = chrome.runtime.getURL(jsURL);
   
@@ -359,14 +363,13 @@ function injectScriptIntoExtensionUIWorld(tabId, jsURL, cssURL) {
       // Then execute it in the popup context
       return chrome.scripting.executeScript({
         target: { tabId },
-        // Remove world specification - extension pages run in extension context by default
         func: (code) => {
           // Create a blob URL from the code
           const blob = new Blob([code], { type: 'text/javascript' });
           const scriptUrl = URL.createObjectURL(blob);
           
           const script = document.createElement('script');
-          script.src = scriptUrl;  // Use blob URL instead of inline script
+          script.src = scriptUrl;
           script.type = 'text/javascript';
           script.className = '❤️injected-script';
           
