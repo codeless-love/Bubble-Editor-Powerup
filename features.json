@@ -313,5 +313,13 @@
     "cssFile": "features/inline_branch_delete/inline_branch_delete.css",
     "jsFile": "features/inline_branch_delete/inline_branch_delete.js",
     "default": true
+  },
+  {
+    "key": "hide_heart_indicators",
+    "category": "Style Tab",
+    "name": "Hide Heart Indicators",
+    "description": "Hides all heart (❤️) indicators that the extension adds to show which elements have been modified. This provides a cleaner interface without the visual indicators.",
+    "cssFile": "features/hide_heart_indicators/hide_heart_indicators.css",
+    "default": false
   }
 ]

@@ -1,0 +1,144 @@
+/* Hide Heart Indicators Feature */
+/* This feature hides all ❤️ indicators that the extension adds to show modifications */
+
+❤️ codelesslove,/* Hide heart indicators from option set expand inputs */
+#mainwindow .tab-panel.option.sets .field .composer-textbox::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from option set limitless attribute lists */
+.popup-content .list-wrapper::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from option set move gaps */
+#mainwindow .custom-fields > .field:first-child .modify-attr-btn:nth-child(3)::before,
+#mainwindow .custom-fields > .field:last-child .modify-attr-btn:nth-child(3)::before {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from privacy status badges on hover */
+.privacy-setting-btn.bubble-ui.light-grey-btn.is-public-visible:hover::after,
+.privacy-setting-text.is-public-visible:hover::after,
+.privacy-setting-btn.bubble-ui.light-grey-btn.is-privacy-applied:hover::after,
+.privacy-setting-text.is-privacy-applied:hover::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from workflow editor folders */
+.sidebar-left .workflow .folder-item:hover::after,
+#mainwindow .action-editor [data-name="workflowList"] > div > div[data-name="FolderItem"]::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from top menu */
+.lxb-application-manager .lxb-application-manager-trigger:hover::after,
+.lxb-application-manager .lxb-application-manager-content .lxb-application-manager-item:hover::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from sidebar */
+.sidebar-left .workflow-link:hover::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from search palette */
+.search-palette .search-result.current::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from branch management */
+.main .tab-selector[data-set="version-control"] .codeless-love-branch-menu-toggle:hover::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from style variables */
+.style-editor .style-variables .style-variable-item:hover::after,
+.token-wrapper:hover::after,
+.token-wrapper::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from expression warnings */
+.❤️expression-warning-left::before {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from data options */
+.data-optionset-item:hover::after,
+.data-datatype-editor:hover::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from property editor */
+.property-editor-2 .viewport .expression-composer-input-element:hover::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from elements tree */
+.element-tree .element-item:hover::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from runtime element explorer */
+.codelesslove-inspector-btn::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart indicators from discourage main branch warning */
+.main::before,
+.main .tab-selector::before {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide hearts from checkbox labels and privacy field captions */
+.privacy-rules .field-caption:hover::after,
+.field-wrapper .field-caption:hover::after,
+.field-wrapper .field-caption::after,
+.field-wrapper .field-caption .permission-div .permission-caption:hover::after,
+.permission-caption:hover::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide hearts from data copy warnings */
+.main .tab-selector[data-set="data"] .copy-to-live-warning::after,
+.main .tab-selector[data-set="data"] .copy-to-dev-warning::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart from top menu layout */
+.trigger-button:after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide heart from canvas left align */
+#mainwindow .canvas.resp-v1::after,
+#mainwindow .designcanvas::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide hearts from input fields (consolidated with specific input rules) */
+input::after,
+.input-element::after,
+.composer-textbox::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide hearts from property editor expression composers */
+.property-editor-2 .viewport .condition::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* Hide hearts from property editor hitboxes */
+.property-editor-2 .text-entry.static-entry-reorg::after,
+.property-editor-2 .object-list-editor .entry .row[prop_name=value] .prop-row-contents .body .editor.shorttext::after {
+  display: none !important;
+}
+
+❤️ codelesslove,/* More comprehensive approach - target common heart locations */
+.property-editor::after,
+.property-editor::before,
+.element-property-editor::after,
+.element-property-editor::before {
+  display: none !important;
+}
