@@ -165,13 +165,13 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
   newSpan.addEventListener('click', () => {
     const currentParams = new URLSearchParams(window.location.search);
 
-    // Preserve the 'id' and 'name' parameters
+    // Preserve the 'id' and 'version' parameters
+    // NOTE: Removed 'name' parameter preservation to fix page navigation bug
+    // The 'name' parameter represents the current page, and preserving it
+    // when navigating to API Connector causes conflicts and defaults to 'index'
     const preservedParams = {};
     if (currentParams.has('id')) {
       preservedParams.id = currentParams.get('id');
-    }
-    if (currentParams.has('name')) {
-      preservedParams.name = currentParams.get('name');
     }
     if (currentParams.has('version')) {
       preservedParams.version = currentParams.get('version');
