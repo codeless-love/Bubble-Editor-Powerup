@@ -8,7 +8,6 @@ window.loadedCodelessLoveScripts ||= {};
     const SAVE_RESULT_ACTION = "saveColorTokenOrderResult";
     const INITIAL_TOKEN_ACTION = "initialColorTokens";
     const REQUEST_TOKEN_ACTION = "requestInitialColorTokens";
-    const WRAPPER_CLASS = "tokens-editor-wrapper";
 
     /* You can ignore all the stuff on this line, but don't delete! */ console.log("❤️" + window.loadedCodelessLoveScripts[thisScriptKey]);
     if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {
@@ -27,6 +26,7 @@ window.loadedCodelessLoveScripts ||= {};
     const INVALID_DOM_TOKEN_IDS = new Set(["wrapper", "token-wrapper", ""]);
     let lastMetadataRequestAt = 0;
     const METADATA_REQUEST_COOLDOWN_MS = 1000;
+    let latestColorTokens = {};
 
     function waitForElement(selector, callback) {
         console.log("running waitForElement");
@@ -113,15 +113,93 @@ window.loadedCodelessLoveScripts ||= {};
         });
     }
 
+    function hasTokenContent(wrapper) {
+        return Array.from(wrapper.children).some((child) => child.classList.contains("token-name-and-edit"));
+    }
+
+    function updateTokenMetadata(colorTokens) {
+        if (!colorTokens || typeof colorTokens !== "object") {
+            tokenMetadataById = {};
+            latestColorTokens = {};
+            syncDomWithMetadata();
+            return;
+        }
+
+        latestColorTokens = colorTokens;
+        tokenMetadataById = {};
+
+        Object.entries(colorTokens).forEach(([tokenId, tokenInfo = {}]) => {
+            if (!tokenId || INVALID_DOM_TOKEN_IDS.has(tokenId)) {
+                return;
+            }
+
+            tokenMetadataById[tokenId] = {
+                initialOrder: tokenInfo.order ?? null,
+                name: tokenInfo.name || tokenInfo.display_name || tokenInfo.label || tokenInfo.text || null,
+                value: tokenInfo.value || tokenInfo.color || tokenInfo.hex || tokenInfo.rgb || tokenInfo.rgba || null,
+                rgba: tokenInfo.rgba || tokenInfo.color || tokenInfo.value || null,
+            };
+        });
+
+        syncDomWithMetadata();
+    }
+
+    function syncDomWithMetadata() {
+        const wrappers = Array.from(document.querySelectorAll(".token-wrapper")).filter(hasTokenContent);
+
+        if (wrappers.length === 0) {
+            maybeRequestMetadata();
+            return;
+        }
+
+        const validIds = new Set();
+
+        wrappers.forEach((wrapper) => {
+            const existingId = wrapper.dataset.tokenId;
+            if (existingId && tokenMetadataById[existingId]) {
+                validIds.add(existingId);
+                annotateWrapper(wrapper, existingId);
+            }
+        });
+
+        const tokensToAssign = Object.entries(tokenMetadataById)
+            .filter(([tokenId]) => !validIds.has(tokenId))
+            .sort(([, a], [, b]) => {
+                const orderA = a.initialOrder ?? Number.MAX_SAFE_INTEGER;
+                const orderB = b.initialOrder ?? Number.MAX_SAFE_INTEGER;
+                return orderA - orderB;
+            });
+
+        wrappers.forEach((wrapper) => {
+            const currentId = wrapper.dataset.tokenId;
+            if (currentId && tokenMetadataById[currentId]) {
+                return;
+            }
+
+            const nextEntry = tokensToAssign.shift();
+            if (!nextEntry) {
+                if (!latestColorTokens || Object.keys(latestColorTokens).length === 0) {
+                    annotateWrapper(wrapper, undefined);
+                }
+                return;
+            }
+
+            const [tokenId] = nextEntry;
+            annotateWrapper(wrapper, tokenId);
+        });
+
+        updateCurrentOrderAttributes();
+    }
+
     function annotateWrapper(wrapper, tokenId) {
         const metadata = tokenMetadataById[tokenId];
-        console.log("annotateWrapper metadata", metadata);
 
         if (!metadata) {
             delete wrapper.dataset.tokenId;
             delete wrapper.dataset.tokenInitialOrder;
             delete wrapper.dataset.tokenName;
             delete wrapper.dataset.tokenValue;
+            delete wrapper.dataset.tokenRgba;
             return;
         }
 
@@ -144,120 +222,12 @@ window.loadedCodelessLoveScripts ||= {};
         } else {
             delete wrapper.dataset.tokenValue;
         }
-    }
 
-    function hasTokenContent(wrapper) {
-        return Array.from(wrapper.children).some((child) => child.classList.contains("token-name-and-edit"));
-    }
-
-    function syncDomWithMetadata() {
-        const wrappers = Array.from(document.querySelectorAll(".token-wrapper")).filter(hasTokenContent);
-
-        if (wrappers.length === 0) {
-            maybeRequestMetadata();
-            return;
+        if (metadata.rgba) {
+            wrapper.dataset.tokenRgba = metadata.rgba;
+        } else {
+            delete wrapper.dataset.tokenRgba;
         }
-
-        const validIds = new Set();
-
-        wrappers.forEach((wrapper) => {
-            const existingId = wrapper.dataset.tokenId;
-            if (existingId && tokenMetadataById[existingId]) {
-                validIds.add(existingId);
-                console.log("annotateWrapper", wrapper, existingId);
-                annotateWrapper(wrapper, existingId);
-            }
-        });
-
-        const tokensToAssign = Object.entries(tokenMetadataById)
-            .filter(([tokenId]) => !validIds.has(tokenId))
-            .sort(([, a], [, b]) => {
-                const orderA = a.initialOrder ?? Number.MAX_SAFE_INTEGER;
-                const orderB = b.initialOrder ?? Number.MAX_SAFE_INTEGER;
-                return orderA - orderB;
-            });
-
-        wrappers.forEach((wrapper) => {
-            const currentId = wrapper.dataset.tokenId;
-            if (currentId && tokenMetadataById[currentId]) {
-                return;
-            }
-
-            const nextEntry = tokensToAssign.shift();
-            if (!nextEntry) {
-                annotateWrapper(wrapper, undefined);
-                return;
-            }
-
-            const [tokenId] = nextEntry;
-            annotateWrapper(wrapper, tokenId);
-        });
-
-        updateCurrentOrderAttributes();
-    }
-
-    function extractTokenMap(payload) {
-        if (payload && payload.normalizedTokenMap && typeof payload.normalizedTokenMap === "object") {
-            return payload.normalizedTokenMap;
-        }
-
-        let colorTokens = payload ? payload.colorTokens : null;
-
-        if (typeof colorTokens === "string") {
-            try {
-                colorTokens = JSON.parse(colorTokens);
-            } catch (error) {
-                console.error("❤️ Unable to parse color token payload", error);
-                colorTokens = null;
-            }
-        }
-
-        if (!colorTokens || typeof colorTokens !== "object") {
-            return {};
-        }
-
-        if (colorTokens["%d1"] && typeof colorTokens["%d1"] === "object") {
-            return colorTokens["%d1"];
-        }
-
-        if (colorTokens.default && typeof colorTokens.default === "object") {
-            return colorTokens.default;
-        }
-
-        if (colorTokens.body && colorTokens.body["%d1"] && typeof colorTokens.body["%d1"] === "object") {
-            return colorTokens.body["%d1"];
-        }
-
-        if (colorTokens.data && colorTokens.data["%d1"] && typeof colorTokens.data["%d1"] === "object") {
-            return colorTokens.data["%d1"];
-        }
-
-        return colorTokens;
-    }
-
-    function updateTokenMetadata(payload) {
-        const tokenContainer = extractTokenMap(payload);
-        const tokenMap = tokenContainer.default || {};
-
-        tokenMetadataById = {};
-
-        const tokenIds = Object.keys(tokenMap || {});
-        tokenIds.forEach((tokenId) => {
-            if (!tokenId || INVALID_DOM_TOKEN_IDS.has(tokenId)) {
-                return;
-            }
-
-            const tokenInfo = tokenMap[tokenId] || {};
-            console.log("❤️ Token info for", tokenId, tokenInfo);
-
-            tokenMetadataById[tokenId] = {
-                initialOrder: tokenInfo.order ?? null,
-                name: tokenInfo.name || tokenInfo.display_name || tokenInfo.label || tokenInfo.text || null,
-                value: tokenInfo.value || tokenInfo.color || tokenInfo.hex || tokenInfo.rgb || null,
-            };
-        });
-
-        syncDomWithMetadata();
     }
 
     function handleInitialColorTokensMessage(payload) {
@@ -270,8 +240,9 @@ window.loadedCodelessLoveScripts ||= {};
             return;
         }
 
-        console.log("❤️ Received initial color tokens");
-        updateTokenMetadata(payload);
+        console.log("❤️ Received initial color tokens", payload.colorTokens || payload);
+
+        updateTokenMetadata(payload.colorTokens || payload);
     }
 
     function requestInitialColorTokens() {
