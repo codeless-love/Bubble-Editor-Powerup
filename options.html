@@ -4,501 +4,96 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Bubble Editor Powerup Options</title>
-        <style>
-            :root {
-                --primary: #4361ee;
-                --primary-hover: #3a56d4;
-                --bg: #ffffff;
-                --bg-secondary: #f8f9fa;
-                --text: #1f242b;
-                --text-muted: #6b7280;
-                --border: #e5e7eb;
-                --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-                --radius: 12px;
-            }
-
-            * {
-                box-sizing: border-box;
-            }
-            html,
-            body {
-                margin: 0;
-            }
-
-            body {
-                width: 560px;
-                background: var(--bg);
-                color: var(--text);
-                font:
-                    14px/1.5 -apple-system,
-                    BlinkMacSystemFont,
-                    Segoe UI,
-                    Roboto,
-                    Inter,
-                    system-ui,
-                    sans-serif;
-            }
-
-            [hidden] {
-                display: none !important;
-            }
-
-            /* Header */
-            header {
-                background: var(--bg);
-                border-bottom: 1px solid var(--border);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            }
-
-            .h-wrap {
-                padding: 16px;
-                display: grid;
-                grid-template-columns: auto 1fr auto;
-                gap: 12px;
-                align-items: center;
-            }
-
-            .logo {
-                height: 32px;
-                width: 32px;
-                border-radius: 8px;
-            }
-            h1 {
-                margin: 0;
-                font-size: 18px;
-                font-weight: 600;
-            }
-
-            .button-close {
-                appearance: none;
-                border: 0;
-                background: transparent;
-                padding: 8px;
-                font-size: 24px;
-                color: var(--text-muted);
-                border-radius: 50%;
-                cursor: pointer;
-                line-height: 1;
-                width: 40px;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .button-close:hover {
-                background: var(--bg-secondary);
-            }
-
-            /* Toolbar */
-            .toolbar {
-                position: sticky;
-                top: 0px;
-                z-index: 19;
-                background: var(--bg);
-                padding: 12px 16px;
-                border-bottom: 1px solid var(--border);
-            }
-            .search-box {
-                position: relative;
-                margin-bottom: 12px;
-            }
-
-            .search-icon {
-                position: absolute;
-                left: 14px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 16px;
-                opacity: 0.5;
-            }
-
-            .search-box input {
-                width: 100%;
-                padding: 10px 12px 10px 40px;
-                border: 1px solid var(--border);
-                border-radius: 10px;
-                font-size: 14px;
-                outline: none;
-                background: var(--bg-secondary);
-                transition: all 0.2s;
-            }
-            .search-box input:focus {
-                border-color: var(--primary);
-                background: var(--bg);
-            }
-
-            .filters {
-                display: flex;
-                gap: 8px;
-            }
-
-            .filter-btn {
-                appearance: none;
-                border: 1px solid var(--border);
-                background: var(--bg);
-                color: var(--text);
-                padding: 8px 16px;
-                border-radius: 999px;
-                font-size: 13px;
-                cursor: pointer;
-                font-weight: 500;
-                transition: all 0.2s;
-            }
-            .filter-btn:hover {
-                background: var(--bg-secondary);
-            }
-            .filter-btn.active {
-                background: var(--primary);
-                color: white;
-                border-color: var(--primary);
-            }
-
-            /* Main content */
-            main {
-                padding: 16px;
-            }
-
-            /* Category sections */
-            .category-section {
-                margin-bottom: 16px;
-                border: 1px solid var(--border);
-                border-radius: var(--radius);
-                background: var(--bg);
-                overflow: hidden;
-            }
-
-            .category-header {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 14px 16px;
-                cursor: pointer;
-                background: var(--bg);
-                border: none;
-                width: 100%;
-                text-align: left;
-                font-size: 15px;
-                font-weight: 600;
-                transition: background 0.2s;
-                /*position: sticky;
-                top: 0;
-                z-index: 15;*/
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            }
-            .category-header:hover {
-                background: var(--bg-secondary);
-            }
-
-            .category-icon {
-                font-size: 18px;
-                display: flex;
-                align-items: center;
-            }
-
-            .chevron {
-                margin-left: auto;
-                font-size: 12px;
-                color: var(--text-muted);
-                transition: transform 0.2s;
-            }
-            .category-section[open] .chevron {
-                transform: rotate(90deg);
-            }
-
-            .category-count {
-                font-size: 13px;
-                color: var(--text-muted);
-                font-weight: 500;
-            }
-
-            .features-grid {
-                padding: 8px;
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            /* Feature cards */
-            .feature-card {
-                border: 1px solid var(--border);
-                border-radius: 10px;
-                padding: 14px 16px;
-                background: var(--bg);
-                transition: all 0.2s;
-                cursor: pointer;
-            }
-            .feature-card:hover {
-                box-shadow: var(--shadow);
-                border-color: #d1d5db;
-            }
-
-            .feature-main {
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .feature-checkbox {
-                margin-top: 2px;
-                width: 20px;
-                height: 20px;
-                border: 2px solid #9ca3af;
-                border-radius: 6px;
-                cursor: pointer;
-                flex-shrink: 0;
-                appearance: none;
-                display: grid;
-                place-content: center;
-                transition: all 0.2s;
-            }
-            .feature-checkbox:checked {
-                background: var(--primary);
-                border-color: var(--primary);
-            }
-            .feature-checkbox:checked::before {
-                content: "";
-                width: 10px;
-                height: 10px;
-                background: white;
-                clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-            }
-
-            .feature-content {
-                flex: 1;
-            }
-
-            .feature-title {
-                font-weight: 600;
-                font-size: 14px;
-                margin-bottom: 4px;
-            }
-
-            .feature-description {
-                font-size: 13px;
-                color: var(--text-muted);
-                line-height: 1.4;
-            }
-
-            /* Sub-features */
-            .sub-features {
-                margin-left: 32px;
-                margin-top: 8px;
-                padding-left: 16px;
-                border-left: 2px solid var(--border);
-            }
-
-            .sub-feature {
-                margin-bottom: 8px;
-            }
-
-            /* Footer */
-            footer {
-                position: sticky;
-                bottom: 0;
-                background: var(--bg);
-                border-top: 1px solid var(--border);
-                padding: 12px 16px;
-                display: flex;
-                gap: 8px;
-                align-items: center;
-            }
-
-            #status {
-                display: none;
-                font-size: 13px;
-                color: #065f46;
-                background: #ecfdf5;
-                border-left: 3px solid #10b981;
-                padding: 8px 12px;
-                border-radius: 6px;
-                flex: 1;
-            }
-
-            .button {
-                appearance: none;
-                border: 0;
-                border-radius: 8px;
-                padding: 10px 16px;
-                font-weight: 600;
-                cursor: pointer;
-                font-size: 14px;
-                transition: all 0.2s;
-            }
-
-            #save-button {
-                background: var(--primary);
-                color: white;
-            }
-            #save-button:hover {
-                background: var(--primary-hover);
-            }
-
-            .button-secondary {
-                background: var(--bg-secondary);
-                color: var(--text);
-                border: 1px solid var(--border);
-                padding: 8px 14px;
-                font-size: 13px;
-            }
-            .button-secondary:hover {
-                background: #e5e7eb;
-            }
-
-            /* Legacy/hidden elements */
-            #features-list {
-                display: none;
-            }
-
-            /* Utility classes */
-            .emoji-row {
-                display: flex;
-                gap: 16px;
-                align-items: center;
-                margin: 16px 0;
-            }
-            .emoji-row .emoji {
-                font-size: 32px;
-            }
-
-            /* Tool section */
-            .tool-section {
-                margin-top: 16px;
-                padding: 16px;
-                border: 1px solid var(--border);
-                border-radius: var(--radius);
-                background: #fbfbfd;
-            }
-            .tool-section h2 {
-                margin: 0 0 8px;
-                font-size: 16px;
-                font-weight: 700;
-            }
-
-            /* Input fields */
-            .input-container {
-                margin-left: 32px;
-                margin-top: 8px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            .input-label {
-                font-size: 13px;
-                color: var(--text-muted);
-            }
-            .input-field {
-                width: 80px;
-                padding: 6px 10px;
-                border: 1px solid var(--border);
-                border-radius: 6px;
-                font-size: 13px;
-            }
-            .input-field:focus {
-                outline: none;
-                border-color: var(--primary);
-            }
-
-            /* Candidate domains */
-            .candidate-domains {
-                margin: 12px 0 0 32px;
-                font-size: 11px;
-                font-weight: 600;
-                color: #666;
-            }
-            .candidate-domains-list {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 6px;
-                margin-top: 8px;
-            }
-            .candidate-domains-list > span {
-                border: 1px solid var(--border);
-                border-radius: 12px;
-                padding: 3px 10px;
-                font-size: 11px;
-                background: var(--bg-secondary);
-            }
-
-            /* Disabled state */
-            .feature.disabled {
-                opacity: 0.6;
-                pointer-events: none;
-            }
-        </style>
-
-        <link rel="stylesheet" href="features/bulk_branch_delete/bulk_branch_delete.css" />
+        <link rel="stylesheet" href="options.css" />
         <script src="features/bulk_branch_delete/bulk_branch_delete.js" defer></script>
         <script src="options.js" defer></script>
     </head>
     <body>
         <header>
-            <div class="h-wrap">
+            <div class="header-row">
                 <img class="logo" src="extension-icons/icon-64.png" alt="Bubble Editor Powerup" />
-                <h1>Bubble Editor Powerup</h1>
-                <button class="button-close" id="close-button">&times;</button>
+                <div class="header-copy">
+                    <h1>Bubble Editor Powerup</h1>
+                    <p>Toggle extension features and manage helper tools for the Bubble editor.</p>
+                </div>
             </div>
         </header>
 
+        <section class="toolbar" id="editor-toolbar">
+            <div class="search">
+                <input id="feature-search" type="search" placeholder="Search features" aria-label="Search features" />
+            </div>
+            <div class="filters" role="group" aria-label="Filter features">
+                <button class="filter-button" data-filter="all" data-state="active">All</button>
+                <button class="filter-button" data-filter="enabled">Enabled</button>
+                <button class="filter-button" data-filter="disabled">Disabled</button>
+            </div>
+        </section>
+
         <main id="Editor">
-            <!-- Toolbar and categories will be injected here -->
-            <div id="loading-message" style="padding: 20px; text-align: center; color: var(--text-muted)">Loading features...</div>
-            <div id="features-list" class="features-container"></div>
+            <div id="loading-message" class="loading-text">Loading features...</div>
+            <div id="categories-container"></div>
 
-            <div class="tool-section">
-                <h2>❤️ Fast Branch Delete</h2>
-                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px">
-                    Quickly delete one or more branches by selecting them from the list. This performs a soft delete on all selected branches.
-                </p>
+            <section class="branch-card" aria-labelledby="branch-card-title">
+                <h2 id="branch-card-title">Fast Branch Delete</h2>
+                <p>Quickly soft delete one or more branches from the current Bubble app.</p>
 
-                <div class="branch-delete-container">
-                    <div class="branch-list-container">
-                        <div class="branch-list-header">
-                            <button id="branch-select-none" class="button-secondary" style="padding: 6px 12px; font-size: 12px">Clear Selection</button>
-                        </div>
-                        <div id="branch-list" class="branch-list">
-                            <div class="branch-list-loading">Loading versions...</div>
-                        </div>
+                <div class="branch-list-container">
+                    <div class="branch-list-header">
+                        <span>Branches</span>
+                        <button id="branch-select-none" class="button button-ghost" type="button">Clear Selection</button>
                     </div>
-
-                    <div style="display: flex; gap: 8px; align-items: center; margin: 12px 0">
-                        <button id="branch-refresh-button" class="button-secondary">Refresh</button>
-                        <span id="branch-selection-count" style="font-size: 13px; color: var(--text-muted)"></span>
+                    <div id="branch-list" class="branch-list">
+                        <div class="branch-list-loading">Loading versions...</div>
                     </div>
+                </div>
 
-                    <button id="branch-delete-button" class="branch-delete-button" disabled>Delete Selected Branches</button>
-                    <div id="branch-delete-status" class="branch-delete-status"></div>
+                <div class="branch-actions">
+                    <button id="branch-refresh-button" class="button button-ghost" type="button">Refresh</button>
+                    <span id="branch-selection-count"></span>
+                </div>
+
+                <button id="branch-delete-button" class="button button-primary" type="button" disabled>Delete Selected Branches</button>
+                <div id="branch-delete-status" class="branch-delete-status" role="status" aria-live="polite"></div>
+            </section>
+        </main>
+
+        <main id="Candidate" hidden>
+            <div class="empty-state">
+                <span class="empty-state-icon" aria-hidden="true">☑️</span>
+                <div class="empty-state-body">
+                    <h2>Domain permission needed</h2>
+                    <p>Allow the powerup to access this Bubble domain to continue.</p>
+                    <button id="grant-access-btn" class="button button-primary" type="button">Grant access</button>
                 </div>
             </div>
         </main>
 
-        <main id="Candidate" hidden>
-            <div class="emoji-row">
-                <span class="emoji">☑️</span>
-                <p>Powerup needs your permission to run on this domain.</p>
-            </div>
-            <button id="grant-access-btn" class="button">Grant access to this domain</button>
-        </main>
-
         <main id="Approved" hidden>
-            <div class="emoji-row">
-                <span class="emoji">✅</span>
-                <p>Powerup extension is approved for this site! Use <code>debug_mode</code> to see features.</p>
+            <div class="empty-state">
+                <span class="empty-state-icon" aria-hidden="true">✅</span>
+                <div class="empty-state-body">
+                    <h2>All set</h2>
+                    <p>The powerup is approved here. Use <code>debug_mode</code> inside Bubble to explore features.</p>
+                </div>
             </div>
         </main>
 
         <main id="Unrelated" hidden>
-            <div class="emoji-row">
-                <span class="emoji">🫠</span>
-                <p>Powerup extension is not enabled for this site.</p>
+            <div class="empty-state">
+                <span class="empty-state-icon" aria-hidden="true">🫠</span>
+                <div class="empty-state-body">
+                    <h2>Not a Bubble editor</h2>
+                    <p>Open a Bubble editor tab to manage extension features.</p>
+                </div>
             </div>
         </main>
 
         <footer>
-            <div id="status"></div>
-            <button id="save-button" class="button">Save Changes</button>
-            <div style="flex: 1"></div>
-            <button id="refresh-button" class="button-secondary">Reload this tab</button>
-            <button id="refresh-all-button" class="button-secondary">Reload all editor tabs</button>
+            <div id="status" role="status" aria-live="polite"></div>
+            <button id="save-button" class="button button-primary" type="button">Save Changes</button>
+            <button id="refresh-button" class="button button-ghost" type="button">Reload this tab</button>
+            <button id="refresh-all-button" class="button button-ghost" type="button">Reload all editor tabs</button>
         </footer>
     </body>
 </html>

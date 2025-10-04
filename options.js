@@ -82,6 +82,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (main) main.hidden = state !== domainState;
         });
 
+        const toolbar = document.getElementById("editor-toolbar");
+        if (toolbar) toolbar.hidden = domainState !== "Editor";
+
+        const headerEl = document.querySelector("header");
+        if (headerEl) headerEl.hidden = domainState !== "Editor";
+
+        const footerEl = document.querySelector("footer");
+        if (footerEl) footerEl.hidden = domainState !== "Editor";
+
         // --- Grant access button logic (moved here for correct scope) ---
         const grantBtn = document.getElementById("grant-access-btn");
         if (grantBtn) {
@@ -132,9 +141,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Track whether changes have been made
     let changesMade = false;
 
-    const container = document.getElementById("features-list");
-    console.log("[Options.js] Container element:", container);
-
     const categories = [
         "Runtime",
         "Expressions",
@@ -152,23 +158,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         "Example Feature",
     ];
 
-    const categoryIcons = {
-        Runtime: "🎯",
-        Expressions: "🧮",
-        "Expression Composers": "🎼",
-        "Property Editor": "🎨",
-        Branches: "🌿",
-        "Top Menubar": "📋",
-        Sidebar: "📐",
-        "Style Tab": "🎨",
-        "Styler Tab": "🎨",
-        "Design Canvas": "🎨",
-        "Data View": "📊",
-        "Workflow View": "⚙️",
-        "Search Palette": "🔍",
-        Merge: "🔀",
-    };
-
     // Group features by categories
     const featuresByCategory = features.reduce((acc, feature) => {
         const category = feature.category || "Uncategorized"; // Default to "Uncategorized" if no category is specified
@@ -178,6 +167,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         acc[category].push(feature);
         return acc;
     }, {});
+
+    const orderedCategories = [...categories, ...Object.keys(featuresByCategory).filter((category) => !categories.includes(category))];
 
     const isDependencySatisfied = (feature, prefs) => {
         if (!feature.requires) return true; // No dependency
@@ -194,57 +185,68 @@ document.addEventListener("DOMContentLoaded", async () => {
         return features.filter((f) => f.requires === parentFeatureKey);
     };
 
+    let applyFiltersRef = () => {};
+
     // Function to create input fields based on feature config
-    const createFeatureInputs = (feature, containerDiv, isVisible = true) => {
+    const createFeatureInputs = (feature, container, isVisible = true) => {
         if (!feature.config || !feature.config.inputs || !feature.config.inputs.length) {
             return;
         }
 
+        container.innerHTML = "";
+        container.style.display = isVisible ? "flex" : "none";
+
         feature.config.inputs.forEach((inputConfig) => {
-            // Get the stored value or use default
-            chrome.storage.sync.get([inputConfig.key], function (result) {
-                const value = result[inputConfig.key] !== undefined ? result[inputConfig.key] : inputConfig.default;
+            chrome.storage.sync.get([inputConfig.key], (result) => {
+                const storedValue = result[inputConfig.key];
+                const initialValue = storedValue !== undefined ? storedValue : inputConfig.default;
 
-                // Create input container
-                const inputContainer = document.createElement("div");
-                inputContainer.className = "input-container";
-                inputContainer.style.display = isVisible ? "flex" : "none";
+                const group = document.createElement("div");
+                group.className = "input-group";
 
-                // Create label for input
-                const inputLabel = document.createElement("label");
-                inputLabel.textContent = `${inputConfig.label}: `;
-                inputLabel.className = "input-label";
+                const label = document.createElement("label");
+                const inputId = `${feature.key}-${inputConfig.key}`;
+                label.setAttribute("for", inputId);
+                label.textContent = inputConfig.label;
 
-                // Create input element based on type
-                const input = document.createElement("input");
-                input.className = "input-field";
-                input.id = inputConfig.key;
-
-                // Set input attributes based on type
-                switch (inputConfig.type) {
-                    case "number":
-                        input.type = "number";
-                        if (inputConfig.min !== undefined) input.min = inputConfig.min;
-                        if (inputConfig.max !== undefined) input.max = inputConfig.max;
-                        input.value = value;
-                        break;
-                    case "text":
-                        input.type = "text";
-                        input.value = value;
-                        break;
-                    case "checkbox":
-                        input.type = "checkbox";
-                        input.checked = value;
-                        break;
-                    default:
-                        input.type = "text";
-                        input.value = value;
+                let input;
+                if (inputConfig.type === "textarea") {
+                    input = document.createElement("textarea");
+                } else {
+                    input = document.createElement("input");
+                    input.type = inputConfig.type === "checkbox" ? "checkbox" : inputConfig.type || "text";
                 }
 
-                // Add event listener to input
+                input.id = inputId;
+
+                if (inputConfig.placeholder) {
+                    input.placeholder = inputConfig.placeholder;
+                }
+
+                if (inputConfig.type === "checkbox") {
+                    input.checked = Boolean(initialValue);
+                } else if (inputConfig.type === "number") {
+                    input.value = initialValue ?? "";
+                    if (inputConfig.min !== undefined) input.min = inputConfig.min;
+                    if (inputConfig.max !== undefined) input.max = inputConfig.max;
+                    if (inputConfig.step !== undefined) input.step = inputConfig.step;
+                } else {
+                    input.value = initialValue ?? "";
+                }
+
+                group.appendChild(label);
+                group.appendChild(input);
+                container.appendChild(group);
+
                 input.addEventListener("change", () => {
-                    // Store the value in chrome.storage
-                    const newValue = input.type === "checkbox" ? input.checked : input.type === "number" ? parseInt(input.value, 10) : input.value;
+                    let newValue;
+                    if (inputConfig.type === "checkbox") {
+                        newValue = input.checked;
+                    } else if (inputConfig.type === "number") {
+                        newValue = input.value === "" ? null : Number(input.value);
+                    } else {
+                        newValue = input.value;
+                    }
 
                     const storageUpdate = {};
                     storageUpdate[inputConfig.key] = newValue;
@@ -253,247 +255,235 @@ document.addEventListener("DOMContentLoaded", async () => {
                     changesMade = true;
                     saveButton.style.display = "block";
                 });
-
-                // Append elements to container
-                inputContainer.appendChild(inputLabel);
-                inputContainer.appendChild(input);
-                containerDiv.appendChild(inputContainer);
             });
         });
     };
 
     function initNewUI() {
-        const legacyContainer = document.getElementById("features-list");
-        if (!legacyContainer) {
-            console.log("[Options.js] features-list container not found");
+        const categoriesContainer = document.getElementById("categories-container");
+        if (!categoriesContainer) {
+            console.log("[Options.js] categories container not found");
             return;
         }
 
-        // Create new UI structure
-        const editor = document.getElementById("Editor");
+        categoriesContainer.innerHTML = "";
 
-        // Create toolbar
-        const toolbar = document.createElement("div");
-        toolbar.className = "toolbar";
-        toolbar.innerHTML = `
-    <div class="search-box">
-      <span class="search-icon">🔎</span>
-      <input id="feature-search" type="search" placeholder="Find features..." />
-    </div>
-    <div class="filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="enabled">Enabled</button>
-      <button class="filter-btn" data-filter="disabled">Disabled</button>
-    </div>
-  `;
+        orderedCategories.forEach((categoryName) => {
+            const featureList = featuresByCategory[categoryName];
+            if (!featureList || featureList.length === 0) return;
 
-        const categoriesContainer = document.createElement("div");
-        categoriesContainer.id = "categories-container";
+        const accordion = document.createElement("section");
+        accordion.className = "accordion";
+        accordion.dataset.state = "open";
+        accordion.dataset.category = categoryName;
 
-        // Find the tool section to insert before it
-        const toolSection = editor.querySelector(".tool-section");
-        if (toolSection) {
-            editor.insertBefore(toolbar, toolSection);
-            editor.insertBefore(categoriesContainer, toolSection);
-        } else {
-            // Fallback: insert before legacy container
-            editor.insertBefore(toolbar, legacyContainer);
-            editor.insertBefore(categoriesContainer, legacyContainer);
-        }
+        const trigger = document.createElement("button");
+        trigger.type = "button";
+        trigger.className = "accordion-trigger";
+        trigger.setAttribute("aria-expanded", "true");
 
-        // Process each category
-        categories.forEach((categoryName) => {
-            if (!featuresByCategory[categoryName]) return;
+        const titleSpan = document.createElement("span");
+        titleSpan.textContent = categoryName;
 
-            const section = document.createElement("details");
-            section.className = "category-section";
-            section.open = true;
-            section.dataset.category = categoryName;
+        const countSpan = document.createElement("span");
+            countSpan.className = "category-count";
+            countSpan.dataset.count = "";
 
-            const header = document.createElement("summary");
-            header.className = "category-header";
-            const icon = categoryIcons[categoryName] || "📦";
-            header.innerHTML = `
-      <span class="category-icon">${icon}</span>
-      <span>${categoryName}</span>
-      <span class="category-count" data-count></span>
-      <span class="chevron">▶</span>
-    `;
+            trigger.appendChild(titleSpan);
+            trigger.appendChild(countSpan);
+            trigger.insertAdjacentHTML(
+                "beforeend",
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
+            );
 
-            const grid = document.createElement("div");
-            grid.className = "features-grid";
+            trigger.addEventListener("click", () => {
+                const isOpen = accordion.dataset.state === "open";
+                accordion.dataset.state = isOpen ? "closed" : "open";
+                trigger.setAttribute("aria-expanded", (!isOpen).toString());
+            });
 
-            section.appendChild(header);
-            section.appendChild(grid);
+            const content = document.createElement("div");
+            content.className = "accordion-content";
 
-            let featureCount = 0;
-            featuresByCategory[categoryName].forEach((feature) => {
+            featureList.forEach((feature) => {
                 if (isSubFeature(feature)) return;
 
                 const card = createFeatureCard(feature);
-                grid.appendChild(card);
-                featureCount++;
+                content.appendChild(card);
 
                 const subFeatures = getSubFeatures(feature.key);
                 if (subFeatures.length > 0) {
                     subFeatures.forEach((subFeature) => {
                         const subCard = createFeatureCard(subFeature, true);
-                        grid.appendChild(subCard);
+                        content.appendChild(subCard);
                     });
                 }
             });
 
-            if (featureCount > 0) {
-                categoriesContainer.appendChild(section);
-                updateCategoryCount(section);
+            if (content.children.length > 0) {
+                accordion.appendChild(trigger);
+                accordion.appendChild(content);
+                categoriesContainer.appendChild(accordion);
+                updateCategoryCount(accordion);
             }
         });
 
-        // Hide loading message
         const loadingMsg = document.getElementById("loading-message");
         if (loadingMsg) {
             loadingMsg.style.display = "none";
         }
 
-        // Setup search and filters
         setupFilters();
 
-        console.log("[Options.js] ✅ UI Migration complete!");
-
-        // Listen for checkbox changes to update counts
-        document.addEventListener("change", (e) => {
-            if (e.target.type === "checkbox") {
-                setTimeout(() => {
-                    document.querySelectorAll(".category-section").forEach(updateCategoryCount);
-                }, 10);
-            }
-        });
+        console.log("[Options.js] ✅ UI refreshed with minimal layout");
     }
 
     function createFeatureCard(feature, isSubFeature = false) {
         const card = document.createElement("div");
-        card.className = isSubFeature ? "feature-card sub-feature" : "feature-card";
+        card.className = "feature";
+        card.dataset.featureKey = feature.key;
+        if (isSubFeature) {
+            card.dataset.variant = "child";
+        }
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = prefs[feature.key];
-        checkbox.id = feature.key;
-        checkbox.className = "feature-checkbox";
-
-        const title = feature.name;
-        const desc = feature.description;
+        const title = feature.name || feature.key;
+        const desc = feature.description || "";
+        const isEnabled = Boolean(prefs[feature.key]);
 
         card.dataset.title = title.toLowerCase();
         card.dataset.desc = desc.toLowerCase();
-        card.dataset.enabled = checkbox.checked ? "true" : "false";
+        card.dataset.enabled = isEnabled ? "true" : "false";
 
-        const mainDiv = document.createElement("div");
-        mainDiv.className = "feature-main";
+        const header = document.createElement("div");
+        header.className = "feature-header";
 
-        mainDiv.appendChild(checkbox);
+        const label = document.createElement("div");
+        label.className = "feature-label";
+        label.textContent = title;
 
-        const content = document.createElement("div");
-        content.className = "feature-content";
+        const controls = document.createElement("div");
+        controls.className = "feature-controls";
 
-        const titleDiv = document.createElement("div");
-        titleDiv.className = "feature-title";
-        titleDiv.textContent = title;
+        const toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "switch";
+        toggle.dataset.role = "feature-switch";
+        toggle.dataset.state = isEnabled ? "on" : "off";
+        toggle.setAttribute("role", "switch");
+        toggle.setAttribute("aria-checked", isEnabled ? "true" : "false");
+        toggle.setAttribute("aria-label", `Toggle ${title}`);
+        controls.appendChild(toggle);
 
-        const descDiv = document.createElement("div");
-        descDiv.className = "feature-description";
-        descDiv.textContent = desc;
+        header.appendChild(label);
+        header.appendChild(controls);
+        card.appendChild(header);
 
-        content.appendChild(titleDiv);
-        content.appendChild(descDiv);
-
-        mainDiv.appendChild(content);
-        card.appendChild(mainDiv);
-
-        // Add inputs if any
-        if (feature.config && feature.config.inputs) {
-            createFeatureInputs(feature, card, checkbox.checked);
+        if (desc) {
+            const description = document.createElement("p");
+            description.className = "feature-description";
+            description.textContent = desc;
+            card.appendChild(description);
         }
 
-        // Add domains if any
-        if (feature.key === "enable_runtime_features") {
-            const domainsContainer = document.createElement("div");
-            domainsContainer.className = "candidate-domains";
-            domainsContainer.textContent = "Loading domains...";
-            card.appendChild(domainsContainer);
-            if (candidateDomains.length === 0) {
-                domainsContainer.textContent = "No eligible domains.";
-            } else {
-                const unapprovedCandidateDomains = candidateDomains.filter((domain) => !approvedDomains.includes(domain));
-                if (unapprovedCandidateDomains.length === 0) {
-                    domainsContainer.style.display = "none";
-                } else {
-                    domainsContainer.textContent = "Domains waiting for approval:";
-                    const container = document.createElement("div");
-                    container.className = "candidate-domains-list";
-                    unapprovedCandidateDomains.forEach((domain) => {
-                        const span = document.createElement("span");
-                        span.textContent = domain;
-                        container.appendChild(span);
-                    });
-                    domainsContainer.appendChild(container);
-                }
-            }
-            // --- Approved domains list ---
-            const approvedContainer = document.createElement("div");
-            approvedContainer.className = "candidate-domains";
-            approvedContainer.textContent = "Loading approved domains...";
-            card.appendChild(approvedContainer);
+        let configContainer = null;
+        if (feature.config && feature.config.inputs && feature.config.inputs.length) {
+            configContainer = document.createElement("div");
+            configContainer.className = "feature-config";
+            configContainer.style.display = isEnabled ? "flex" : "none";
+            card.appendChild(configContainer);
+            createFeatureInputs(feature, configContainer, isEnabled);
+        }
 
-            if (approvedDomains.length === 0) {
-                approvedContainer.style.display = "none";
-            } else {
-                approvedContainer.textContent = "Approved domains:";
-                const container = document.createElement("div");
-                container.className = "candidate-domains-list";
-                approvedDomains.forEach((domain) => {
-                    const span = document.createElement("span");
-                    span.textContent = domain;
-                    container.appendChild(span);
+        if (feature.key === "enable_runtime_features") {
+            const domainsSection = document.createElement("div");
+            domainsSection.className = "feature-config feature-config-domains";
+
+            const domainsContent = document.createElement("div");
+            domainsContent.className = "domain-summary";
+
+            const pending = candidateDomains.filter((domain) => !approvedDomains.includes(domain));
+            if (pending.length > 0) {
+                const pendingLabel = document.createElement("div");
+                pendingLabel.className = "helper-text";
+                pendingLabel.textContent = "Domains pending approval:";
+                domainsContent.appendChild(pendingLabel);
+
+                const pendingList = document.createElement("div");
+                pendingList.className = "domain-list";
+                pending.forEach((domain) => {
+                    const chip = document.createElement("span");
+                    chip.className = "domain-pill";
+                    chip.textContent = domain;
+                    pendingList.appendChild(chip);
                 });
-                approvedContainer.appendChild(container);
+                domainsContent.appendChild(pendingList);
             }
+
+            if (approvedDomains.length > 0) {
+                const approvedLabel = document.createElement("div");
+                approvedLabel.className = "helper-text";
+                approvedLabel.textContent = "Approved domains:";
+                domainsContent.appendChild(approvedLabel);
+
+                const approvedList = document.createElement("div");
+                approvedList.className = "domain-list";
+                approvedDomains.forEach((domain) => {
+                    const chip = document.createElement("span");
+                    chip.className = "domain-pill";
+                    chip.textContent = domain;
+                    approvedList.appendChild(chip);
+                });
+                domainsContent.appendChild(approvedList);
+            }
+
+            if (!domainsContent.hasChildNodes()) {
+                const emptyLabel = document.createElement("div");
+                emptyLabel.className = "helper-text";
+                emptyLabel.textContent = "No domains configured yet.";
+                domainsContent.appendChild(emptyLabel);
+            }
+
+            domainsSection.appendChild(domainsContent);
+            card.appendChild(domainsSection);
         }
 
         let isDisabled = false;
         if (isSubFeature) {
             const parentFeatureKey = feature.requires;
-            const parentFeature = features.find((f) => f.key === parentFeatureKey);
             isDisabled = !prefs[parentFeatureKey];
             if (isDisabled) {
-                checkbox.title = `Requires "${parentFeature.name}" to be enabled.`;
+                toggle.title = `Requires "${features.find((f) => f.key === parentFeatureKey)?.name || parentFeatureKey}" to be enabled.`;
             }
         } else if (!isDependencySatisfied(feature, prefs)) {
             isDisabled = true;
-            checkbox.title = `Requires "${features.find((f) => f.key === feature.requires)?.name || feature.requires}" to be enabled.`;
+            toggle.title = `Requires "${features.find((f) => f.key === feature.requires)?.name || feature.requires}" to be enabled.`;
         }
 
         if (isDisabled) {
-            card.classList.add("disabled");
-            checkbox.disabled = true;
+            card.dataset.disabled = "true";
+            toggle.disabled = true;
+            toggle.setAttribute("aria-disabled", "true");
         } else {
-            checkbox.addEventListener("change", () => {
-                prefs[feature.key] = checkbox.checked;
-                card.dataset.enabled = checkbox.checked ? "true" : "false";
-                updateDependentFeatures(feature, checkbox.checked);
+            toggle.addEventListener("click", () => {
+                const shouldEnable = toggle.dataset.state !== "on";
+                toggle.dataset.state = shouldEnable ? "on" : "off";
+                toggle.setAttribute("aria-checked", shouldEnable ? "true" : "false");
+                prefs[feature.key] = shouldEnable;
+                card.dataset.enabled = shouldEnable ? "true" : "false";
+
+                if (configContainer) {
+                    configContainer.style.display = shouldEnable ? "flex" : "none";
+                }
+
+                updateDependentFeatures(feature, shouldEnable);
                 checkForChanges();
 
-                if (feature.config && feature.config.inputs) {
-                    const inputContainers = card.querySelectorAll(".input-container");
-                    inputContainers.forEach((container) => {
-                        container.style.display = checkbox.checked ? "flex" : "none";
-                    });
+                const parentAccordion = card.closest(".accordion");
+                if (parentAccordion) {
+                    updateCategoryCount(parentAccordion);
                 }
-            });
 
-            card.addEventListener("click", (e) => {
-                if (e.target === checkbox || e.target.closest(".input-container")) return;
-                checkbox.checked = !checkbox.checked;
-                checkbox.dispatchEvent(new Event("change"));
+                applyFiltersRef();
             });
         }
 
@@ -504,49 +494,71 @@ document.addEventListener("DOMContentLoaded", async () => {
         const dependentFeatures = getSubFeatures(parentFeature.key);
 
         dependentFeatures.forEach((dependentFeature) => {
-            const dependentCard = document.getElementById(dependentFeature.key).closest(".feature-card");
-            const dependentCheckbox = dependentCard.querySelector(".feature-checkbox");
+            const dependentCard = document.querySelector(`[data-feature-key="${dependentFeature.key}"]`);
+            if (!dependentCard) return;
+
+            const dependentToggle = dependentCard.querySelector('[data-role="feature-switch"]');
+            const dependentConfig = dependentCard.querySelector(".feature-config");
+            const requirementTitle = `Requires "${parentFeature.name || parentFeature.key}" to be enabled.`;
 
             if (!isParentChecked) {
-                dependentCard.classList.add("disabled");
-                dependentCheckbox.disabled = true;
-                dependentCheckbox.checked = false;
-                prefs[dependentFeature.key] = false;
+                dependentCard.dataset.disabled = "true";
                 dependentCard.dataset.enabled = "false";
-                dependentCheckbox.title = `Requires "${parentFeature.name}" to be enabled.`;
+                prefs[dependentFeature.key] = false;
+
+                if (dependentToggle) {
+                    dependentToggle.disabled = true;
+                    dependentToggle.dataset.state = "off";
+                    dependentToggle.setAttribute("aria-disabled", "true");
+                    dependentToggle.setAttribute("aria-checked", "false");
+                    dependentToggle.title = requirementTitle;
+                }
+
+                if (dependentConfig) {
+                    dependentConfig.style.display = "none";
+                }
+
                 updateDependentFeatures(dependentFeature, false);
             } else {
-                dependentCard.classList.remove("disabled");
-                dependentCheckbox.disabled = false;
-                dependentCheckbox.title = "";
+                delete dependentCard.dataset.disabled;
+                if (dependentToggle) {
+                    dependentToggle.disabled = false;
+                    dependentToggle.removeAttribute("aria-disabled");
+                    dependentToggle.title = "";
+                }
             }
         });
     }
 
-    function updateCategoryCount(section) {
-        const grid = section.querySelector(".features-grid");
-        const cards = Array.from(grid.querySelectorAll(".feature-card:not(.sub-feature)"));
-        const enabled = cards.filter((c) => c.dataset.enabled === "true");
-        const countEl = section.querySelector("[data-count]");
-        countEl.textContent = enabled.length > 0 ? `(${enabled.length})` : "";
+    function updateCategoryCount(accordion) {
+        const cards = Array.from(accordion.querySelectorAll(".feature"));
+        const topLevel = cards.filter((card) => !card.dataset.variant);
+        const enabled = topLevel.filter((card) => card.dataset.enabled === "true");
+        const countEl = accordion.querySelector(".category-count");
+        if (countEl) {
+            countEl.textContent = enabled.length > 0 ? `(${enabled.length})` : "";
+        }
     }
 
     function setupFilters() {
         const searchInput = document.getElementById("feature-search");
-        const filterBtns = document.querySelectorAll(".filter-btn");
+        if (!searchInput) return;
+
+        const filterBtns = document.querySelectorAll(".filter-button");
         let currentFilter = "all";
 
         const applyFilters = () => {
             const query = searchInput.value.toLowerCase().trim();
 
-            document.querySelectorAll(".category-section").forEach((section) => {
-                const cards = section.querySelectorAll(".feature-card");
+            document.querySelectorAll(".accordion").forEach((section) => {
+                const cards = section.querySelectorAll(".feature");
                 let visibleCount = 0;
 
                 cards.forEach((card) => {
                     const title = card.dataset.title || "";
                     const desc = card.dataset.desc || "";
                     const enabled = card.dataset.enabled === "true";
+                    const isSub = Boolean(card.dataset.variant);
 
                     let visible = true;
 
@@ -563,7 +575,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
                     card.style.display = visible ? "" : "none";
-                    if (visible && !card.classList.contains("sub-feature")) {
+                    if (visible && !isSub) {
                         visibleCount++;
                     }
                 });
@@ -572,12 +584,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         };
 
+        applyFiltersRef = applyFilters;
+
         searchInput.addEventListener("input", applyFilters);
 
         filterBtns.forEach((btn) => {
+            if (btn.dataset.state !== "active") {
+                btn.dataset.state = "inactive";
+            }
             btn.addEventListener("click", () => {
-                filterBtns.forEach((b) => b.classList.remove("active"));
-                btn.classList.add("active");
+                filterBtns.forEach((b) => b.dataset.state = "inactive");
+                btn.dataset.state = "active";
                 currentFilter = btn.dataset.filter;
                 applyFilters();
             });
@@ -589,7 +606,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     initNewUI();
 
     const notificationStatus = document.getElementById("status");
-    const refreshSection = document.getElementById("refreshSection");
     const refreshButton = document.getElementById("refresh-button");
     const refreshAllButton = document.getElementById("refresh-all-button");
     const saveButton = document.getElementById("save-button");
@@ -617,9 +633,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (notificationStatus) {
                 notificationStatus.style.display = "none";
             }
-            if (refreshSection) {
-                refreshSection.style.display = "none";
-            }
             window.close();
         }, delay);
     };
@@ -639,9 +652,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             notificationStatus.textContent = "Options saved! Please reload editor tabs for changes to take effect.";
             notificationStatus.style.display = "block";
         }
-        if (refreshSection) {
-            refreshSection.style.display = "flex";
-        }
     });
 
     // Reload tab
@@ -660,10 +670,5 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         });
         closePopup(1500);
-    });
-
-    // click close button
-    document.getElementById("close-button").addEventListener("click", async () => {
-        closePopup();
     });
 });
