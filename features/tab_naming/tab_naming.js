@@ -27,7 +27,7 @@ window.loadedCodelessLoveScripts ||= {};
 
     // Function to update the tab title with the branch name
     function updateTabTitle() {
-        const version = getQueryParam("version");
+        const version = getQueryParam("version") || "test";
 
         document.title = `${version} | ${originalTitle}`;
         console.log("❤️" + "Tab title updated with branch name: " + version);
