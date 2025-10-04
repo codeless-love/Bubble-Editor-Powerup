@@ -1,27 +1,58 @@
 window.loadedCodelessLoveScripts ||= {};
 (function() {
   console.log("❤️" + "Styles Drag Rearrange - ISOLATED WORLD script");
-  let thisScriptKey = "styles_drag_rearrange";
+  const thisScriptKey = "styles_drag_rearrange";
+  const ISOLATED_WORLD_SOURCE = 'isolated-world-script';
+  const MAIN_WORLD_SOURCE = 'main-world-script';
+  const SAVE_TOKEN_ACTION = 'saveColorTokenOrder';
+  const SAVE_RESULT_ACTION = 'saveColorTokenOrderResult';
+  const INITIAL_TOKEN_ACTION = 'initialColorTokens';
+  const REQUEST_TOKEN_ACTION = 'requestInitialColorTokens';
+
   /* You can ignore all the stuff on this line, but don't delete! */ console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);if (window.loadedCodelessLoveScripts[thisScriptKey] == "loaded") {console.warn("❤️"+thisScriptKey + " tried to load, but it's value is already " + window.loadedCodelessLoveScripts[thisScriptKey]); return;} /*Exit if already loaded*/ window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
 
   // Inject main world script to access appquery
   chrome.runtime.sendMessage({
-    action: "injectScriptIntoMainWorld",
-    jsFile: "features/styles-drag-rearrange/styles-drag-rearrange-main.js"
+    action: 'injectScriptIntoMainWorld',
+    jsFile: 'features/styles-drag-rearrange/styles-drag-rearrange-main.js'
   });
 
   let draggedElement = null;
   let saveButton = null;
+  let tokenMetadataById = {};
+
+  const INVALID_DOM_TOKEN_IDS = new Set(['wrapper', 'token-wrapper', '']);
+  let lastMetadataRequestAt = 0;
+  const METADATA_REQUEST_COOLDOWN_MS = 1000;
+
+  function postToMainWorld(action, payload) {
+    window.postMessage({
+      source: ISOLATED_WORLD_SOURCE,
+      action,
+      payload
+    }, '*');
+  }
 
   // Extract token ID from a token wrapper element
   function getTokenId(wrapper) {
+    if (wrapper.dataset.tokenId && !INVALID_DOM_TOKEN_IDS.has(wrapper.dataset.tokenId)) {
+      return wrapper.dataset.tokenId;
+    }
+
     // Token IDs are stored in class names like "token-cm123"
     // or in data attributes
     const classes = Array.from(wrapper.classList);
     for (const className of classes) {
       // Look for classes that match the token ID pattern (e.g., "token-cmMXY")
-      if (className.startsWith('token-') && className.length > 6) {
-        return className.substring(6); // Remove "token-" prefix
+      if (
+        className.startsWith('token-') &&
+        className.length > 6 &&
+        className !== 'token-wrapper'
+      ) {
+        const potentialId = className.substring(6);
+        if (!INVALID_DOM_TOKEN_IDS.has(potentialId)) {
+          return potentialId; // Remove "token-" prefix
+        }
       }
     }
 
@@ -40,6 +71,184 @@ window.loadedCodelessLoveScripts ||= {};
     return null;
   }
 
+  function updateCurrentOrderAttributes() {
+    const wrappers = document.querySelectorAll('.token-wrapper.draggable');
+    wrappers.forEach((wrapper, index) => {
+      wrapper.dataset.tokenCurrentOrder = String(index);
+    });
+  }
+
+  function annotateWrapper(wrapper, tokenId) {
+    const metadata = tokenMetadataById[tokenId];
+
+    if (!metadata) {
+      delete wrapper.dataset.tokenId;
+      delete wrapper.dataset.tokenInitialOrder;
+      delete wrapper.dataset.tokenName;
+      delete wrapper.dataset.tokenValue;
+      return;
+    }
+
+    wrapper.dataset.tokenId = tokenId;
+
+    if (metadata.initialOrder !== undefined && metadata.initialOrder !== null) {
+      wrapper.dataset.tokenInitialOrder = String(metadata.initialOrder);
+    } else {
+      delete wrapper.dataset.tokenInitialOrder;
+    }
+
+    if (metadata.name) {
+      wrapper.dataset.tokenName = metadata.name;
+    } else {
+      delete wrapper.dataset.tokenName;
+    }
+
+    if (metadata.value) {
+      wrapper.dataset.tokenValue = metadata.value;
+    } else {
+      delete wrapper.dataset.tokenValue;
+    }
+  }
+
+  function hasTokenContent(wrapper) {
+    return Array.from(wrapper.children).some(child =>
+      child.classList.contains('token-name-and-edit')
+    );
+  }
+
+  function syncDomWithMetadata() {
+    const wrappers = Array
+      .from(document.querySelectorAll('.token-wrapper'))
+      .filter(hasTokenContent);
+
+    if (wrappers.length === 0) {
+      maybeRequestMetadata();
+      return;
+    }
+
+    const validIds = new Set();
+
+    wrappers.forEach(wrapper => {
+      const existingId = wrapper.dataset.tokenId;
+      if (existingId && tokenMetadataById[existingId]) {
+        validIds.add(existingId);
+        annotateWrapper(wrapper, existingId);
+      }
+    });
+
+    const tokensToAssign = Object.entries(tokenMetadataById)
+      .filter(([tokenId]) => !validIds.has(tokenId))
+      .sort(([, a], [, b]) => {
+        const orderA = a.initialOrder ?? Number.MAX_SAFE_INTEGER;
+        const orderB = b.initialOrder ?? Number.MAX_SAFE_INTEGER;
+        return orderA - orderB;
+      });
+
+    wrappers.forEach(wrapper => {
+      const currentId = wrapper.dataset.tokenId;
+      if (currentId && tokenMetadataById[currentId]) {
+        return;
+      }
+
+      const nextEntry = tokensToAssign.shift();
+      if (!nextEntry) {
+        annotateWrapper(wrapper, undefined);
+        return;
+      }
+
+      const [tokenId] = nextEntry;
+      annotateWrapper(wrapper, tokenId);
+    });
+
+    updateCurrentOrderAttributes();
+  }
+
+  function extractTokenMap(payload) {
+    if (payload && payload.normalizedTokenMap && typeof payload.normalizedTokenMap === 'object') {
+      return payload.normalizedTokenMap;
+    }
+
+    let colorTokens = payload ? payload.colorTokens : null;
+
+    if (typeof colorTokens === 'string') {
+      try {
+        colorTokens = JSON.parse(colorTokens);
+      } catch (error) {
+        console.error('❤️ Unable to parse color token payload', error);
+        colorTokens = null;
+      }
+    }
+
+    if (!colorTokens || typeof colorTokens !== 'object') {
+      return {};
+    }
+
+    if (colorTokens['%d1'] && typeof colorTokens['%d1'] === 'object') {
+      return colorTokens['%d1'];
+    }
+
+    if (colorTokens.body && colorTokens.body['%d1'] && typeof colorTokens.body['%d1'] === 'object') {
+      return colorTokens.body['%d1'];
+    }
+
+    if (colorTokens.data && colorTokens.data['%d1'] && typeof colorTokens.data['%d1'] === 'object') {
+      return colorTokens.data['%d1'];
+    }
+
+    return colorTokens;
+  }
+
+  function updateTokenMetadata(payload) {
+    const tokenMap = extractTokenMap(payload);
+    tokenMetadataById = {};
+
+    Object.keys(tokenMap).forEach(tokenId => {
+      if (!tokenId || INVALID_DOM_TOKEN_IDS.has(tokenId)) {
+        return;
+      }
+      const tokenInfo = tokenMap[tokenId] || {};
+      tokenMetadataById[tokenId] = {
+        initialOrder: tokenInfo.order ?? null,
+        name: tokenInfo.name || tokenInfo.display_name || tokenInfo.label || null,
+        value: tokenInfo.value || tokenInfo.color || null
+      };
+    });
+
+    syncDomWithMetadata();
+  }
+
+  function handleInitialColorTokensMessage(payload) {
+    if (!payload) {
+      return;
+    }
+
+    if (payload.status === 'error') {
+      console.error('❤️ Failed to receive initial color tokens:', payload.error);
+      return;
+    }
+
+    console.log('❤️ Received initial color tokens');
+    updateTokenMetadata(payload);
+  }
+
+  function requestInitialColorTokens() {
+    lastMetadataRequestAt = Date.now();
+    postToMainWorld(REQUEST_TOKEN_ACTION, {});
+  }
+
+  function maybeRequestMetadata() {
+    if (Object.keys(tokenMetadataById).length > 0) {
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastMetadataRequestAt < METADATA_REQUEST_COOLDOWN_MS) {
+      return;
+    }
+
+    requestInitialColorTokens();
+  }
+
   // Get current order of all token IDs from DOM
   function getCurrentTokenOrder() {
     const wrappers = document.querySelectorAll('.token-wrapper.draggable');
@@ -47,8 +256,10 @@ window.loadedCodelessLoveScripts ||= {};
 
     wrappers.forEach(wrapper => {
       const tokenId = getTokenId(wrapper);
-      if (tokenId) {
+      if (tokenId && tokenMetadataById[tokenId]) {
         tokenOrder.push(tokenId);
+      } else if (tokenId) {
+        console.warn('❤️ Skipping wrapper with unknown token id:', tokenId, wrapper);
       }
     });
 
@@ -70,13 +281,9 @@ window.loadedCodelessLoveScripts ||= {};
     updateSaveButton('saving');
 
     // Send message to main world to save
-    window.postMessage({
-      source: 'isolated-world-script',
-      action: 'saveColorTokenOrder',
-      payload: {
-        tokenOrder: tokenOrder
-      }
-    }, '*');
+    postToMainWorld(SAVE_TOKEN_ACTION, {
+      tokenOrder
+    });
   }
 
   // Update save button state
@@ -120,12 +327,11 @@ window.loadedCodelessLoveScripts ||= {};
 
   // Listen for messages from main world
   window.addEventListener('message', (event) => {
-    if (
-      event.source === window &&
-      event.data &&
-      event.data.source === 'main-world-script' &&
-      event.data.action === 'saveColorTokenOrderResult'
-    ) {
+    if (!event || event.source !== window || !event.data || event.data.source !== MAIN_WORLD_SOURCE) {
+      return;
+    }
+
+    if (event.data.action === SAVE_RESULT_ACTION) {
       console.log('❤️ Received save result:', event.data);
 
       if (event.data.payload.status === 'success') {
@@ -135,6 +341,10 @@ window.loadedCodelessLoveScripts ||= {};
         console.error('❤️ Save failed:', errorMsg);
         updateSaveButton('error', 'Error - Try Again');
       }
+    }
+
+    if (event.data.action === INITIAL_TOKEN_ACTION) {
+      handleInitialColorTokensMessage(event.data.payload);
     }
   });
 
@@ -161,15 +371,13 @@ window.loadedCodelessLoveScripts ||= {};
   // Function to make token wrappers draggable
   function makeDraggable() {
     // Find all token-wrapper elements that have a direct child with class token-name-and-edit
-    const tokenWrappers = document.querySelectorAll('.token-wrapper');
+    syncDomWithMetadata();
+
+    const tokenWrappers = Array
+      .from(document.querySelectorAll('.token-wrapper'))
+      .filter(hasTokenContent);
 
     tokenWrappers.forEach(wrapper => {
-      // Check if it has a direct child with class token-name-and-edit
-      const hasTokenNameChild = Array.from(wrapper.children).some(child =>
-        child.classList.contains('token-name-and-edit')
-      );
-
-      if (!hasTokenNameChild) return;
 
       // Skip if already processed
       if (wrapper.dataset.draggableEnabled) return;
@@ -256,16 +464,22 @@ window.loadedCodelessLoveScripts ||= {};
         // Show save button after successful drop
         showSaveButton();
 
+        updateCurrentOrderAttributes();
+
         return false;
       });
     });
+
+    updateCurrentOrderAttributes();
+
+    maybeRequestMetadata();
   }
 
   // Initial run
   makeDraggable();
 
   // Set up a MutationObserver to watch for new token wrappers being added
-  const observer = new MutationObserver(function(mutations) {
+  const observer = new MutationObserver(function() {
     makeDraggable();
   });
 
@@ -274,4 +488,6 @@ window.loadedCodelessLoveScripts ||= {};
     childList: true,
     subtree: true
   });
+
+  requestInitialColorTokens();
 })();

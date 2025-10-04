@@ -1,6 +1,67 @@
 console.log("❤️" + "Styles Drag Rearrange - MAIN WORLD script");
 
 (function() {
+  const MAIN_WORLD_SOURCE = 'main-world-script';
+  const ISOLATED_WORLD_SOURCE = 'isolated-world-script';
+  const SAVE_TOKEN_ACTION = 'saveColorTokenOrder';
+  const SAVE_RESULT_ACTION = 'saveColorTokenOrderResult';
+  const INITIAL_TOKEN_ACTION = 'initialColorTokens';
+  const REQUEST_TOKEN_ACTION = 'requestInitialColorTokens';
+  const MAX_APPQUERY_ATTEMPTS = 10;
+  const APPQUERY_RETRY_DELAY = 500;
+
+  function getAppqueryRoot() {
+    if (typeof window.appquery === 'function') {
+      try {
+        const result = window.appquery();
+        if (result) {
+          return result;
+        }
+      } catch (error) {
+        console.error('❤️ Error calling appquery():', error);
+      }
+    }
+
+    if (window.appquery) {
+      return window.appquery;
+    }
+
+    return null;
+  }
+
+  function normalizeColorTokenMap(rawTokens) {
+    if (!rawTokens) {
+      return {};
+    }
+
+    let parsed = rawTokens;
+
+    if (typeof parsed === 'string') {
+      try {
+        parsed = JSON.parse(parsed);
+      } catch (error) {
+        console.error('❤️ Unable to parse color token payload string', error);
+        parsed = {};
+      }
+    }
+
+    if (parsed && typeof parsed === 'object') {
+      if (parsed['%d1'] && typeof parsed['%d1'] === 'object') {
+        return parsed['%d1'];
+      }
+
+      if (parsed.body && parsed.body['%d1'] && typeof parsed.body['%d1'] === 'object') {
+        return parsed.body['%d1'];
+      }
+
+      if (parsed.data && parsed.data['%d1'] && typeof parsed.data['%d1'] === 'object') {
+        return parsed.data['%d1'];
+      }
+    }
+
+    return parsed || {};
+  }
+
   // Helper to get app name and version from URL
   function getAppInfo() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -15,26 +76,78 @@ console.log("❤️" + "Styles Drag Rearrange - MAIN WORLD script");
     return Date.now() + 'x' + Math.floor(Math.random() * 1000000000);
   }
 
+  function postToIsolatedWorld(action, payload) {
+    window.postMessage({
+      source: MAIN_WORLD_SOURCE,
+      action,
+      payload
+    }, '*');
+  }
+
   // Get color tokens from appquery
   function getColorTokens() {
     try {
-      if (!window.appquery) {
+      const appqueryRoot = getAppqueryRoot();
+
+      if (!appqueryRoot) {
         throw new Error('appquery not available');
       }
 
-      const colorTokens = window.appquery().app().json
-        .child('settings')
-        .child('client_safe')
-        .child('color_tokens_user');
-
-      if (!colorTokens.exists()) {
-        throw new Error('Color tokens not found in appquery');
+      if (typeof appqueryRoot.get_public_setting === 'function') {
+        const publicSetting = appqueryRoot.get_public_setting('color_tokens_user');
+        if (publicSetting) {
+          return publicSetting;
+        }
       }
 
-      return colorTokens.raw();
+      if (appqueryRoot.app && typeof appqueryRoot.app === 'function') {
+        const appObj = appqueryRoot.app();
+        if (appObj && appObj.json && typeof appObj.json.child === 'function') {
+          const colorTokens = appObj.json
+            .child('settings')
+            .child('client_safe')
+            .child('color_tokens_user');
+
+          if (colorTokens && typeof colorTokens.exists === 'function' && colorTokens.exists()) {
+            return colorTokens.raw();
+          }
+        }
+      }
+
+      throw new Error('color tokens not found in appquery');
     } catch (error) {
       console.error('❤️ Error getting color tokens:', error);
       throw error;
+    }
+  }
+
+  function trySendInitialColorTokens(attempt = 0) {
+    try {
+      const colorTokens = getColorTokens();
+      const normalizedTokenMap = normalizeColorTokenMap(colorTokens);
+
+      postToIsolatedWorld(INITIAL_TOKEN_ACTION, {
+        status: 'success',
+        colorTokens,
+        normalizedTokenMap
+      });
+    } catch (error) {
+      const message = error && error.message ? error.message : String(error);
+      const shouldRetry = /appquery/i.test(message) && attempt < MAX_APPQUERY_ATTEMPTS;
+
+      console.error('❤️ Failed to fetch initial color tokens:', message, 'attempt:', attempt);
+
+      if (shouldRetry) {
+        setTimeout(() => {
+          trySendInitialColorTokens(attempt + 1);
+        }, APPQUERY_RETRY_DELAY);
+        return;
+      }
+
+      postToIsolatedWorld(INITIAL_TOKEN_ACTION, {
+        status: 'error',
+        error: message
+      });
     }
   }
 
@@ -46,11 +159,11 @@ console.log("❤️" + "Styles Drag Rearrange - MAIN WORLD script");
 
         // Get current color tokens from appquery
         const currentTokens = getColorTokens();
+        const tokenMap = normalizeColorTokenMap(currentTokens);
         console.log('❤️ Current tokens:', currentTokens);
 
         // Build updated tokens object with new order
         const updatedTokens = {};
-        const tokenMap = currentTokens['%d1'] || {};
 
         // Update order for each token based on the new order array
         tokenOrder.forEach((tokenId, index) => {
@@ -146,40 +259,37 @@ console.log("❤️" + "Styles Drag Rearrange - MAIN WORLD script");
 
   // Listen for messages from isolated world
   window.addEventListener('message', async (event) => {
-    if (
-      event.source === window &&
-      event.data &&
-      event.data.source === 'isolated-world-script' &&
-      event.data.action === 'saveColorTokenOrder'
-    ) {
+    if (!event || event.source !== window || !event.data || event.data.source !== ISOLATED_WORLD_SOURCE) {
+      return;
+    }
+
+    if (event.data.action === SAVE_TOKEN_ACTION) {
       console.log('❤️ Received save request:', event.data);
 
       try {
         const tokenOrder = event.data.payload.tokenOrder;
         const result = await saveColorTokenOrder(tokenOrder);
 
-        // Send success response
-        window.postMessage({
-          source: 'main-world-script',
-          action: 'saveColorTokenOrderResult',
-          payload: {
-            status: 'success',
-            result: result
-          }
-        }, '*');
+        postToIsolatedWorld(SAVE_RESULT_ACTION, {
+          status: 'success',
+          result: result
+        });
       } catch (error) {
-        // Send error response
-        window.postMessage({
-          source: 'main-world-script',
-          action: 'saveColorTokenOrderResult',
-          payload: {
-            status: 'error',
-            error: error.message || String(error)
-          }
-        }, '*');
+        postToIsolatedWorld(SAVE_RESULT_ACTION, {
+          status: 'error',
+          error: error.message || String(error)
+        });
       }
     }
+
+    if (event.data.action === REQUEST_TOKEN_ACTION) {
+      console.log('❤️ Received request for initial color tokens');
+      trySendInitialColorTokens();
+    }
   });
+
+  // Attempt to send initial token data on load
+  trySendInitialColorTokens();
 
   console.log('❤️ Main world script ready to receive save requests');
 })();
