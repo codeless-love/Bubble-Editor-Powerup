@@ -1,443 +1,504 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bubble Editor Powerup Options</title>
-  <style>
-    :root {
-      /* Color variables */
-      --primary-color: #4361ee;
-      --primary-hover: #3a56d4;
-      --secondary-color: #f8f9fa;
-      --text-color: #212529;
-      --text-secondary: #6c757d;
-      --border-color: #e9ecef;
-      --success-color: #10b981;
-      --warning-color: #f59e0b;
-      --danger-color: #ef4444;
-      --background-color: #ffffff;
-      --card-background: #ffffff;
-      --shadow-color: rgba(0, 0, 0, 0.08);
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bubble Editor Powerup Options</title>
+        <style>
+            :root {
+                --primary: #4361ee;
+                --primary-hover: #3a56d4;
+                --bg: #ffffff;
+                --bg-secondary: #f8f9fa;
+                --text: #1f242b;
+                --text-muted: #6b7280;
+                --border: #e5e7eb;
+                --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                --radius: 12px;
+            }
 
-      /* Spacing variables */
-      --close-button-width: 40px;
-      --base-padding: 12px;
-      --border-radius: 8px;
-      --transition-speed: 0.2s;
-    }
+            * {
+                box-sizing: border-box;
+            }
+            html,
+            body {
+                margin: 0;
+            }
 
-    * {
-      box-sizing: border-box;
-    }
+            body {
+                width: 560px;
+                background: var(--bg);
+                color: var(--text);
+                font:
+                    14px/1.5 -apple-system,
+                    BlinkMacSystemFont,
+                    Segoe UI,
+                    Roboto,
+                    Inter,
+                    system-ui,
+                    sans-serif;
+            }
 
-    body {
-      width: 450px;
-      margin: 0;
-      position: relative;
-      background-color: var(--background-color);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      color: var(--text-color);
-      line-height: 1.5;
-      font-size: 14px;
-    }
+            [hidden] {
+                display: none !important;
+            }
 
-    [hidden] {
-      display: none !important;
-    }
+            /* Header */
+            header {
+                background: var(--bg);
+                border-bottom: 1px solid var(--border);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            }
 
-    body.full-page {
-      margin: auto;
-      border: solid 1px var(--border-color);
-      border-radius: var(--border-radius);
-      box-shadow: 0 10px 25px var(--shadow-color);
-      margin-top: calc(var(--base-padding) * 2);
-    }
+            .h-wrap {
+                padding: 16px;
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                gap: 12px;
+                align-items: center;
+            }
 
-    header {
-      position: sticky;
-      top: 0;
-      padding: var(--base-padding);
-      background-color: var(--background-color);
-      box-shadow: 0 2px 10px var(--shadow-color);
-      border-bottom: 1px solid var(--border-color);
-      z-index: 10;
-    }
+            .logo {
+                height: 32px;
+                width: 32px;
+                border-radius: 8px;
+            }
+            h1 {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+            }
 
-    main {
-      margin: var(--base-padding);
-      padding: 0 var(--base-padding);
-    }
+            .button-close {
+                appearance: none;
+                border: 0;
+                background: transparent;
+                padding: 8px;
+                font-size: 24px;
+                color: var(--text-muted);
+                border-radius: 50%;
+                cursor: pointer;
+                line-height: 1;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .button-close:hover {
+                background: var(--bg-secondary);
+            }
 
-    footer {
-      position: sticky;
-      bottom: 0;
-      padding: var(--base-padding);
-      background-color: var(--background-color);
-      box-shadow: 0 -2px 10px var(--shadow-color);
-      border-top: 1px solid var(--border-color);
-      z-index: 10;
-    }
+            /* Toolbar */
+            .toolbar {
+                position: sticky;
+                top: 0px;
+                z-index: 19;
+                background: var(--bg);
+                padding: 12px 16px;
+                border-bottom: 1px solid var(--border);
+            }
+            .search-box {
+                position: relative;
+                margin-bottom: 12px;
+            }
 
-    h1 {
-      margin: 0;
-      font-size: 1.5em;
-      font-weight: 600;
-    }
+            .search-icon {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 16px;
+                opacity: 0.5;
+            }
 
-    h2 {
-      font-size: 1.2em;
-      margin-top: 1.5em;
-      margin-bottom: 0.75em;
-      padding-bottom: 0.5em;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--primary-color);
-    }
+            .search-box input {
+                width: 100%;
+                padding: 10px 12px 10px 40px;
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                font-size: 14px;
+                outline: none;
+                background: var(--bg-secondary);
+                transition: all 0.2s;
+            }
+            .search-box input:focus {
+                border-color: var(--primary);
+                background: var(--bg);
+            }
 
-    button {
-      padding: var(--base-padding) calc(var(--base-padding) * 2);
-      border: none;
-      border-radius: var(--border-radius);
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transition-speed) ease;
-      font-size: 14px;
-    }
+            .filters {
+                display: flex;
+                gap: 8px;
+            }
 
-    button#save-button {
-      background-color: var(--primary-color);
-      color: white;
-    }
+            .filter-btn {
+                appearance: none;
+                border: 1px solid var(--border);
+                background: var(--bg);
+                color: var(--text);
+                padding: 8px 16px;
+                border-radius: 999px;
+                font-size: 13px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s;
+            }
+            .filter-btn:hover {
+                background: var(--bg-secondary);
+            }
+            .filter-btn.active {
+                background: var(--primary);
+                color: white;
+                border-color: var(--primary);
+            }
 
-    button#save-button:hover {
-      background-color: var(--primary-hover);
-    }
+            /* Main content */
+            main {
+                padding: 16px;
+            }
 
-    .button-secondary {
-      background-color: var(--secondary-color);
-      color: var(--text-color);
-      padding: 8px 12px;
-      font-size: 13px;
-    }
+            /* Category sections */
+            .category-section {
+                margin-bottom: 16px;
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                background: var(--bg);
+                overflow: hidden;
+            }
 
-    .button-secondary:hover {
-      background-color: var(--border-color);
-    }
+            .category-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 14px 16px;
+                cursor: pointer;
+                background: var(--bg);
+                border: none;
+                width: 100%;
+                text-align: left;
+                font-size: 15px;
+                font-weight: 600;
+                transition: background 0.2s;
+                /*position: sticky;
+                top: 0;
+                z-index: 15;*/
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            }
+            .category-header:hover {
+                background: var(--bg-secondary);
+            }
 
-    .row {
-      display: flex;
-      align-items: center;
-      gap: var(--base-padding);
-    }
+            .category-icon {
+                font-size: 18px;
+                display: flex;
+                align-items: center;
+            }
 
-    .space-between {
-      justify-content: space-between;
-    }
+            .chevron {
+                margin-left: auto;
+                font-size: 12px;
+                color: var(--text-muted);
+                transition: transform 0.2s;
+            }
+            .category-section[open] .chevron {
+                transform: rotate(90deg);
+            }
 
-    .justify-center {
-      justify-content: center;
-    }
+            .category-count {
+                font-size: 13px;
+                color: var(--text-muted);
+                font-weight: 500;
+            }
 
-    .fill-available {
-      width: -webkit-fill-available;
-      width: -moz-available;
-      width: stretch;
-    }
+            .features-grid {
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
 
-    .space-for-close-button {
-      padding-right: calc(var(--close-button-width) + var(--base-padding) + var(--base-padding))
-    }
+            /* Feature cards */
+            .feature-card {
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                padding: 14px 16px;
+                background: var(--bg);
+                transition: all 0.2s;
+                cursor: pointer;
+            }
+            .feature-card:hover {
+                box-shadow: var(--shadow);
+                border-color: #d1d5db;
+            }
 
-    .logo {
-      height: 36px;
-      width: 36px;
-      border-radius: 8px;
-    }
+            .feature-main {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+            }
 
-    .button-close {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: none;
-      border: none;
-      font-size: 1.5em;
-      padding: 8px;
-      margin: 0;
-      border-radius: 50%;
-      line-height: 0;
-      width: var(--close-button-width);
-      height: var(--close-button-width);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      transition: all var(--transition-speed) ease;
-    }
+            .feature-checkbox {
+                margin-top: 2px;
+                width: 20px;
+                height: 20px;
+                border: 2px solid #9ca3af;
+                border-radius: 6px;
+                cursor: pointer;
+                flex-shrink: 0;
+                appearance: none;
+                display: grid;
+                place-content: center;
+                transition: all 0.2s;
+            }
+            .feature-checkbox:checked {
+                background: var(--primary);
+                border-color: var(--primary);
+            }
+            .feature-checkbox:checked::before {
+                content: "";
+                width: 10px;
+                height: 10px;
+                background: white;
+                clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            }
 
-    .top-margin {
-      margin-top: calc(var(--base-padding) * 2);
-    }
+            .feature-content {
+                flex: 1;
+            }
 
-    .button-close:hover {
-      background-color: var(--secondary-color);
-      color: var(--text-color);
-    }
+            .feature-title {
+                font-weight: 600;
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
 
-    .column {
-      display: flex;
-      flex-direction: column;
-      gap: var(--base-padding);
-    }
+            .feature-description {
+                font-size: 13px;
+                color: var(--text-muted);
+                line-height: 1.4;
+            }
 
-    /* Feature styling */
-    .feature {
-      padding: 12px;
-      border-radius: var(--border-radius);
-      margin-bottom: 12px;
-      transition: all var(--transition-speed) ease;
-      border: 1px solid transparent;
-    }
+            /* Sub-features */
+            .sub-features {
+                margin-left: 32px;
+                margin-top: 8px;
+                padding-left: 16px;
+                border-left: 2px solid var(--border);
+            }
 
-    .feature:hover {
-      background-color: var(--secondary-color);
-      border-color: var(--border-color);
-    }
+            .sub-feature {
+                margin-bottom: 8px;
+            }
 
-    .feature label {
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-      cursor: pointer;
-    }
+            /* Footer */
+            footer {
+                position: sticky;
+                bottom: 0;
+                background: var(--bg);
+                border-top: 1px solid var(--border);
+                padding: 12px 16px;
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
 
-    /* Custom checkbox styling */
-    .feature input[type="checkbox"] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--text-secondary);
-      border-radius: 4px;
-      margin-right: 10px;
-      display: grid;
-      place-content: center;
-      transition: all var(--transition-speed) ease;
-    }
+            #status {
+                display: none;
+                font-size: 13px;
+                color: #065f46;
+                background: #ecfdf5;
+                border-left: 3px solid #10b981;
+                padding: 8px 12px;
+                border-radius: 6px;
+                flex: 1;
+            }
 
-    .feature input[type="checkbox"]:checked {
-      border-color: var(--primary-color);
-      background-color: var(--primary-color);
-    }
+            .button {
+                appearance: none;
+                border: 0;
+                border-radius: 8px;
+                padding: 10px 16px;
+                font-weight: 600;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s;
+            }
 
-    .feature input[type="checkbox"]::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      transform: scale(0);
-      transition: transform var(--transition-speed) ease;
-      box-shadow: inset 1em 1em white;
-      transform-origin: center;
-      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-    }
+            #save-button {
+                background: var(--primary);
+                color: white;
+            }
+            #save-button:hover {
+                background: var(--primary-hover);
+            }
 
-    .feature input[type="checkbox"]:checked::before {
-      transform: scale(1);
-    }
+            .button-secondary {
+                background: var(--bg-secondary);
+                color: var(--text);
+                border: 1px solid var(--border);
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+            .button-secondary:hover {
+                background: #e5e7eb;
+            }
 
-    .feature input[disabled] {
-      border-color: var(--border-color);
-      background-color: var(--secondary-color);
-    }
+            /* Legacy/hidden elements */
+            #features-list {
+                display: none;
+            }
 
-    .feature input[disabled] + span {
-      color: var(--text-secondary);
-      cursor: not-allowed;
-    }
+            /* Utility classes */
+            .emoji-row {
+                display: flex;
+                gap: 16px;
+                align-items: center;
+                margin: 16px 0;
+            }
+            .emoji-row .emoji {
+                font-size: 32px;
+            }
 
-    .feature.disabled {
-      opacity: 0.7;
-      background-color: var(--secondary-color);
-      cursor: not-allowed;
-    }
+            /* Tool section */
+            .tool-section {
+                margin-top: 16px;
+                padding: 16px;
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                background: #fbfbfd;
+            }
+            .tool-section h2 {
+                margin: 0 0 8px;
+                font-size: 16px;
+                font-weight: 700;
+            }
 
-    .feature p {
-      margin: 8px 0 0 28px;
-      color: var(--text-secondary);
-      font-size: 13px;
-    }
+            /* Input fields */
+            .input-container {
+                margin-left: 32px;
+                margin-top: 8px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .input-label {
+                font-size: 13px;
+                color: var(--text-muted);
+            }
+            .input-field {
+                width: 80px;
+                padding: 6px 10px;
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                font-size: 13px;
+            }
+            .input-field:focus {
+                outline: none;
+                border-color: var(--primary);
+            }
 
-    .sub-features {
-      margin-left: 28px;
-      padding-left: 12px;
-      border-left: 2px solid var(--border-color);
-      margin-bottom: 16px;
-    }
+            /* Candidate domains */
+            .candidate-domains {
+                margin: 12px 0 0 32px;
+                font-size: 11px;
+                font-weight: 600;
+                color: #666;
+            }
+            .candidate-domains-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-top: 8px;
+            }
+            .candidate-domains-list > span {
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 3px 10px;
+                font-size: 11px;
+                background: var(--bg-secondary);
+            }
 
-    .sub-feature {
-      margin-top: 8px;
-      padding-top: 8px;
-    }
+            /* Disabled state */
+            .feature.disabled {
+                opacity: 0.6;
+                pointer-events: none;
+            }
+        </style>
 
-    #status {
-      display: none;
-      font-size: 14px;
-      color: var(--success-color);
-      margin-bottom: 10px;
-      padding: 8px 12px;
-      background-color: rgba(16, 185, 129, 0.1);
-      border-radius: var(--border-radius);
-      border-left: 3px solid var(--success-color);
-    }
+        <link rel="stylesheet" href="features/bulk_branch_delete/bulk_branch_delete.css" />
+        <script src="features/bulk_branch_delete/bulk_branch_delete.js" defer></script>
+        <script src="options.js" defer></script>
+    </head>
+    <body>
+        <header>
+            <div class="h-wrap">
+                <img class="logo" src="extension-icons/icon-64.png" alt="Bubble Editor Powerup" />
+                <h1>Bubble Editor Powerup</h1>
+                <button class="button-close" id="close-button">&times;</button>
+            </div>
+        </header>
 
-    #refreshSection {
-      display: none;
-    }
+        <main id="Editor">
+            <!-- Toolbar and categories will be injected here -->
+            <div id="loading-message" style="padding: 20px; text-align: center; color: var(--text-muted)">Loading features...</div>
+            <div id="features-list" class="features-container"></div>
 
-    /* Feature input field styling */
-    .input-container {
-      margin-left: 28px;
-      margin-top: 8px;
-      display: flex;
-      align-items: center;
-    }
+            <div class="tool-section">
+                <h2>❤️ Fast Branch Delete</h2>
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px">
+                    Quickly delete one or more branches by selecting them from the list. This performs a soft delete on all selected branches.
+                </p>
 
-    .input-label {
-      margin-right: 8px;
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
+                <div class="branch-delete-container">
+                    <div class="branch-list-container">
+                        <div class="branch-list-header">
+                            <button id="branch-select-none" class="button-secondary" style="padding: 6px 12px; font-size: 12px">Clear Selection</button>
+                        </div>
+                        <div id="branch-list" class="branch-list">
+                            <div class="branch-list-loading">Loading versions...</div>
+                        </div>
+                    </div>
 
-    .input-field {
-      width: 60px;
-      padding: 4px 8px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      font-size: 13px;
-    }
+                    <div style="display: flex; gap: 8px; align-items: center; margin: 12px 0">
+                        <button id="branch-refresh-button" class="button-secondary">Refresh</button>
+                        <span id="branch-selection-count" style="font-size: 13px; color: var(--text-muted)"></span>
+                    </div>
 
-    .input-field:focus {
-      border-color: var(--primary-color);
-      outline: none;
-    }
+                    <button id="branch-delete-button" class="branch-delete-button" disabled>Delete Selected Branches</button>
+                    <div id="branch-delete-status" class="branch-delete-status"></div>
+                </div>
+            </div>
+        </main>
 
-    /* Fast Branch Delete styling */
-    .tool-section {
-      margin-top: 2em;
-      padding: 1em;
-      background-color: var(--secondary-color);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-    }
+        <main id="Candidate" hidden>
+            <div class="emoji-row">
+                <span class="emoji">☑️</span>
+                <p>Powerup needs your permission to run on this domain.</p>
+            </div>
+            <button id="grant-access-btn" class="button">Grant access to this domain</button>
+        </main>
 
-    .tool-section h2 {
-      margin-top: 0;
-      font-size: 1.1em;
-      color: var(--text-color);
-      border-bottom: none;
-      padding-bottom: 0;
-    }
+        <main id="Approved" hidden>
+            <div class="emoji-row">
+                <span class="emoji">✅</span>
+                <p>Powerup extension is approved for this site! Use <code>debug_mode</code> to see features.</p>
+            </div>
+        </main>
 
-    .candidate-domains {
-      margin: 8px 0 0 28px;
-      font-weight: bold;
-      font-size: 10px;
-      color: #666666;
-    }
-    .candidate-domains-list {
-      display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      gap: 6px;
-      max-width: 100%;
-      margin-top: 6px;
-    }
-    .candidate-domains-list > span{
-      border: solid 1px var(--border-color);
-      border-radius: 20px;
-      padding: 2px 8px;
-      white-space: nowrap;
-      font-size: .8em;
-      font-family: math;
-    }
-    .emoji-row {
-      display: flex;
-      align-items: flex-start;
-      gap: calc(var(--base-padding) * 2);
-      align-items: center;
-    }
-    .emoji-row p,
-    .emoji-row .emoji  {
-      margin: var(--base-padding) 0;
-      line-height: 1.5em;
-    }
-    .emoji-row .emoji {
-      font-size: 1.5em;
-    }
-  </style>
-  <link rel="stylesheet" href="features/bulk_branch_delete/bulk_branch_delete.css">
-  <script src="features/bulk_branch_delete/bulk_branch_delete.js" defer></script>
-  <script src="options.js" defer></script>
-</head>
-<body>
-  <header class="sticky">
-    <div class="row space-for-close-button">
-      <img class="logo" src="extension-icons/icon-64.png" alt="Codeless Love Icon" />
-      <h1>Bubble Editor Powerup</h1>
-    </div>
-    <button class="button-close" id="close-button" aria-label="Close">&times;</button>
-  </header>
-  <main id="Editor">
-    <p>Select which features you want to enable:</p>
-    <div id="features-list" class="features-container"></div>
+        <main id="Unrelated" hidden>
+            <div class="emoji-row">
+                <span class="emoji">🫠</span>
+                <p>Powerup extension is not enabled for this site.</p>
+            </div>
+        </main>
 
-    <div class="tool-section">
-      <h2>❤️ Fast Branch Delete</h2>
-      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 1em;">
-        Quickly delete one or more branches by selecting them from the list. This will execute a soft delete on all selected branches.
-      </p>
-      <div class="branch-delete-container">
-        <div class="branch-list-container">
-          <div class="branch-list-header">
-            <button id="branch-select-none" class="button-secondary" style="padding: 4px 8px; font-size: 12px;">
-              Clear Selection
-            </button>
-          </div>
-          <div id="branch-list" class="branch-list">
-            <div class="branch-list-loading">Loading versions...</div>
-          </div>
-        </div>
-        <div class="row" style="gap: 8px; margin-bottom: 1em;">
-          <button id="branch-refresh-button" class="button-secondary" style="padding: 8px 12px;">
-            Refresh
-          </button>
-          <span id="branch-selection-count" style="font-size: 13px; color: var(--text-secondary);"></span>
-        </div>
-        <button id="branch-delete-button" class="branch-delete-button" disabled>
-          Delete Selected Branches
-        </button>
-        <div id="branch-delete-status" class="branch-delete-status"></div>
-      </div>
-    </div>
-  </main>
-  <main id="Candidate" hidden>
-    <div class="emoji-row"><span class="emoji">☑️</span><p>Powerup needs your permission to run on this domain.</p></div>
-    <button id="grant-access-btn">Grant access to this domain</button>
-  </main>
-  <main id="Approved" hidden>
-    <div class="emoji-row"><span class="emoji">✅</span><p>Powerup extension is approved for this site! Use debug_mode to see features.</p></div>
-  </main>
-  <main id="Unrelated" hidden>
-    <div class="emoji-row"><span class="emoji">🫠</span><p>Powerup extension is not enabled for this site.</p></div>
-  </main>
-  <footer>
-    <div id="status"></div>
-    <div class="row">
-      <button id="save-button">Save Changes</button>
-      <div class="row justify-center fill-available" id="refreshSection">
-        <button id="refresh-button" class="button-secondary">Reload this tab</button>
-        <button id="refresh-all-button" class="button-secondary">Reload all editor tabs</button>
-      </div>
-    </div>
-  </footer>
-</body>
+        <footer>
+            <div id="status"></div>
+            <button id="save-button" class="button">Save Changes</button>
+            <div style="flex: 1"></div>
+            <button id="refresh-button" class="button-secondary">Reload this tab</button>
+            <button id="refresh-all-button" class="button-secondary">Reload all editor tabs</button>
+        </footer>
+    </body>
 </html>
