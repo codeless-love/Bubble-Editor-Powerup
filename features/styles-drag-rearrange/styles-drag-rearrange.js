@@ -281,8 +281,47 @@ window.loadedCodelessLoveScripts ||= {};
         return tokenOrder;
     }
 
+    function updateMetadataOrder(tokenOrder) {
+        if (!Array.isArray(tokenOrder) || tokenOrder.length === 0) {
+            return;
+        }
+
+        const seen = new Set();
+
+        tokenOrder.forEach((tokenId, index) => {
+            if (!tokenId) {
+                return;
+            }
+
+            seen.add(tokenId);
+
+            if (tokenMetadataById[tokenId]) {
+                tokenMetadataById[tokenId].initialOrder = index;
+            }
+
+            if (latestColorTokens[tokenId]) {
+                latestColorTokens[tokenId].order = index;
+            }
+        });
+
+        // Push any tokens not present to the end to preserve lookup data
+        Object.keys(tokenMetadataById).forEach((tokenId) => {
+            if (!seen.has(tokenId) && tokenMetadataById[tokenId]) {
+                tokenMetadataById[tokenId].initialOrder = tokenOrder.length;
+            }
+        });
+
+        Object.keys(latestColorTokens).forEach((tokenId) => {
+            if (!seen.has(tokenId) && latestColorTokens[tokenId]) {
+                latestColorTokens[tokenId].order = tokenOrder.length;
+            }
+        });
+    }
+
     // Save the current order
     function saveOrder() {
+        showSaveButton();
+
         const tokenOrder = getCurrentTokenOrder();
 
         if (tokenOrder.length === 0) {
@@ -290,6 +329,8 @@ window.loadedCodelessLoveScripts ||= {};
             updateSaveButton("error", "No tokens found");
             return;
         }
+
+        updateMetadataOrder(tokenOrder);
 
         // Update button state
         updateSaveButton("saving");
@@ -383,6 +424,49 @@ window.loadedCodelessLoveScripts ||= {};
     }
 
     // Function to make token wrappers draggable
+    function createDragHandle(wrapper) {
+        let handle = wrapper.querySelector(".token-drag-handle");
+
+        if (!handle) {
+            handle = document.createElement("div");
+            handle.className = "token-drag-handle";
+
+            for (let i = 0; i < 3; i += 1) {
+                const bar = document.createElement("span");
+                handle.appendChild(bar);
+            }
+
+            wrapper.insertBefore(handle, wrapper.firstChild);
+        }
+
+        if (!handle.dataset.dragHandleInitialized) {
+            handle.setAttribute("draggable", "true");
+            handle.dataset.dragHandleInitialized = "true";
+
+            handle.addEventListener("dragstart", (event) => {
+                draggedElement = wrapper;
+                wrapper.classList.add("dragging");
+                event.dataTransfer.effectAllowed = "move";
+                event.dataTransfer.setData("text/plain", wrapper.dataset.tokenId || "");
+
+                if (event.dataTransfer.setDragImage) {
+                    event.dataTransfer.setDragImage(wrapper, 10, 10);
+                }
+            });
+
+            handle.addEventListener("dragend", () => {
+                wrapper.classList.remove("dragging");
+                draggedElement = null;
+
+                document
+                    .querySelectorAll(".drag-over, .drag-over-bottom")
+                    .forEach((el) => el.classList.remove("drag-over", "drag-over-bottom"));
+            });
+        }
+
+        return handle;
+    }
+
     function makeDraggable() {
         // Find all token-wrapper elements that have a direct child with class token-name-and-edit
         syncDomWithMetadata();
@@ -396,24 +480,13 @@ window.loadedCodelessLoveScripts ||= {};
             // Mark as processed
             wrapper.dataset.draggableEnabled = "true";
             wrapper.classList.add("draggable");
-            wrapper.setAttribute("draggable", "true");
 
-            // Drag start event
-            wrapper.addEventListener("dragstart", function (e) {
-                draggedElement = this;
-                this.classList.add("dragging");
-                e.dataTransfer.effectAllowed = "move";
-                e.dataTransfer.setData("text/html", this.innerHTML);
-            });
+            const handle = createDragHandle(wrapper);
 
-            // Drag end event
-            wrapper.addEventListener("dragend", function (e) {
-                this.classList.remove("dragging");
-                // Remove all drag-over classes
-                document.querySelectorAll(".drag-over, .drag-over-bottom").forEach((el) => {
-                    el.classList.remove("drag-over", "drag-over-bottom");
-                });
-            });
+            // Ensure handle keeps draggable attribute if wrapper gets re-rendered
+            if (!handle.hasAttribute("draggable")) {
+                handle.setAttribute("draggable", "true");
+            }
 
             // Drag over event
             wrapper.addEventListener("dragover", function (e) {
@@ -422,7 +495,7 @@ window.loadedCodelessLoveScripts ||= {};
                 }
                 e.dataTransfer.dropEffect = "move";
 
-                if (draggedElement === this) return;
+                if (!draggedElement || draggedElement === this) return;
 
                 // Remove previous drag-over classes
                 document.querySelectorAll(".drag-over, .drag-over-bottom").forEach((el) => {
@@ -458,7 +531,7 @@ window.loadedCodelessLoveScripts ||= {};
                     e.stopPropagation();
                 }
 
-                if (draggedElement === this) return false;
+                if (!draggedElement || draggedElement === this) return false;
 
                 // Determine if we should insert before or after
                 const rect = this.getBoundingClientRect();
@@ -472,10 +545,13 @@ window.loadedCodelessLoveScripts ||= {};
                     this.parentNode.insertBefore(draggedElement, this.nextSibling);
                 }
 
-                // Show save button after successful drop
-                showSaveButton();
+                document
+                    .querySelectorAll(".drag-over, .drag-over-bottom")
+                    .forEach((el) => el.classList.remove("drag-over", "drag-over-bottom"));
 
                 updateCurrentOrderAttributes();
+
+                saveOrder();
 
                 return false;
             });

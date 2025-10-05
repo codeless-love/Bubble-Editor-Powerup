@@ -2,8 +2,36 @@
 /* Styles > Style Variables Drag to Rearrange */
 /* Make style variable rows draggable with visual feedback */
 
+.token-wrapper:not(.draggable) {
+    justify-content: flex-start !important;
+    margin-left: 24px;
+
+    .color-token-picker {
+        order: 1;
+    }
+
+    .token-caption {
+        padding-left: 16px;
+        order: 2;
+    }
+}
+
 .token-wrapper.draggable {
-    cursor: move;
+    justify-content: flex-start !important;
+    cursor: default;
+
+    .token-drag-handle {
+        order: 0;
+    }
+
+    .token-composer-and-delete {
+        order: 1;
+        margin-right: 16px;
+    }
+
+    .token-name-and-edit {
+        order: 2;
+    }
 }
 
 .token-wrapper.dragging {
@@ -63,4 +91,28 @@
 #styles-save-order-btn:disabled {
     cursor: not-allowed;
     opacity: 0.8;
+}
+
+.token-drag-handle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    width: 16px;
+    margin-right: 8px;
+    padding: 0 4px;
+    cursor: grab;
+    user-select: none;
+}
+
+.token-drag-handle span {
+    width: 100%;
+    height: 2px;
+    background-color: #9e9e9e;
+    border-radius: 1px;
+}
+
+.token-wrapper.dragging .token-drag-handle {
+    cursor: grabbing;
 }
