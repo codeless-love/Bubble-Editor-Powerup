@@ -9,6 +9,14 @@
     "default": false
   },
   {
+    "key": "tab_naming",
+    "category": "Branches",
+    "name": "Tab Naming",
+    "description": "Automatically renames the Chrome tab to display the current branch name from the version URL parameter. Makes it easier to identify which branch you're working on when multiple editor tabs are open.",
+    "jsFile": "features/tab_naming/tab_naming.js",
+    "default": false
+  },
+  {
     "key": "privacy_button_red_public",
     "category": "Privacy",
     "name": "Privacy Status Badges",
@@ -321,5 +329,14 @@
     "description": "Hides all heart (❤️) indicators that the extension adds to show which elements have been modified. This provides a cleaner interface without the visual indicators.",
     "cssFile": "features/hide_heart_indicators/hide_heart_indicators.css",
     "default": false
+  },
+  {
+    "key": "styles_drag_rearrange",
+    "category": "Style Tab",
+    "name": "Drag to Rearrange Style Variables",
+    "description": "Allows you to drag and drop style variable rows to rearrange their order in the Styles tab.",
+    "cssFile": "features/styles-drag-rearrange/styles-drag-rearrange.css",
+    "jsFile": "features/styles-drag-rearrange/styles-drag-rearrange.js",
+    "default": true
   }
 ]

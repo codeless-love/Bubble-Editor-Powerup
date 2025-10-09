@@ -48,7 +48,15 @@ function handleApiConnectorClick() {
 }
 
 // Add an event listener for clicks on other buttons in the menu
+// Use a flag to prevent duplicate listeners
+let menuListenersAdded = false;
+
 function addMenuButtonListeners() {
+  if (menuListenersAdded) {
+    console.log("❤️"+"Menu button listeners already added, skipping");
+    return; // Don't add duplicate listeners
+  }
+
   // Select all buttons that could be clicked
   const menuButtons = document.querySelectorAll('button[data-tab-item]');
 
@@ -61,6 +69,9 @@ function addMenuButtonListeners() {
       }
     });
   });
+  
+  menuListenersAdded = true;
+  console.log("❤️"+"Menu button listeners added");
 }
 
 // Function to wait for the [data-id="apiconnector2"] element to load
@@ -163,41 +174,25 @@ waitForElement('button[data-tab-item="Plugins"]', (APIButton) => {
   // Remove all other parameters.
   //
   newSpan.addEventListener('click', () => {
-    const currentParams = new URLSearchParams(window.location.search);
-
-    // Preserve the 'id' and 'name' parameters
-    const preservedParams = {};
-    if (currentParams.has('id')) {
-      preservedParams.id = currentParams.get('id');
+    console.log("❤️"+"API Connector button clicked");
+    
+    // Instead of manipulating URLs, let's use a simpler approach:
+    // Just click the Plugins tab and then find the API Connector
+    const pluginsTab = document.querySelector('[data-tab-item="Plugins"]');
+    if (pluginsTab) {
+      console.log("❤️"+"Clicking Plugins tab");
+      pluginsTab.click();
+      
+      // Wait for the Plugins tab to load, then click API Connector
+      setTimeout(() => {
+        waitForApiConnectorElement(handleApiConnectorClick);
+      }, 200); // Slightly longer timeout to let UI settle
+    } else {
+      console.log("❤️"+"Plugins tab not found, trying direct API Connector access");
+      waitForApiConnectorElement(handleApiConnectorClick);
     }
-    if (currentParams.has('name')) {
-      preservedParams.name = currentParams.get('name');
-    }
-    if (currentParams.has('version')) {
-      preservedParams.version = currentParams.get('version');
-    }
 
-    // Update or add the specified parameters
-    const updatedParams = {
-      ...preservedParams, // Include preserved parameters
-      tab: 'Plugins',
-      type: 'custom'
-    };
-
-    // Build the new URLSearchParams with only the required parameters
-    const newParams = new URLSearchParams(updatedParams);
-
-    // Construct the new URL and update the history
-    const newUrl = `${window.location.pathname}?${newParams.toString()}`;
-    history.pushState(null, '', newUrl); // Update the URL without reloading
-    // Trigger a popstate event so Bubble actually sees this happens
-    window.dispatchEvent(new PopStateEvent('popstate'));
-    console.log("❤️"+"Updated URL:", newUrl);
-
-    // Wait for the API Connector element to load and then handle the click
-    waitForApiConnectorElement(handleApiConnectorClick);
-
-    // Add listeners for all menu buttons
+    // Add listeners for all menu buttons (only once)
     addMenuButtonListeners();
   });
 });
