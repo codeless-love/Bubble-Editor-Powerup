@@ -321,5 +321,14 @@
     "cssFile": "features/inline_branch_delete/inline_branch_delete.css",
     "jsFile": "features/inline_branch_delete/inline_branch_delete.js",
     "default": true
+  },
+  {
+    "key": "styles_drag_rearrange",
+    "category": "Style Tab",
+    "name": "Drag to Rearrange Style Variables",
+    "description": "Allows you to drag and drop style variable rows to rearrange their order in the Styles tab.",
+    "cssFile": "features/styles-drag-rearrange/styles-drag-rearrange.css",
+    "jsFile": "features/styles-drag-rearrange/styles-drag-rearrange.js",
+    "default": false
   }
 ]
