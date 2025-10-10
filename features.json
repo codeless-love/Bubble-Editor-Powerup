@@ -323,12 +323,20 @@
     "default": true
   },
   {
+    "key": "hide_heart_indicators",
+    "category": "Style Tab",
+    "name": "Hide Heart Indicators",
+    "description": "Hides all heart (❤️) indicators that the extension adds to show which elements have been modified. This provides a cleaner interface without the visual indicators.",
+    "cssFile": "features/hide_heart_indicators/hide_heart_indicators.css",
+    "default": false
+  },
+  {
     "key": "styles_drag_rearrange",
     "category": "Style Tab",
     "name": "Drag to Rearrange Style Variables",
     "description": "Allows you to drag and drop style variable rows to rearrange their order in the Styles tab.",
     "cssFile": "features/styles-drag-rearrange/styles-drag-rearrange.css",
     "jsFile": "features/styles-drag-rearrange/styles-drag-rearrange.js",
-    "default": false
+    "default": true
   }
 ]
