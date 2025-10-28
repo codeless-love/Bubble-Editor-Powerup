@@ -617,4 +617,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       sendResponse({ success: true });
     }
   });
+
+  // Listen for settings changes and reload popup
+  chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'sync') {
+      // Check if any feature settings changed
+      const featureChanges = Object.keys(changes).some(key => 
+        features.some(f => f.key === key)
+      );
+      
+      if (featureChanges) {
+        console.log("❤️ Feature settings changed, reloading popup");
+        window.location.reload();
+      }
+    }
+  });
 });
