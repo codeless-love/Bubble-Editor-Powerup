@@ -1,6 +1,8 @@
 // Service worker initialization
 
 let debounceTimeouts = {}; // Store timeouts for each tabId
+let popupTabID = null;
+let featuresToInjectInPopup = [];
 
 // Load features dynamically from a JSON file
 async function loadFeatures() {
@@ -215,7 +217,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // First check if the tab is ready
     chrome.tabs.get(sender.tab.id, (tab) => {
       if (chrome.runtime.lastError || !tab.status || tab.status !== "complete") {
-        console.warn("❤️ Tab not ready for script injection, waiting for load");
+        console.log("❤️ Tab not ready for script injection, waiting for load");
         // Wait for tab to be ready
         chrome.tabs.onUpdated.addListener(function listener(updatedTabId, changeInfo) {
           if (updatedTabId === sender.tab.id && changeInfo.status === "complete") {
@@ -277,6 +279,54 @@ function injectScriptIntoMainWorld(tabId, url) {
       throw error;
     });
 }
+
+/* Facilitate feature's injecting their own scripts into the Extension UI world */
+
+/* Listen for popup to tell us it's done loading */
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "popupReady") {
+    console.log("❤️ Popup is ready to receive injected scripts.");
+    
+    // For popups, we don't have a tabId - we communicate via messages
+    // Process any pending injections by sending them to the popup
+    featuresToInjectInPopup.forEach(({ sender: originalSender, message: originalMessage, sendResponse: originalSendResponse }) => {
+      // Send the script/CSS info to the popup for it to load itself
+      chrome.runtime.sendMessage({
+        action: "loadFeatureInPopup",
+        jsFile: originalMessage.jsFile,
+        cssFile: originalMessage.cssFile
+      }, (response) => {
+        originalSendResponse(response);
+      });
+    });
+  }
+});
+
+/* Listen to feature scripts for a command to inject code into the popup */
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "injectScriptIntoExtensionUIWorld") {
+
+    // Add the feature to the list so that every time the popup is loaded, we can re-inject everything.
+    console.log("❤️ Added ${message.jsfile} to the list of features to inject in the popup.");
+    featuresToInjectInPopup.push({ sender, message, sendResponse });
+
+    // If the popup is currently loaded, inject now (Note: this is an unlikely case. Usually the popup won't load until later and all scrips will be loaded at that point.)
+    // chrome.runtime.sendMessage({
+    //   action: "loadFeatureInPopup",
+    //   jsFile: message.jsFile,
+    //   cssFile: message.cssFile
+    // }, (response) => {
+    //   if (!chrome.runtime.lastError) {
+    //     // Popup is open and received the message
+    //     console.log("❤️ Injected ${message.jsFile} into currently open popup");
+    //     sendResponse(response);
+    //   }
+    // });
+
+    return true; // Keep message channel open for async response
+  }
+});
+
 
 // Clean up when tab is closed
 chrome.tabs.onRemoved.addListener((tabId) => {

@@ -2,7 +2,7 @@
 // This module handles the UI and logic for deleting Bubble app branches
 
 (function() {
-  // Only run if we're on the options/popup page
+  // Only run if we're on the popup page
   if (!document.getElementById("branch-list")) return;
   
   console.log("❤️ Fast Branch Delete module loaded");
