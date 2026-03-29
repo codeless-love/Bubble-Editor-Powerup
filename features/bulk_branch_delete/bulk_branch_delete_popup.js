@@ -2,10 +2,48 @@
 // This module handles the UI and logic for deleting Bubble app branches
 
 (function() {
-  // Only run if we're on the popup page
-  if (!document.getElementById("branch-list")) return;
-  
-  console.log("❤️ Fast Branch Delete module loaded");
+  console.log("❤️ Fast Branch Delete module loaded into popup");
+
+  // 1. Create and inject the HTML for the tool
+  const editorMain = document.getElementById('Editor');
+  if (!editorMain) {
+    console.error("❤️ Bulk Branch Delete: Could not find editor main container in popup.");
+    return;
+  }
+
+  const toolHtml = `
+    <div class="tool-section">
+      <h2>❤️ Fast Branch Delete</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 1em;">
+        Quickly delete one or more branches by selecting them from the list. This will execute a soft delete on all selected branches.
+      </p>
+      <div class="branch-delete-container">
+        <div class="branch-list-container">
+          <div class="branch-list-header">
+            <button id="branch-select-none" class="button-secondary" style="padding: 4px 8px; font-size: 12px;">
+              Clear Selection
+            </button>
+          </div>
+          <div id="branch-list" class="branch-list">
+            <div class="branch-list-loading">Loading versions...</div>
+          </div>
+        </div>
+        <div class="row" style="gap: 8px; margin-bottom: 1em;">
+          <button id="branch-refresh-button" class="button-secondary" style="padding: 8px 12px;">
+            Refresh
+          </button>
+          <span id="branch-selection-count" style="font-size: 13px; color: var(--text-secondary);"></span>
+        </div>
+        <button id="branch-delete-button" class="branch-delete-button" disabled>
+          Delete Selected Branches
+        </button>
+        <div id="branch-delete-status" class="branch-delete-status"></div>
+      </div>
+    </div>
+  `;
+  editorMain.insertAdjacentHTML('beforeend', toolHtml);
+
+  // 2. Now that HTML is injected, run the original logic
   
   // Get DOM elements
   const branchList = document.getElementById("branch-list");
