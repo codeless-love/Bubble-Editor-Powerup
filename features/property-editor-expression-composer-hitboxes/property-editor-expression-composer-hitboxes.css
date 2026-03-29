@@ -73,7 +73,16 @@
       }
     }
     .entry-rows > .static-entry-reorg.add-text-at-beginning {
-      background-color: red;
-      &::after {content: "❤️ expression deleter prank detected!";}
+      background-color: white;
+      &::after {content: "❤️";}
+    }
+  
+    .entry-rows > .static-entry-reorg.add-text-at-beginning:has(~ .textcomposer-entry:focus-within) {
+      background-color: lightcoral;
+      display: block !important;
+      height: 1.4em;
+      width: 0px;
+      overflow: hidden;
+      &::after {content: "‼️ Do not click this or it will delete your expression! First blur the text input below."; color: firebrick;}
     }
 }
