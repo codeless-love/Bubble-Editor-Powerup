@@ -20,9 +20,9 @@ window.loadedCodelessLoveScripts ||= {};
   // INSTRUCTIONS
   //
   // 1. If your feature is CSS only, delete this file.
-  // 2. Replace the example text on line 3with the name of your feature on line 3 of this file.
+  // 2. Replace the example text on line 3 with the name of your feature on line 3 of this file.
   // 3. Replace the example key on line 4 with your feature's script (snake_case preferred) on line 4 of this file.
-  // 4. Insert any Javascript here. Don't put anything after the })(); at the end.
+  // 4. Insert any Javascript for your feature here in this file (example line 30). Don't put anything after the })(); at the end.
   // 5. Delete the "main world" injection demo code on lines 32-36, and delete the example script as well.
   /* ------------------------------------------------------------------- */
 

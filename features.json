@@ -319,7 +319,7 @@
     "category": "Branches",
     "name": "Bulk Branch Delete",
     "description": "Provides a quick way to delete multiple branches at once from the extension popup. Access this feature by clicking the extension icon while in a Bubble editor.",
-    "jsFile": "features/bulk_branch_delete/fast_branch_delete.js",
+    "jsFile": "features/bulk_branch_delete/bulk_branch_delete.js",
     "default": true
   },
   {
