@@ -306,6 +306,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "injectScriptIntoExtensionUIWorld") {
 
+    // Prevent duplicate injections into the popup
+    const alreadyExists = featuresToInjectInPopup.some(
+      (item) => item.message.jsFile === message.jsFile
+    );
+
+    if (alreadyExists) {
+      console.log(`❤️ ${message.jsFile} is already in the injection list for the popup, skipping.`);
+      return true; // Acknowledge message, but do nothing.
+    }
+
     // Add the feature to the list so that every time the popup is loaded, we can re-inject everything.
     console.log("❤️ Added ${message.jsfile} to the list of features to inject in the popup.");
     featuresToInjectInPopup.push({ sender, message, sendResponse });
