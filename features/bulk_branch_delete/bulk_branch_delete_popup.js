@@ -18,11 +18,6 @@
       </p>
       <div class="branch-delete-container">
         <div class="branch-list-container">
-          <div class="branch-list-header">
-            <button id="branch-select-none" class="button-secondary" style="padding: 4px 8px; font-size: 12px;">
-              Clear Selection
-            </button>
-          </div>
           <div id="branch-list" class="branch-list">
             <div class="branch-list-loading">Loading versions...</div>
           </div>
@@ -30,6 +25,9 @@
         <div class="row" style="gap: 8px; margin-bottom: 1em;">
           <button id="branch-refresh-button" class="button-secondary" style="padding: 8px 12px;">
             Refresh
+          </button>
+          <button id="branch-select-none" class="button-secondary" style="padding: 4px 8px; font-size: 12px; display: none;">
+            Clear Selection
           </button>
           <span id="branch-selection-count" style="font-size: 13px; color: var(--text-secondary);"></span>
         </div>
@@ -69,6 +67,8 @@
   function updateSelectionCount() {
     const checkedCount = branchList.querySelectorAll('input[type="checkbox"]:checked').length;
     
+    branchSelectNone.style.display = checkedCount > 0 ? 'inline-block' : 'none';
+
     if (checkedCount === 0) {
       branchSelectionCount.textContent = '';
       branchDeleteButton.textContent = 'Delete Selected Branches';
@@ -305,7 +305,8 @@
     await fetchVersions();
   });
   
-  branchSelectNone.addEventListener("click", () => {
+  branchSelectNone.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent this click from bubbling up and toggling the feature's main checkbox
     const checkboxes = branchList.querySelectorAll('input[type="checkbox"]:checked');
     checkboxes.forEach(cb => {
       cb.checked = false;

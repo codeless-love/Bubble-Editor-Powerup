@@ -12,14 +12,6 @@
   margin-bottom: 1em;
 }
 
-.branch-list-header {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
-}
-
 /* Branch list */
 .branch-list {
   max-height: 200px;
