@@ -23,9 +23,6 @@
           </div>
         </div>
         <div class="row" style="gap: 8px; margin-bottom: 1em;">
-          <button id="branch-refresh-button" class="button-secondary" style="padding: 8px 12px;">
-            Refresh
-          </button>
           <button id="branch-select-none" class="button-secondary" style="padding: 4px 8px; font-size: 12px; display: none;">
             Clear Selection
           </button>
@@ -34,7 +31,10 @@
         <button id="branch-delete-button" class="branch-delete-button" disabled>
           Delete Selected Branches
         </button>
-        <div id="branch-delete-status" class="branch-delete-status"></div>
+        <div id="branch-delete-status-container" style="display: none; flex-direction: row; align-items: center; gap: 10px; margin-top: 10px;">
+            <div id="branch-delete-status" class="branch-delete-status" style="margin-top: 0; flex-grow: 1; text-align: left;"></div>
+            <button id="branch-refresh-button" class="button-secondary" style="padding: 8px 12px;">Refresh</button>
+        </div>
       </div>
     </div>
   `;
@@ -45,21 +45,25 @@
   // Get DOM elements
   const branchList = document.getElementById("branch-list");
   const branchDeleteButton = document.getElementById("branch-delete-button");
-  const branchRefreshButton = document.getElementById("branch-refresh-button");
   const branchDeleteStatus = document.getElementById("branch-delete-status");
   const branchSelectionCount = document.getElementById("branch-selection-count");
   const branchSelectNone = document.getElementById("branch-select-none");
+  const branchRefreshButton = document.getElementById("branch-refresh-button");
+  const branchDeleteStatusContainer = document.getElementById("branch-delete-status-container");
   
   // Helper function to show status messages
   function showStatus(message, type = 'info') {
     branchDeleteStatus.textContent = message;
     branchDeleteStatus.className = `branch-delete-status ${type}`;
     branchDeleteStatus.style.display = 'block';
+    branchDeleteStatusContainer.style.display = 'flex';
     
+    // Per user request, the status message and refresh button should remain visible
+    // after a success or error, and not time out.
     if (type === 'success' || type === 'error') {
-      setTimeout(() => {
-        branchDeleteStatus.style.display = 'none';
-      }, 5000);
+      branchRefreshButton.style.display = 'block';
+    } else {
+      branchRefreshButton.style.display = 'none';
     }
   }
   
@@ -253,9 +257,8 @@
     
     if (!confirm(confirmMessage)) return;
     
-    // Disable controls during deletion
-    branchDeleteButton.disabled = true;
-    branchRefreshButton.disabled = true;
+    // Hide delete button and disable other controls during deletion
+    branchDeleteButton.style.display = 'none';
     branchSelectNone.disabled = true;
     selectedCheckboxes.forEach(cb => cb.disabled = true);
     
@@ -295,14 +298,24 @@
     }
     
     // Re-enable controls
-    branchDeleteButton.disabled = false;
-    branchRefreshButton.disabled = false;
     branchSelectNone.disabled = false;
   });
   
-  branchRefreshButton.addEventListener("click", async () => {
-    branchList.innerHTML = '<div class="branch-list-loading">Refreshing...</div>';
-    await fetchVersions();
+  branchRefreshButton.addEventListener("click", async (e) => {
+    e.stopPropagation(); // Prevent this click from bubbling up and toggling the feature's main checkbox
+    
+    // Reload parent tab
+    try {
+        const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (activeTab && activeTab.id) {
+            chrome.tabs.reload(activeTab.id);
+        }
+    } catch (error) {
+        console.error("❤️ Error reloading parent tab:", error);
+    }
+
+    // Reload popup
+    window.location.reload();
   });
   
   branchSelectNone.addEventListener("click", (e) => {
