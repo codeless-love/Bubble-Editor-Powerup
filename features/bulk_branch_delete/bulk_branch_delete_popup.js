@@ -5,15 +5,14 @@
   console.log("❤️ Fast Branch Delete module loaded into popup");
 
   // 1. Create and inject the HTML for the tool
-  const editorMain = document.getElementById('Editor');
-  if (!editorMain) {
-    console.error("❤️ Bulk Branch Delete: Could not find editor main container in popup.");
+  const featureDiv = document.getElementById('bulk_branch_delete')?.closest('.feature');
+  if (!featureDiv) {
+    console.error("❤️ Bulk Branch Delete: Could not find feature container in popup.");
     return;
   }
 
   const toolHtml = `
     <div class="tool-section">
-      <h2>❤️ Fast Branch Delete</h2>
       <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 1em;">
         Quickly delete one or more branches by selecting them from the list. This will execute a soft delete on all selected branches.
       </p>
@@ -41,7 +40,7 @@
       </div>
     </div>
   `;
-  editorMain.insertAdjacentHTML('beforeend', toolHtml);
+  featureDiv.insertAdjacentHTML('beforeend', toolHtml);
 
   // 2. Now that HTML is injected, run the original logic
   
