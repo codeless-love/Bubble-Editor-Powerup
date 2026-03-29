@@ -51,7 +51,7 @@
 /* add heart indicator to the far-right of the hitbox to show it's clickable. */
 ❤️ codelesslove,
 .property-editor-2 .object-list-editor .entry .row[prop_name=value] .prop-row-contents .body .editor.shorttext::after {
-  content: "❤️🔵💙";
+  content: "❤️";
   font-size: 3px;
   position: absolute;
   right: 0;
