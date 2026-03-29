@@ -7,16 +7,23 @@
   display: inline;
 }
 ❤️ codelesslove,
-.property-editor-2 .text-entry.static-entry-reorg::after {
+.property-editor-2 .text-entry.static-entry-reorg {
+    &::before {
     content: "❤️";
+    margin-right: 0;
+    position: absolute;
+    top: 50%;
+    left: -12px;
     font-size: 3px;
-    position: relative;
-    right: 0;
-    top: -2px;
-    padding-right: 5px;
     line-height: 0;
     opacity: .8;
   }
+  &::after {
+    content: "";
+    position: relative;
+    padding-right: 5px;
+  }
+}
 /* When an expression box allows static text at the end, expand the static-text "hitbox" to the full width of the expression input. */
 ❤️ codelesslove,
 .property-editor-2 .object-list-editor .entry {/* flexbox with wrapping so that the 3rd item wraps if it's wider than the available width */
@@ -51,4 +58,31 @@
   top: 0;
   right: 0;
   opacity: .8;
+}
+/* color the hitbox area */
+.property-editor-2 .long-text-composer {
+    padding: 0;
+    
+    .text-entry.static-entry-reorg.static-entry-reorg.static-entry-reorg,
+    .text-entry.editing-static-entry-reorg.editing-static-entry-reorg.editing-static-entry-reorg { /* boosting specificity so we don't have to use an !important which interferes with Bubble's hiding of this */
+      display: block;
+      background-color: #00c0ff0f;
+      
+      .autostretch {
+        background-color: #00c0ff0f;
+      }
+    }
+    .entry-rows > .static-entry-reorg.add-text-at-beginning {
+      background-color: white;
+      &::after {content: "❤️";}
+    }
+  
+    .entry-rows > .static-entry-reorg.add-text-at-beginning:has(~ .textcomposer-entry:focus-within) {
+      background-color: lightcoral;
+      display: block !important;
+      height: 1.4em;
+      width: 0px;
+      overflow: hidden;
+      &::after {content: "‼️ Do not click this or it will delete your expression! First blur the text input below."; color: firebrick;}
+    }
 }

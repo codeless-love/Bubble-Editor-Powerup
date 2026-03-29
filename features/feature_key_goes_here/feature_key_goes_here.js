@@ -20,9 +20,9 @@ window.loadedCodelessLoveScripts ||= {};
   // INSTRUCTIONS
   //
   // 1. If your feature is CSS only, delete this file.
-  // 2. Replace the example text on line 3with the name of your feature on line 3 of this file.
+  // 2. Replace the example text on line 3 with the name of your feature on line 3 of this file.
   // 3. Replace the example key on line 4 with your feature's script (snake_case preferred) on line 4 of this file.
-  // 4. Insert any Javascript here. Don't put anything after the })(); at the end.
+  // 4. Insert any Javascript for your feature here in this file (example line 30). Don't put anything after the })(); at the end.
   // 5. Delete the "main world" injection demo code on lines 32-36, and delete the example script as well.
   /* ------------------------------------------------------------------- */
 
@@ -33,6 +33,13 @@ window.loadedCodelessLoveScripts ||= {};
     chrome.runtime.sendMessage({
         action: "injectScriptIntoMainWorld",
         jsFile: "features/feature_key_goes_here/example_script_that_must_execute_in_the_main_world.js"
+    });
+
+    // If your feature needs to run something in the popup, you can inject a script into the "Extension UI world" (the options popup), like this:
+    chrome.runtime.sendMessage({
+        action: "injectScriptIntoExtensionUIWorld",
+        jsFile: "features/feature_key_goes_here/example_script_that_must_execute_in_the_extension_ui_world.js",
+        cssFile: "features/feature_key_goes_here/example_style_that_must_load_in_the_extension_ui_world.css"
     });
 
 })();//👈👈 don't delete this, and don't put anything outside of this!!

@@ -1,7 +1,7 @@
 window.loadedCodelessLoveScripts ||= {};
 (function() {
-  console.log("❤️"+"Bulk Branch Delete");
-  let thisScriptKey = "bulk_branch_delete";
+  console.log("❤️ Enter Debug Mode feature loaded");
+  let thisScriptKey = "runtime_enter_debug";
 
   /* ------------------------------------------------ */
   /* ⬇️ ⬇️ ⬇️ ⬇️ ⬇️ Don't mess with this  ⬇️ ⬇️ ⬇️ ⬇️ ⬇️ */
@@ -11,15 +11,30 @@ window.loadedCodelessLoveScripts ||= {};
     return;
   }
   window.loadedCodelessLoveScripts[thisScriptKey] = "loaded";
+  console.log("❤️"+window.loadedCodelessLoveScripts[thisScriptKey]);
   /* ------------------------------------------------ */
   /* ⬆️ ⬆️ ⬆️ ⬆️ ⬆️ Don't mess with this  ⬆️ ⬆️ ⬆️ ⬆️ ⬆️ */
   /* ------------------------------------------------ */
 
-    // If your feature needs to run something in the popup, you can inject a script into the "Extension UI world" (the options popup), like this:
-    chrome.runtime.sendMessage({
-        action: "injectScriptIntoExtensionUIWorld",
-        jsFile: "features/bulk_branch_delete/bulk_branch_delete_popup.js",
-        cssFile: "features/bulk_branch_delete/bulk_branch_delete.css"
-    });
+  // Only activate if debug_mode=true is not in the URL
+  // const params = new URLSearchParams(window.location.search);
+  // if (params.get("debug_mode") === "true") {
+  //   return;
+  // }
 
+  // Inject a script into the "Extension UI world" (the options popup)
+  chrome.runtime.sendMessage({
+      action: "injectScriptIntoExtensionUIWorld",
+      jsFile: "features/runtime_enter_debug/options_script.js",
+  });
+
+  
 })(); //👈👈 don't delete this, and don't put anything outside of this!!
+
+
+
+
+
+
+
+

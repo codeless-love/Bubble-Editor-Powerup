@@ -1,16 +1,15 @@
 /* Fast Branch Delete styles for the extension popup */
 
+.tool-section {
+  margin-left: 28px;
+  & p {
+    margin-left: 0;
+  }
+}
+
 /* Branch list container */
 .branch-list-container {
   margin-bottom: 1em;
-}
-
-.branch-list-header {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
 }
 
 /* Branch list */

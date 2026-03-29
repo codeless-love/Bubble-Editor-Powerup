@@ -589,4 +589,47 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("close-button").addEventListener("click", async () => {
     closePopup();
   });
+
+  // Notify background.js that the Extension UI world is ready to receive injected scripts
+  console.log("❤️ Sending message to background.js that the popup is ready");
+  chrome.runtime.sendMessage({ action: "popupReady" });
+
+  // Listen for features to be loaded into the popup
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "loadFeatureInPopup") {
+      // Load CSS if provided
+      if (message.cssFile) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = chrome.runtime.getURL(message.cssFile);
+        document.head.appendChild(link);
+      }
+      
+      // Load JS if provided
+      if (message.jsFile) {
+        const script = document.createElement('script');
+        script.src = chrome.runtime.getURL(message.jsFile);
+        script.type = 'text/javascript';
+        script.className = '❤️injected-script';
+        document.head.appendChild(script);
+      }
+      
+      sendResponse({ success: true });
+    }
+  });
+
+  // Listen for settings changes and reload popup
+  chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'sync') {
+      // Check if any feature settings changed
+      const featureChanges = Object.keys(changes).some(key => 
+        features.some(f => f.key === key)
+      );
+      
+      if (featureChanges) {
+        console.log("❤️ Feature settings changed, reloading popup");
+        window.location.reload();
+      }
+    }
+  });
 });
