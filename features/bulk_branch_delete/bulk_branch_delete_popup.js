@@ -219,8 +219,11 @@
               </label>
             `;
             
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            const label = item.querySelector('label');
+
             // Add change handler to checkbox
-            item.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+            checkbox.addEventListener('change', (e) => {
               if (e.target.checked) {
                 item.classList.add('selected');
               } else {
@@ -228,7 +231,19 @@
               }
               updateSelectionCount();
             });
-            
+
+            // Make the whole item clickable and stop propagation
+            item.addEventListener('click', (e) => {
+              e.stopPropagation(); // Stop the click from bubbling up to the feature card
+
+              // If the click was on the checkbox or label, the browser handles the toggle.
+              // We only need to manually toggle if the click was on the item's padding.
+              if (e.target !== checkbox && !label.contains(e.target)) {
+                  checkbox.checked = !checkbox.checked;
+                  checkbox.dispatchEvent(new Event('change'));
+              }
+            });
+
             branchList.appendChild(item);
           });
           
