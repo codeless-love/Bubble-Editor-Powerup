@@ -101,7 +101,11 @@ async function updateBranchMapping(force = false) {
  */
 function extractBranchInfo(branchRow) {
   // Try to find the branch name span
-  const branchNameSpan = branchRow.querySelector('.branch-name-icon-container ._1nfonn86._1lkv1fwa');
+  let branchNameSpan = branchRow.querySelector('.branch-name-icon-container ._1nfonn87._1lkv1fwa');
+  if (!branchNameSpan) {
+    // Fallback if class names change: target the text span sibling after the icon span
+    branchNameSpan = branchRow.querySelector('.branch-name-icon-container > div > span ~ span');
+  }
   if (branchNameSpan) {
     // Skip system branches
     const branchName = branchNameSpan.textContent.trim();
@@ -527,7 +531,10 @@ function ensureBranchHasMenu(branchName) {
   // Find all branch rows and check their text content
   const branchRows = document.querySelectorAll('.branch-env-row.branch');
   for (const row of branchRows) {
-    const nameSpan = row.querySelector('span._1nfonn86._1lkv1fw9:not(._1ij2r33)');
+    let nameSpan = row.querySelector('.branch-name-icon-container ._1nfonn87._1lkv1fwa');
+    if (!nameSpan) {
+      nameSpan = row.querySelector('.branch-name-icon-container > div > span ~ span');
+    }
     if (nameSpan && nameSpan.textContent.trim() === branchName) {
       processBranchRow(row);
       return true;
