@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const categories = [
     "Runtime",
+    "Editor Styling",
     "Expressions",
     "Expression Composers",
     "Property Editor",

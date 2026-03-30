@@ -1,0 +1,24 @@
+❤️ codelesslove,
+html {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Cancel the inversion for mainwindow and its children */
+❤️ codelesslove,
+.designcanvas {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Re-invert media OUTSIDE mainwindow */
+❤️ codelesslove,
+img, video, iframe {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* But inside mainwindow, the double-inversion already fixed them */
+❤️ codelesslove,
+.designcanvas img,
+.designcanvas video,
+.designcanvas iframe {
+  filter: none;
+}

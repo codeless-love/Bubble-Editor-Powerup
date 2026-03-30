@@ -181,7 +181,7 @@
     "description": "Make expressions multiple lines, indented, and collapsible.",
     "cssFile": "features/property-editor-expression-composer-multiline/property-editor-expression-composer-multiline.css",
     "default": true,
-    "contributors": ["brenton"]
+    "contributors": ["george", "brenton"]
   },
   {
     "key": "expression_collapser",
@@ -191,7 +191,7 @@
     "jsFile": "features/expression_collapser/script.js",
     "requires": "property_editor_expression_composer_multiline",
     "default": true,
-    "contributors": ["brenton"]
+    "contributors": ["george", "brenton"]
   },
   {
     "key": "property_editor_expression_composers_full_width",
@@ -279,6 +279,15 @@
       ]
     },
     "contributors": ["george"]
+  },
+  {
+    "key": "dark_mode",
+    "category": "Editor Styling",
+    "name": "Dark Mode",
+    "description": "Applies a dark mode theme to the Bubble editor. This is an experimental feature and may have visual glitches.",
+    "cssFile": "features/dark_mode/dark_mode.css",
+    "default": false,
+    "contributors": ["brenton"]
   },
   {
     "key": "folder_click_toggle",
