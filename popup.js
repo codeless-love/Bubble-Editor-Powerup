@@ -82,6 +82,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (main) main.hidden = (state !== domainState);
     });
 
+    // Conditionally hide the toolbar if not in editor view
+    const toolbar = document.querySelector('.toolbar');
+    if (toolbar) {
+      toolbar.hidden = (domainState !== 'Editor');
+    }
+
     // --- Grant access button logic (moved here for correct scope) ---
     const grantBtn = document.getElementById("grant-access-btn");
     if (grantBtn) {
@@ -302,7 +308,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         .join(', ');
 
       if (contributorLinks) {
-        contributorsDiv.innerHTML = `Contributors: ${contributorLinks}`;
+        const label = feature.contributors.length === 1 ? 'Contributor' : 'Contributors';
+        contributorsDiv.innerHTML = `<span>${label}:</span> ${contributorLinks}`;//text directly in the div has a taller height, so we keep height minimal by wrapping the label in 'span'
         div.appendChild(contributorsDiv);
       }
     }
