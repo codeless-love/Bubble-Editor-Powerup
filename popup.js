@@ -395,13 +395,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function updateCategoryCount(accordion) {
     const cards = Array.from(accordion.querySelectorAll(".feature:not(.sub-feature)"));
-    const enabled = cards.filter((card) => {
+    const total = cards.length;
+    const enabledCount = cards.filter((card) => {
         const checkbox = card.querySelector('input[type="checkbox"]');
         return checkbox && !checkbox.disabled && checkbox.checked;
-    });
+    }).length;
     const countEl = accordion.querySelector(".category-count");
     if (countEl) {
-        countEl.textContent = enabled.length > 0 ? `(${enabled.length})` : "";
+      if (total > 0) {
+        countEl.textContent = `(${enabledCount}/${total} features enabled)`;
+      } else {
+        countEl.textContent = "";
+      }
     }
   }
 

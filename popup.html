@@ -419,7 +419,6 @@
       width: 100%;
       display: flex;
       align-items: center;
-      justify-content: space-between;
       padding: 10px 12px;
       border: none;
       background: transparent;
@@ -431,15 +430,22 @@
       transition: background .2s ease;
     }
 
+    .accordion-trigger > span:first-of-type {
+      text-align: left;
+    }
+
     .accordion-trigger:hover {
       background: var(--secondary-color);
     }
 
     .category-count {
-      font-size: 12px;
+      flex-grow: 1;
+      text-align: left;
+      font-size: 10px;
       color: var(--text-secondary);
       font-weight: normal;
       padding-left: 8px;
+      padding-right: 8px;
     }
 
     .accordion-trigger svg {
