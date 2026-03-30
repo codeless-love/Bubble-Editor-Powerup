@@ -317,21 +317,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     // Add the feature to the list so that every time the popup is loaded, we can re-inject everything.
-    console.log("❤️ Added ${message.jsfile} to the list of features to inject in the popup.");
+    console.log(`❤️ Added ${message.jsfile} to the list of features to inject in the popup.`);
     featuresToInjectInPopup.push({ sender, message, sendResponse });
 
     // If the popup is currently loaded, inject now (Note: this is an unlikely case. Usually the popup won't load until later and all scrips will be loaded at that point.)
-    // chrome.runtime.sendMessage({
-    //   action: "loadFeatureInPopup",
-    //   jsFile: message.jsFile,
-    //   cssFile: message.cssFile
-    // }, (response) => {
-    //   if (!chrome.runtime.lastError) {
-    //     // Popup is open and received the message
-    //     console.log("❤️ Injected ${message.jsFile} into currently open popup");
-    //     sendResponse(response);
-    //   }
-    // });
+    chrome.runtime.sendMessage({
+      action: "loadFeatureInPopup",
+      jsFile: message.jsFile,
+      cssFile: message.cssFile
+    }, (response) => {
+      if (!chrome.runtime.lastError) {
+        // Popup is open and received the message
+        console.log(`❤️ Injected ${message.jsFile} into currently open popup`);
+        sendResponse(response);
+      }
+    });
 
     return true; // Keep message channel open for async response
   }

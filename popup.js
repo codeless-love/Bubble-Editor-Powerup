@@ -2,6 +2,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   let candidateDomains = [];
   let approvedDomains = [];
 
+  const contributors = {
+    "example": { name: "Example Contributor", link: "https://codeless.love" },
+    "brenton": { name: "Brenton Strine", link: "https://popcode.studio" },
+    "rathan": { name: "Rathan A", link: "https://www.linkedin.com/in/rathan-the-builder/" },
+    "rico": { name: "Rico Trevisan", link: "https://www.mocharymethod.com/team/rico-trevisan" },
+    "george": { name: "George Collier", link: "https://notquiteunicorns.xyz/" },
+    "tim": { name: "Timothy Tu", link: "https://community.buildcamp.io/u/b0c0b288" },
+    "rafa": { name: "Rafa Chavantes", link: "https://rafa.chavantes.com/" }
+  };
+
   // Helper: Promisified chrome.storage.sync.get
   function getCandidateDomains() {
     return new Promise(resolve => {
@@ -72,6 +82,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (main) main.hidden = (state !== domainState);
     });
 
+    // Conditionally hide the toolbar if not in editor view
+    const toolbar = document.querySelector('.toolbar');
+    if (toolbar) {
+      toolbar.hidden = (domainState !== 'Editor');
+    }
+
     // --- Grant access button logic (moved here for correct scope) ---
     const grantBtn = document.getElementById("grant-access-btn");
     if (grantBtn) {
@@ -119,6 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const originalPrefs = JSON.parse(JSON.stringify(prefs));
   // Track whether changes have been made
   let changesMade = false;
+  let applyFiltersRef = () => {};
 
   const container = document.getElementById("features-list");
 
@@ -274,6 +291,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     description.textContent = feature.description;
     div.appendChild(description);
 
+    // Create contributors section
+    if (feature.contributors && feature.contributors.length > 0) {
+      const contributorsDiv = document.createElement("div");
+      contributorsDiv.className = "contributors-section";
+
+      const contributorLinks = feature.contributors
+        .map(contribKey => {
+          const contributorData = contributors[contribKey];
+          if (contributorData) {
+            return contributorData.link ? `<a href="${contributorData.link}" target="_blank" rel="noopener noreferrer">${contributorData.name}</a>` : `<span>${contributorData.name}</span>`;
+          }
+          return null;
+        })
+        .filter(Boolean)
+        .join(', ');
+
+      if (contributorLinks) {
+        const label = feature.contributors.length === 1 ? 'Contributor' : 'Contributors';
+        contributorsDiv.innerHTML = `<span>${label}:</span> ${contributorLinks}`;//text directly in the div has a taller height, so we keep height minimal by wrapping the label in 'span'
+        div.appendChild(contributorsDiv);
+      }
+    }
+
     // Inject domains list for enable_runtime_features only
     if (feature.key === "enable_runtime_features") {
       const domainsContainer = document.createElement("div");
@@ -327,6 +367,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Add change event listeners for dependency handling and change tracking
       checkbox.addEventListener("change", () => {
         updateDependentFeatures(feature, checkbox.checked);
+        prefs[feature.key] = checkbox.checked;
         checkForChanges();
 
         // Handle feature input visibility
@@ -341,6 +382,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             createFeatureInputs(feature, div);
           }
         }
+
+        const parentAccordion = div.closest(".accordion");
+        if (parentAccordion) {
+          updateCategoryCount(parentAccordion);
+        }
+        applyFiltersRef();
       });
 
       // Add input fields for features with config
@@ -385,22 +432,67 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   };
 
-  // Display features by category in the defined order
-  categories.forEach((category) => {
-    if (featuresByCategory[category]) {
-      // Create category header
-      const categoryHeader = document.createElement("h2");
-      categoryHeader.textContent = category;
-      container.appendChild(categoryHeader);
+  function updateCategoryCount(accordion) {
+    const cards = Array.from(accordion.querySelectorAll(".feature:not(.sub-feature)"));
+    const total = cards.length;
+    const enabledCount = cards.filter((card) => {
+        const checkbox = card.querySelector('input[type="checkbox"]');
+        return checkbox && !checkbox.disabled && checkbox.checked;
+    }).length;
+    const countEl = accordion.querySelector(".category-count");
+    if (countEl) {
+      if (total > 0) {
+        countEl.textContent = `(${enabledCount}/${total} features enabled)`;
+      } else {
+        countEl.textContent = "";
+      }
+    }
+  }
 
-      // Iterate through features in the category
-      featuresByCategory[category].forEach((feature) => {
+  // Display features by category in the defined order
+  categories.forEach((categoryName) => {
+    const featureList = featuresByCategory[categoryName];
+    if (featureList) {
+      // Create category header
+      const accordion = document.createElement("div");
+      accordion.className = "accordion";
+      accordion.dataset.state = "open"; // Start open by default
+      accordion.dataset.category = categoryName;
+
+      const trigger = document.createElement("button");
+      trigger.type = "button";
+      trigger.className = "accordion-trigger";
+      trigger.setAttribute("aria-expanded", "true");
+
+      const titleSpan = document.createElement("span");
+      titleSpan.textContent = categoryName;
+
+      const countSpan = document.createElement("span");
+      countSpan.className = "category-count";
+      
+      trigger.appendChild(titleSpan);
+      trigger.appendChild(countSpan);
+      trigger.insertAdjacentHTML(
+          "beforeend",
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
+      );
+
+      trigger.addEventListener("click", () => {
+          const isOpen = accordion.dataset.state === "open";
+          accordion.dataset.state = isOpen ? "closed" : "open";
+          trigger.setAttribute("aria-expanded", String(!isOpen));
+      });
+
+      const content = document.createElement("div");
+      content.className = "accordion-content";
+
+      featureList.forEach((feature) => {
         // Skip sub-features as they will be handled with their parent
         if (isSubFeature(feature)) return;
 
         // Create the main feature card
         const { div, checkbox } = createFeatureCard(feature);
-        container.appendChild(div);
+        content.appendChild(div);
 
         // Check if this feature has sub-features
         const subFeatures = getSubFeatures(feature.key);
@@ -415,12 +507,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             subFeaturesContainer.appendChild(subDiv);
           });
 
-          container.appendChild(subFeaturesContainer);
+          content.appendChild(subFeaturesContainer);
         }
       });
-    }
 
-    // Event listeners for checkboxes are now added in the createFeatureCard function
+      if (content.children.length > 0) {
+          accordion.appendChild(trigger);
+          accordion.appendChild(content);
+          container.appendChild(accordion);
+          updateCategoryCount(accordion);
+      }
+    }
   });
 
   // Function to update dependent features when a parent feature's state changes
@@ -440,6 +537,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Parent is unchecked, so disable and uncheck the dependent feature
         dependentCheckbox.disabled = true;
         dependentCheckbox.checked = false;
+        prefs[dependentFeature.key] = false;
         dependentCheckbox.title = `Requires "${parentFeature.name}" to be enabled.`;
         dependentFeatureDiv.classList.add('disabled');
         dependentFeatureDiv.style.cursor = 'not-allowed';
@@ -497,25 +595,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Function to check if current preferences differ from original
   const checkForChanges = () => {
-    const currentPrefs = {};
-    features.forEach(feature => {
-      const checkbox = document.getElementById(feature.key);
-      if (checkbox) {
-        currentPrefs[feature.key] = checkbox.checked;
-      }
-    });
-
-    // Compare current preferences with original
-    for (const key in currentPrefs) {
-      if (currentPrefs[key] !== originalPrefs[key]) {
-        changesMade = true;
-        saveButton.style.display = "block";
-        return;
+    let hasChanges = false;
+    for (const key in originalPrefs) {
+      if (prefs[key] !== originalPrefs[key]) {
+        hasChanges = true;
+        break;
       }
     }
+    changesMade = hasChanges;
+    saveButton.style.display = hasChanges ? "block" : "none";
+  };
 
-    // No changes detected
-    changesMade = false;
+  // Change event listeners are now added in the createFeatureCard function
+  if (changesMade) {
     saveButton.style.display = "none";
   };
 
@@ -536,22 +628,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Save button updates preferences in chrome.storage.sync
   document.getElementById("save-button").addEventListener("click", async () => {
-    // Dynamically construct newPrefs object
-    const newPrefs = {};
-    features.forEach(feature => {
-      const checkbox = document.getElementById(feature.key);
-      if (checkbox) {
-        newPrefs[feature.key] = checkbox.checked;
-      }
-    });
-
     // Store updated preferences
     await new Promise(resolve => {
-      chrome.storage.sync.set(newPrefs, resolve);
+      chrome.storage.sync.set(prefs, resolve);
     });
 
     // Update original preferences to match the newly saved ones
-    Object.assign(originalPrefs, newPrefs);
+    Object.assign(originalPrefs, prefs);
 
     // Reset change tracking
     changesMade = false;
@@ -590,6 +673,104 @@ document.addEventListener("DOMContentLoaded", async () => {
     closePopup();
   });
 
+  function setupFilters() {
+    const searchInput = document.getElementById("feature-search");
+    const filterBtns = document.querySelectorAll(".filter-button");
+    let currentFilter = "all";
+
+    const applyFilters = () => {
+      const query = searchInput.value.toLowerCase().trim();
+
+      document.querySelectorAll(".accordion").forEach((section) => {
+          const categoryName = section.dataset.category.toLowerCase();
+          const categoryMatches = query ? categoryName.includes(query) : false;
+
+          const cards = Array.from(section.querySelectorAll(".feature"));
+          const visibility = new Map();
+
+          // Pass 1: Determine initial visibility for all features
+          cards.forEach(card => {
+              const checkbox = card.querySelector('input[type="checkbox"]');
+              const featureKey = checkbox?.id;
+              if (!featureKey) return;
+
+              const featureData = features.find(f => f.key === featureKey);
+              if (!featureData) return;
+
+              const title = (featureData.name || "").toLowerCase();
+              const desc = (featureData.description || "").toLowerCase();
+              const isEnabled = checkbox.checked;
+
+              let isVisible;
+              if (categoryMatches) {
+                  isVisible = true;
+              } else {
+                  isVisible = query ? (title.includes(query) || desc.includes(query)) : true;
+              }
+              if (isVisible && currentFilter === "enabled") isVisible = isEnabled;
+              if (isVisible && currentFilter === "disabled") isVisible = !isEnabled;
+
+              visibility.set(featureKey, isVisible);
+          });
+
+          // Pass 2: If a sub-feature is visible, ensure its parent is also visible
+          cards.forEach(card => {
+              const checkbox = card.querySelector('input[type="checkbox"]');
+              const featureKey = checkbox?.id;
+              if (!featureKey) return;
+
+              const featureData = features.find(f => f.key === featureKey);
+              if (!featureData || !isSubFeature(featureData)) return;
+
+              if (visibility.get(featureKey)) { // if sub-feature is visible
+                  const parentKey = featureData.requires;
+                  if (parentKey) {
+                      visibility.set(parentKey, true); // force parent to be visible
+                  }
+              }
+          });
+
+          let visibleCount = 0;
+          // Pass 3: Apply visibility to DOM and update counts
+          cards.forEach(card => {
+              const checkbox = card.querySelector('input[type="checkbox"]');
+              const featureKey = checkbox?.id;
+              if (!featureKey) return;
+
+              const isVisible = visibility.get(featureKey);
+              card.style.display = isVisible ? '' : 'none';
+
+              if (isVisible && !card.classList.contains('sub-feature')) {
+                  visibleCount++;
+              }
+          });
+          
+          // Also need to hide/show the .sub-features containers
+          section.querySelectorAll('.sub-features').forEach(container => {
+              const hasVisibleChild = Array.from(container.querySelectorAll('.feature.sub-feature')).some(
+                  child => child.style.display !== 'none'
+              );
+              container.style.display = hasVisibleChild ? '' : 'none';
+          });
+
+          section.style.display = visibleCount > 0 ? 'block' : 'none';
+      });
+    };
+
+    applyFiltersRef = applyFilters;
+    searchInput.addEventListener("input", applyFilters);
+
+    filterBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            filterBtns.forEach((b) => b.removeAttribute('data-state'));
+            btn.dataset.state = "active";
+            currentFilter = btn.dataset.filter;
+            applyFilters();
+        });
+    });
+  }
+
+  setupFilters();
   // Notify background.js that the Extension UI world is ready to receive injected scripts
   console.log("❤️ Sending message to background.js that the popup is ready");
   chrome.runtime.sendMessage({ action: "popupReady" });
