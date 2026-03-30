@@ -643,6 +643,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const query = searchInput.value.toLowerCase().trim();
 
       document.querySelectorAll(".accordion").forEach((section) => {
+          const categoryName = section.dataset.category.toLowerCase();
+          const categoryMatches = query ? categoryName.includes(query) : false;
+
           const cards = Array.from(section.querySelectorAll(".feature"));
           const visibility = new Map();
 
@@ -659,7 +662,12 @@ document.addEventListener("DOMContentLoaded", async () => {
               const desc = (featureData.description || "").toLowerCase();
               const isEnabled = checkbox.checked;
 
-              let isVisible = query ? (title.includes(query) || desc.includes(query)) : true;
+              let isVisible;
+              if (categoryMatches) {
+                  isVisible = true;
+              } else {
+                  isVisible = query ? (title.includes(query) || desc.includes(query)) : true;
+              }
               if (isVisible && currentFilter === "enabled") isVisible = isEnabled;
               if (isVisible && currentFilter === "disabled") isVisible = !isEnabled;
 
