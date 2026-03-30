@@ -635,37 +635,74 @@ document.addEventListener("DOMContentLoaded", async () => {
     let currentFilter = "all";
 
     const applyFilters = () => {
-        const query = searchInput.value.toLowerCase().trim();
+      const query = searchInput.value.toLowerCase().trim();
 
-        document.querySelectorAll(".accordion").forEach((section) => {
-            const cards = section.querySelectorAll(".feature");
-            let visibleCount = 0;
+      document.querySelectorAll(".accordion").forEach((section) => {
+          const cards = Array.from(section.querySelectorAll(".feature"));
+          const visibility = new Map();
 
-            cards.forEach((card) => {
-                const checkbox = card.querySelector('input[type="checkbox"]');
-                const featureKey = checkbox?.id;
-                if (!featureKey) return;
+          // Pass 1: Determine initial visibility for all features
+          cards.forEach(card => {
+              const checkbox = card.querySelector('input[type="checkbox"]');
+              const featureKey = checkbox?.id;
+              if (!featureKey) return;
 
-                const featureData = features.find(f => f.key === featureKey);
-                if (!featureData) return;
+              const featureData = features.find(f => f.key === featureKey);
+              if (!featureData) return;
 
-                const title = (featureData.name || "").toLowerCase();
-                const desc = (featureData.description || "").toLowerCase();
-                const isEnabled = checkbox.checked;
-                const isSub = card.classList.contains('sub-feature');
+              const title = (featureData.name || "").toLowerCase();
+              const desc = (featureData.description || "").toLowerCase();
+              const isEnabled = checkbox.checked;
 
-                let isVisible = query ? (title.includes(query) || desc.includes(query)) : true;
+              let isVisible = query ? (title.includes(query) || desc.includes(query)) : true;
+              if (isVisible && currentFilter === "enabled") isVisible = isEnabled;
+              if (isVisible && currentFilter === "disabled") isVisible = !isEnabled;
 
-                if (isVisible && currentFilter === "enabled") isVisible = isEnabled;
-                if (isVisible && currentFilter === "disabled") isVisible = !isEnabled;
+              visibility.set(featureKey, isVisible);
+          });
 
-                card.style.display = isVisible ? "" : "block";
-                
-                if (isVisible && !isSub) visibleCount++;
-            });
+          // Pass 2: If a sub-feature is visible, ensure its parent is also visible
+          cards.forEach(card => {
+              const checkbox = card.querySelector('input[type="checkbox"]');
+              const featureKey = checkbox?.id;
+              if (!featureKey) return;
 
-            section.style.display = visibleCount > 0 ? "block" : "none";
-        });
+              const featureData = features.find(f => f.key === featureKey);
+              if (!featureData || !isSubFeature(featureData)) return;
+
+              if (visibility.get(featureKey)) { // if sub-feature is visible
+                  const parentKey = featureData.requires;
+                  if (parentKey) {
+                      visibility.set(parentKey, true); // force parent to be visible
+                  }
+              }
+          });
+
+          let visibleCount = 0;
+          // Pass 3: Apply visibility to DOM and update counts
+          cards.forEach(card => {
+              const checkbox = card.querySelector('input[type="checkbox"]');
+              const featureKey = checkbox?.id;
+              if (!featureKey) return;
+
+              const isVisible = visibility.get(featureKey);
+              card.style.display = isVisible ? '' : 'none';
+
+              if (isVisible && !card.classList.contains('sub-feature')) {
+                  visibleCount++;
+              }
+          });
+          
+          // Also need to hide/show the .sub-features containers
+          section.querySelectorAll('.sub-features').forEach(container => {
+              const hasVisibleChild = Array.from(container.querySelectorAll('.feature.sub-feature')).some(
+                  child => child.style.display !== 'none'
+              );
+              container.style.display = hasVisibleChild ? '' : 'none';
+          });
+
+          section.style.display = visibleCount > 0 ? 'block' : 'none';
+      });
     };
 
     applyFiltersRef = applyFilters;

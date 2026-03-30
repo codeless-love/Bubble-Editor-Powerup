@@ -361,12 +361,10 @@
 
     /* Toolbar, Search, and Filters */
     .toolbar {
-      padding: 0 0 12px;
+      padding-top: var(--base-padding);
       display: flex;
       flex-direction: column;
       gap: 12px;
-      border-bottom: 1px solid var(--border-color);
-      margin: 0 var(--base-padding) 12px;
     }
 
     .search input {
@@ -474,9 +472,6 @@
       <h1>Bubble Editor Powerup</h1>
     </div>
     <button class="button-close" id="close-button" aria-label="Close">&times;</button>
-  </header>
-  <main id="Editor">
-    <p>Select which features you want to enable:</p>
     <div class="toolbar">
       <div class="search">
         <input id="feature-search" type="search" placeholder="Search features..." aria-label="Search features" />
@@ -487,6 +482,9 @@
         <button class="filter-button" data-filter="disabled">Disabled</button>
       </div>
     </div>
+  </header>
+  <main id="Editor">
+    <p>Select which features you want to enable:</p>
     <div id="features-list" class="features-container" style="padding-bottom: 12px;"></div>
   </main>
   <main id="Candidate" hidden>
