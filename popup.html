@@ -66,7 +66,7 @@
 
     main {
       margin: var(--base-padding);
-      padding: 0 var(--base-padding);
+      padding: 0;
     }
 
     footer {
@@ -191,9 +191,8 @@
 
     /* Feature styling */
     .feature {
-      padding: 12px;
+      padding: 10px 12px;
       border-radius: var(--border-radius);
-      margin-bottom: 12px;
       transition: all var(--transition-speed) ease;
       border: 1px solid transparent;
     }
@@ -201,6 +200,10 @@
     .feature:hover {
       background-color: var(--secondary-color);
       border-color: var(--border-color);
+    }
+
+    .accordion-content .feature:last-child {
+      border-bottom: none;
     }
 
     .feature label {
@@ -261,7 +264,7 @@
     }
 
     .feature p {
-      margin: 8px 0 0 28px;
+      margin: 6px 0 0 28px;
       color: var(--text-secondary);
       font-size: 13px;
     }
@@ -270,7 +273,6 @@
       margin-left: 28px;
       padding-left: 12px;
       border-left: 2px solid var(--border-color);
-      margin-bottom: 16px;
     }
 
     .sub-feature {
@@ -356,6 +358,111 @@
     .emoji-row .emoji {
       font-size: 1.5em;
     }
+
+    /* Toolbar, Search, and Filters */
+    .toolbar {
+      padding: 0 0 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+      margin: 0 var(--base-padding) 12px;
+    }
+
+    .search input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 13px;
+      background: var(--secondary-color);
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .search input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: var(--background-color);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-button {
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 4px 10px;
+      border-radius: var(--border-radius);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .2s ease, border-color .2s ease, color .2s ease;
+    }
+
+    .filter-button[data-state="active"] {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    /* Accordion for Categories */
+    .accordion {
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      margin: 0 var(--base-padding) 12px;
+    }
+
+    .accordion-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border: none;
+      background: transparent;
+      font: inherit;
+      font-size: 1.2em;
+      color: var(--primary-color);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+
+    .accordion-trigger:hover {
+      background: var(--secondary-color);
+    }
+
+    .category-count {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: normal;
+      padding-left: 8px;
+    }
+
+    .accordion-trigger svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      transition: transform .2s ease;
+      color: var(--text-secondary);
+    }
+
+    .accordion[data-state="open"] .accordion-trigger svg {
+      transform: rotate(180deg);
+    }
+
+    .accordion-content {
+      display: block;
+      padding: 0 0 10px;
+    }
+
+    .accordion[data-state="closed"] .accordion-content {
+      display: none;
+    }
   </style>
   <script src="popup.js" defer></script>
 </head>
@@ -369,7 +476,17 @@
   </header>
   <main id="Editor">
     <p>Select which features you want to enable:</p>
-    <div id="features-list" class="features-container"></div>
+    <div class="toolbar">
+      <div class="search">
+        <input id="feature-search" type="search" placeholder="Search features..." aria-label="Search features" />
+      </div>
+      <div class="filters" role="group" aria-label="Filter features">
+        <button class="filter-button" data-filter="all" data-state="active">All</button>
+        <button class="filter-button" data-filter="enabled">Enabled</button>
+        <button class="filter-button" data-filter="disabled">Disabled</button>
+      </div>
+    </div>
+    <div id="features-list" class="features-container" style="padding-bottom: 12px;"></div>
   </main>
   <main id="Candidate" hidden>
     <div class="emoji-row"><span class="emoji">☑️</span><p>Powerup needs your permission to run on this domain.</p></div>
