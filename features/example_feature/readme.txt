@@ -2,7 +2,7 @@
 
 ## SUMMARY
 
-1. Duplicate this folder (/new_features_go_here) and the files inside it.
+1. Duplicate this folder (/example_feature) and the files inside it.
    IMPORTANT: Leave this example folder in place unaltered, so that future devs
    can use it!
 2. Change the folder and file names to match your feature key name.
@@ -19,7 +19,7 @@ Every feature has a FEATURE NAME and a FEATURE KEY.
 
  * The Feature Name should be the same everywhere so that future devs can
    understand which feature is doing what during debugging.
- * The Feature Key (named feature_key_goes_here in all the examples) MUST be
+ * The Feature Key (named example_feature in all the examples) MUST be
    identical everywhere, so that your feature can be properly injected into the
    browser tab.
 
@@ -41,7 +41,10 @@ identifier to allow devs to easily see which CSS rules are from the extension.
 ## UNDERSTANDING THE FEATURE SCRIPT ISOLATED CONTEXT
 
 Scripts from an extension run in what's called an "isolated world." The
-page/tab's context is called the "main world." In this isolated world:
+page/tab's context is called the "main world" and the extension popup's 
+context is called the "extension ui world."
+
+In the feature's isolated world:
 
  * You can't access JavaScript variables in the main world, nor can the main
    world reach vars from the isolated world.
@@ -59,7 +62,8 @@ However, all of these isolated scripts CAN:
    localStorage, sessionStorage, etc.
 
 There are rare situations where a feature may need to have access to the main
-world. In this case, a script can be injected via message passing. This is done
-by passing a message with the action name "injectScriptIntoMainWorld" from the
+world or the extension ui world. In this case, a script can be injected via 
+message passing. This is done by passing a message with the action name 
+"injectScriptIntoMainWorld" or "injectScriptIntoExtensionUIWorld" from the
 content script to the background script. The background script can then inject
 the script into the main world where it can interact with the page's JS.

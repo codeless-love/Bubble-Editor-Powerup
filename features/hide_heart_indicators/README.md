@@ -75,11 +75,11 @@ The feature targets heart indicators from these extension features:
 ### 1. Initial Setup
 ```bash
 # Duplicated template folder
-cp -r "features/feature_key_goes_here" "features/hide_heart_indicators"
+cp -r "features/example_feature" "features/hide_heart_indicators"
 
 # Renamed files to match feature key
-mv feature_key_goes_here.css hide_heart_indicators.css
-mv feature_key_goes_here.js hide_heart_indicators.js  # Later removed (CSS-only)
+mv example_feature.css hide_heart_indicators.css
+mv example_feature.js hide_heart_indicators.js  # Later removed (CSS-only)
 
 # Cleaned up template files
 rm readme.txt example_script_that_must_execute_in_the_main_world.js

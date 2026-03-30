@@ -1,7 +1,7 @@
 window.loadedCodelessLoveScripts ||= {};
 (function() {
   console.log("❤️"+"Name of feature goes here");
-  let thisScriptKey = "feature_key_goes_here";
+  let thisScriptKey = "example_feature";
 
   /* ------------------------------------------------ */
   /* ⬇️ ⬇️ ⬇️ ⬇️ ⬇️ Don't mess with this  ⬇️ ⬇️ ⬇️ ⬇️ ⬇️ */
@@ -32,14 +32,14 @@ window.loadedCodelessLoveScripts ||= {};
     // In the very rare event that you MUST run JavaScript in the main world, you can inject a script into the "main world" (the actual tab context), like this:
     chrome.runtime.sendMessage({
         action: "injectScriptIntoMainWorld",
-        jsFile: "features/feature_key_goes_here/example_script_that_must_execute_in_the_main_world.js"
+        jsFile: "features/example_feature/example_script_that_must_execute_in_the_main_world.js"
     });
 
     // If your feature needs to run something in the popup, you can inject a script into the "Extension UI world" (the options popup), like this:
     chrome.runtime.sendMessage({
         action: "injectScriptIntoExtensionUIWorld",
-        jsFile: "features/feature_key_goes_here/example_script_that_must_execute_in_the_extension_ui_world.js",
-        cssFile: "features/feature_key_goes_here/example_style_that_must_load_in_the_extension_ui_world.css"
+        jsFile: "features/example_feature/example_script_that_must_execute_in_the_extension_ui_world.js",
+        cssFile: "features/example_feature/example_style_that_must_load_in_the_extension_ui_world.css"
     });
 
 })();//👈👈 don't delete this, and don't put anything outside of this!!
