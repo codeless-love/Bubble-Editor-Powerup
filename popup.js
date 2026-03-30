@@ -2,6 +2,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   let candidateDomains = [];
   let approvedDomains = [];
 
+  const contributors = {
+    "example": { name: "Example Contributor", link: "https://codeless.love" },
+    "brenton": { name: "Brenton Strine", link: "https://popcode.studio" },
+    "rathan": { name: "Rathan A", link: "https://www.linkedin.com/in/rathan-the-builder/" },
+    "rico": { name: "Rico Trevisan", link: "https://www.mocharymethod.com/team/rico-trevisan" },
+    "george": { name: "George Collier", link: "https://notquiteunicorns.xyz/" },
+    "tim": { name: "Timothy Tu", link: "https://community.buildcamp.io/u/b0c0b288" },
+    "rafa": { name: "Rafa Chavantes", link: "https://rafa.chavantes.com/" }
+  };
+
   // Helper: Promisified chrome.storage.sync.get
   function getCandidateDomains() {
     return new Promise(resolve => {
@@ -274,6 +284,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     const description = document.createElement("p");
     description.textContent = feature.description;
     div.appendChild(description);
+
+    // Create contributors section
+    if (feature.contributors && feature.contributors.length > 0) {
+      const contributorsDiv = document.createElement("div");
+      contributorsDiv.className = "contributors-section";
+
+      const contributorLinks = feature.contributors
+        .map(contribKey => {
+          const contributorData = contributors[contribKey];
+          if (contributorData) {
+            return contributorData.link ? `<a href="${contributorData.link}" target="_blank" rel="noopener noreferrer">${contributorData.name}</a>` : `<span>${contributorData.name}</span>`;
+          }
+          return null;
+        })
+        .filter(Boolean)
+        .join(', ');
+
+      if (contributorLinks) {
+        contributorsDiv.innerHTML = `Contributors: ${contributorLinks}`;
+        div.appendChild(contributorsDiv);
+      }
+    }
 
     // Inject domains list for enable_runtime_features only
     if (feature.key === "enable_runtime_features") {
