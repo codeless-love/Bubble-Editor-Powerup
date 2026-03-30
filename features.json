@@ -357,7 +357,7 @@
     "description": "Provides a quick way to delete multiple branches at once from the extension popup. Access this feature by clicking the extension icon while in a Bubble editor.",
     "jsFile": "features/bulk_branch_delete/bulk_branch_delete.js",
     "default": true,
-    "contributors": ["brenton"]
+    "contributors": ["george"]
   },
   {
     "key": "inline_branch_delete",
@@ -367,7 +367,7 @@
     "cssFile": "features/inline_branch_delete/inline_branch_delete.css",
     "jsFile": "features/inline_branch_delete/inline_branch_delete.js",
     "default": true,
-    "contributors": ["brenton"]
+    "contributors": ["george"]
   },
   {
     "key": "hide_heart_indicators",
