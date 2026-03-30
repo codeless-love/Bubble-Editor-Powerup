@@ -1,11 +1,11 @@
 [
   {
-    "key": "feature_key_goes_here",
+    "key": "example_feature",
     "category": "Example Feature",
     "name": "Example Feature",
-    "description": "This is an example feature for developers to duplicate. To add a new feature, copy this entire object and paste it in this file (features.json), and then replace the variables with the relevant info. Then find the folder /feature_key_goes_here and duplicate it. Follow the instructions in /feature_key_goes_here/readme.txt to add your feature and create a PR.",
-    "cssFile": "features/feature_key_goes_here/feature_key_goes_here.css",
-    "jsFile": "features/feature_key_goes_here/feature_key_goes_here.js",
+    "description": "Did you know you can contribute to this extension? Download the codebase and use this example feature as your guide. To add a new feature, copy this entire object and paste it in this file (features.json), and then replace the variables with the relevant info. Then find the folder /example_feature and duplicate it. Follow the instructions in /example_feature/readme.txt to add your feature and create a PR.",
+    "cssFile": "features/example_feature/example_feature.css",
+    "jsFile": "features/example_feature/example_feature.js",
     "default": false,
     "contributors": ["example"]
   },
@@ -181,7 +181,7 @@
     "description": "Make expressions multiple lines, indented, and collapsible.",
     "cssFile": "features/property-editor-expression-composer-multiline/property-editor-expression-composer-multiline.css",
     "default": true,
-    "contributors": ["brenton"]
+    "contributors": ["george", "brenton"]
   },
   {
     "key": "expression_collapser",
@@ -191,7 +191,7 @@
     "jsFile": "features/expression_collapser/script.js",
     "requires": "property_editor_expression_composer_multiline",
     "default": true,
-    "contributors": ["brenton"]
+    "contributors": ["george", "brenton"]
   },
   {
     "key": "property_editor_expression_composers_full_width",
@@ -281,6 +281,15 @@
     "contributors": ["george"]
   },
   {
+    "key": "dark_mode",
+    "category": "Editor Styling",
+    "name": "Dark Mode",
+    "description": "Applies a dark mode theme to the Bubble editor. This is an experimental feature and may have visual glitches.",
+    "cssFile": "features/dark_mode/dark_mode.css",
+    "default": false,
+    "contributors": ["brenton"]
+  },
+  {
     "key": "folder_click_toggle",
     "category": "Workflow View",
     "name": "Click Anywhere to Toggle Folders",
@@ -357,7 +366,7 @@
     "description": "Provides a quick way to delete multiple branches at once from the extension popup. Access this feature by clicking the extension icon while in a Bubble editor.",
     "jsFile": "features/bulk_branch_delete/bulk_branch_delete.js",
     "default": true,
-    "contributors": ["brenton"]
+    "contributors": ["george"]
   },
   {
     "key": "inline_branch_delete",
@@ -367,7 +376,7 @@
     "cssFile": "features/inline_branch_delete/inline_branch_delete.css",
     "jsFile": "features/inline_branch_delete/inline_branch_delete.js",
     "default": true,
-    "contributors": ["brenton"]
+    "contributors": ["george"]
   },
   {
     "key": "hide_heart_indicators",

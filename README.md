@@ -13,7 +13,7 @@ See the sections below for more information on how to contribute.
 This extension is available to install from the [Chrome Web Store](https://chromewebstore.google.com/detail/codeless-love-bubble-edit/imaakngdpjbnlgajekmhpiigibmgmial) or you may install it to your browser directly using instructions [below](#how-to-install-from-source).
 
 ## How to add new features in the codebase
-1. Find the folder named `feature_key_goes_here`.
+1. Find the folder named `example_feature`.
    1. Duplicate it (and its children).
    2. Rename it to your new feature name key. This key will be how your feature is referred to in code (snake_case is preferred to make it easy to copy/paste the feature name).
 2. Follow the instructions inside the readme.txt
