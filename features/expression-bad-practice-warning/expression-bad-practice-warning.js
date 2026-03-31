@@ -225,49 +225,53 @@ let warningPrefs = {
   // Initial detection on page load
   // insertCollapser(document.querySelector(".nested"));
 
-  // Set up a MutationObserver to watch for DOM changes (with debounce)
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
-        // Check if the node is an element node (not text or comment node)
-        if (node.nodeType === Node.ELEMENT_NODE) {
-          // Check if the node's class list contains a class with ❤️
-          if (Array.from(node.classList).some(className => className.includes('❤️'))) {
-            // If a class with ❤️ is found, it is something we just inserted. If we insert again, it will cause an infinite loop.
-            return;
-          }
+  function setupObserver() {
+    // Set up a MutationObserver to watch for DOM changes (with debounce)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          // Check if the node is an element node (not text or comment node)
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            // Check if the node's class list contains a class with ❤️
+            if (Array.from(node.classList).some(className => className.includes('❤️'))) {
+              // If a class with ❤️ is found, it is something we just inserted. If we insert again, it will cause an infinite loop.
+              return;
+            }
 
-          // Check if nodes were added or modified
-          if (!isProcessing && mutation.type === 'childList' || mutation.type === 'subtree') {
-            // Clear the previous timeout if there is one
-            clearTimeout(debounceTimeout);
-            // Set a new timeout to run the function after a short delay
-            debounceTimeout = setTimeout(() => {
-              detectBadPractices(); // Run the function to check for bad practices
-            }, 300);
+            // Check if nodes were added or modified
+            if (!isProcessing && mutation.type === 'childList' || mutation.type === 'subtree') {
+              // Clear the previous timeout if there is one
+              clearTimeout(debounceTimeout);
+              // Set a new timeout to run the function after a short delay
+              debounceTimeout = setTimeout(() => {
+                detectBadPractices(); // Run the function to check for bad practices
+              }, 300);
+            }
           }
-        }
+        });
       });
     });
-  });
 
-  // Start observing the body or a specific parent element
-  observer.observe(document.body, {
-    childList: true, // Watch for child nodes being added/removed
-    subtree: true,   // Watch within all descendant nodes
-    characterData: true // Watch for text content changes
-  });
+    // Start observing the body or a specific parent element
+    observer.observe(document.body, {
+      childList: true, // Watch for child nodes being added/removed
+      subtree: true,   // Watch within all descendant nodes
+      characterData: true // Watch for text content changes
+    });
+  }
 
   // Polyfill for closestAll to get all ancestors with a specific class
-  Element.prototype.closestAll = function(selector) {
-    let ancestors = [];
-    let currentElement = this;
-    while (currentElement) {
-      if (currentElement.matches(selector)) {
-        ancestors.push(currentElement);
+  if (!Element.prototype.closestAll) {
+    Element.prototype.closestAll = function(selector) {
+      let ancestors = [];
+      let currentElement = this;
+      while (currentElement) {
+        if (currentElement.matches(selector)) {
+          ancestors.push(currentElement);
+        }
+        currentElement = currentElement.parentElement;
       }
-      currentElement = currentElement.parentElement;
-    }
-    return ancestors;
-  };
+      return ancestors;
+    };
+  }
 })();

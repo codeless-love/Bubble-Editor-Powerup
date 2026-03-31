@@ -38,6 +38,16 @@
     "contributors": ["tim"]
   },
   {
+    "key": "expression_syntax_highlighting",
+    "category": "Expressions",
+    "name": "Expression Syntax Highlighting",
+    "description": "This feature provides enhanced syntax highlighting for expressions within the Bubble editor, making it easier to read, understand, and debug your application logic.",
+    "cssFile": "features/expression_syntax_highlighting/expression_syntax_highlighting.css",
+    "jsFile": "features/expression_syntax_highlighting/expression_syntax_highlighting.js",
+    "default": false,
+    "contributors": ["brenton"]
+  },
+  {
     "key": "checkbox_label_click",
     "category": "Data View",
     "name": "Clickable Checkbox Labels",
