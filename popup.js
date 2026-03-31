@@ -653,6 +653,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Reload tab
   refreshButton.addEventListener("click", async () => {
     chrome.tabs.reload();
+    window.location.reload();
     closePopup(1500);
   });
   // Reload all Bubble and Bubble.is tabs
@@ -662,6 +663,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (tab.url && (tab.url.includes("bubble.io") || tab.url.includes("bubble.is"))) {
           console.log(`❤️ Reloading tab: ${tab.url}`);
           chrome.tabs.reload(tab.id);
+          window.location.reload();
         }
       });
     });
@@ -800,18 +802,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Listen for settings changes and reload popup
-  chrome.storage.onChanged.addListener((changes, namespace) => {
-    if (namespace === 'sync') {
-      // Check if any feature settings changed
-      const featureChanges = Object.keys(changes).some(key => 
-        features.some(f => f.key === key)
-      );
-      
-      if (featureChanges) {
-        console.log("❤️ Feature settings changed, reloading popup");
-        window.location.reload();
-      }
-    }
-  });
 });

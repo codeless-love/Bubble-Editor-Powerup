@@ -1,0 +1,80 @@
+/* Expression Syntax Highlighting */
+❤️ codelesslove, body {
+  .property-editor.property-editor.property-editor,
+  .composer.composer.composer,
+  .expression-composer.expression-composer.expression-composer,
+  .property-editor-row.property-editor-row.property-editor-row {/* EASB: Explicitly Arbitrary Specificity booster. Repeat class multipel times to boost specificicty of this selector without adding unintended semantics. */
+
+    /* Generic Infix Property (overwritten in some more specific cases below) */
+    .nested span[data-prop-name=next] {
+        color: purple;
+    }
+
+    /* Data Sources are Blue */
+    /* These aren't 100% accurate but problems should be corrected by injected ❤️ classes below */
+    /* EASB */
+    .nested span[data-prop-name="0"], 
+    .nested span[data-prop-name^="1"], 
+    .nested span[data-prop-name^="2"], 
+    .nested span[data-prop-name^="3"], 
+    .nested span[data-prop-name^="4"], 
+    .nested span[data-prop-name^="5"], 
+    .nested span[data-prop-name^="6"], 
+    .nested span[data-prop-name^="7"], 
+    .nested span[data-prop-name^="8"], 
+    .nested span[data-prop-name^="9"], /* we need to match any arbitrary number, the workaround is to check if it starts with any digit. hopefully this is safe. */
+    .nested span[data-prop-name^=arg],
+    .nested span[data-prop-name=args],
+    .nested span[data-prop-name=date],
+    .nested span[data-prop-name^=_wf],
+    .nested span[data-prop-name=value],
+    .nested span[data-prop-name^=param],
+    .nested span[data-prop-name=to_change],
+    .nested span[data-prop-name=condition],
+    .nested span[data-prop-name=data_source] {
+        color: rgb(10, 105, 230);
+        font-weight: 700;
+    }
+
+    /* Literals are Orange */
+    /* EASB */
+    .nested.nested span.dynamic.literal { /* don't be tempted to put a ❤️ here */
+        color: orange;
+    }
+
+    /* Property Accessors */
+    /* EASB */
+    .nested.nested span.❤️property {
+      color: dodgerblue;
+    }
+    /* Chained Operators */
+    /* EASB */
+    .nested.nested span.❤️chained {
+      color: green;
+
+    }
+
+    /* Comparison */
+    /* EASB */
+    .nested.nested span.❤️comparison {
+      color: Magenta;
+    }
+
+    /* Logical */
+    /* EASB */
+    .nested.nested span.❤️logical {
+      color: red;
+      font-weight: 800;
+
+      margin: 0 .5em;
+    }
+  }
+  
+  /* Heart Indicator */
+  .expression-composer > div[style]:after {
+    content: "❤️";
+    font-size: 4px;
+    position: relative;
+    top: -6px;
+  }
+}

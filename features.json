@@ -38,6 +38,16 @@
     "contributors": ["tim"]
   },
   {
+    "key": "expression_syntax_highlighting",
+    "category": "Expressions",
+    "name": "Expression Syntax Highlighting",
+    "description": "This feature provides enhanced syntax highlighting for expressions within the Bubble editor, making it easier to read, understand, and debug your application logic.",
+    "cssFile": "features/expression_syntax_highlighting/expression_syntax_highlighting.css",
+    "jsFile": "features/expression_syntax_highlighting/expression_syntax_highlighting.js",
+    "default": true,
+    "contributors": ["brenton"]
+  },
+  {
     "key": "checkbox_label_click",
     "category": "Data View",
     "name": "Clickable Checkbox Labels",
@@ -104,16 +114,16 @@
   },
   {
     "key": "top_menu_layout",
-    "category": "Top Menubar",
+    "category": "Broken",
     "name": "Maximize App Interface Manager dropdown in top menubar",
-    "description": "Make the unexpanded page dropdown take up the full width in the top menubar.",
+    "description": "[Currently Broken] Make the unexpanded page dropdown take up the full width in the top menubar.",
     "cssFile": "features/top_menu_layout/top_menu_layout.css",
-    "default": true,
+    "default": false,
     "contributors": ["brenton"]
   },
   {
     "key": "top_menu_aim",
-    "category": "Top Menubar",
+    "category": "Editor Styling",
     "name": "Maximize the expanded App Interface Manager dropdown menu",
     "description": "When the AIM menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
     "cssFile": "features/top_menu_layout/top_menu_aim.css",

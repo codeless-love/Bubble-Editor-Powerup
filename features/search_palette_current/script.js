@@ -30,13 +30,13 @@ window.loadedCodelessLoveScripts ||= {};
 
       div.addEventListener('click', function() {
         console.log("❤️ Result div clicked");
-        // Remove 'current' class from all result divs
+        // Remove '❤️current' class from all result divs
         document.querySelectorAll('.result-area.overview .result-div').forEach(d =>
-          d.classList.remove('current')
+          d.classList.remove('❤️current')
         );
 
-        // Add 'current' class to clicked div
-        this.classList.add('current');
+        // Add '❤️current' class to clicked div
+        this.classList.add('❤️current');
       });
     });
   }
