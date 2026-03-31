@@ -48,6 +48,16 @@
     "contributors": ["brenton"]
   },
   {
+    "key": "notification",
+    "category": "Hidden",
+    "name": "What's New Notification",
+    "description": "Shows a one-time notification after an extension update to highlight new features. This message is only shown once per update.",
+    "cssFile": "features/notification/notification.css",
+    "jsFile": "features/notification/notification.js",
+    "default": true,
+    "contributors": ["brenton"]
+  },
+  {
     "key": "checkbox_label_click",
     "category": "Data View",
     "name": "Clickable Checkbox Labels",
