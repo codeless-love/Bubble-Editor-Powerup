@@ -65,9 +65,11 @@
     .nested.nested span.❤️logical {
       color: red;
       font-weight: 800;
+
       margin: 0 .5em;
     }
   }
+  
   /* Heart Indicator */
   .expression-composer > div[style]:after {
     content: "❤️";
