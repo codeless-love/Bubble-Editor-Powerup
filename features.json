@@ -15,7 +15,7 @@
     "name": "Tab Naming",
     "description": "Automatically renames the Chrome tab to display the current branch name from the version URL parameter. Makes it easier to identify which branch you're working on when multiple editor tabs are open.",
     "jsFile": "features/tab_naming/tab_naming.js",
-    "default": false,
+    "default": true,
     "contributors": ["rico"]
   },
   {
@@ -44,6 +44,16 @@
     "description": "This feature provides enhanced syntax highlighting for expressions within the Bubble editor, making it easier to read, understand, and debug your application logic.",
     "cssFile": "features/expression_syntax_highlighting/expression_syntax_highlighting.css",
     "jsFile": "features/expression_syntax_highlighting/expression_syntax_highlighting.js",
+    "default": true,
+    "contributors": ["brenton"]
+  },
+  {
+    "key": "notification",
+    "category": "Hidden",
+    "name": "What's New Notification",
+    "description": "Shows a one-time notification after an extension update to highlight new features. This message is only shown once per update.",
+    "cssFile": "features/notification/notification.css",
+    "jsFile": "features/notification/notification.js",
     "default": true,
     "contributors": ["brenton"]
   },
@@ -113,19 +123,10 @@
     "contributors": ["brenton", "rathan"]
   },
   {
-    "key": "top_menu_layout",
-    "category": "Broken",
-    "name": "Maximize App Interface Manager dropdown in top menubar",
-    "description": "[Currently Broken] Make the unexpanded page dropdown take up the full width in the top menubar.",
-    "cssFile": "features/top_menu_layout/top_menu_layout.css",
-    "default": false,
-    "contributors": ["brenton"]
-  },
-  {
     "key": "top_menu_aim",
     "category": "Editor Styling",
     "name": "Maximize the expanded App Interface Manager dropdown menu",
-    "description": "When the AIM menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
+    "description": "When the pp Interface Manager (AIM) menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
     "cssFile": "features/top_menu_layout/top_menu_aim.css",
     "default": true,
     "contributors": ["brenton"]
@@ -294,8 +295,8 @@
     "key": "dark_mode",
     "category": "Editor Styling",
     "name": "Dark Mode",
-    "description": "Applies a dark mode theme to the Bubble editor. This is an experimental feature and may have visual glitches.",
-    "cssFile": "features/dark_mode/dark_mode.css",
+    "description": "Applies a dark mode theme to the Bubble editor. Automatically follows your system or browser dark mode settings.",
+    "cssFile": "features/editor_style_dark_mode/dark_mode.css",
     "default": false,
     "contributors": ["brenton"]
   },
@@ -311,7 +312,7 @@
   },
   {
     "key": "search_palette_current",
-    "category": "Search Palette",
+    "category": "Search Palette Bookmark",
     "name": "Highlight Current Search Result",
     "description": "Adds visual feedback to show which search result was last clicked in the search palette.",
     "cssFile": "features/search_palette_current/style.css",
