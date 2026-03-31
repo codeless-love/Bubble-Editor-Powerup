@@ -1,5 +1,7 @@
 # Bubble Editor Internal JSON API: The Unofficial Documentation
 
+This document outlines how to interact with the internal JSON state of a [Bubble.io](https://bubble.io) application from within the editor. Bubble is a no-code platform for building web applications.
+
 ## ⚠️ Important Disclaimer: Bubble's Policy
 Before utilizing this API, you must understand Bubble’s official stance on editor extensions interacting with their internal state:
 * **"Build At Your Own Risk":** This is an internal, unofficial API. Bubble can and will change it without warning. 
@@ -36,6 +38,8 @@ Once you have a Node, you can traverse the tree using Bubble's internal navigati
 
 ### Utilizing Indexes for Fast Lookups
 Bubble maintains root-level maps to help you instantly find specific elements or pages without crawling the tree.
+You can access this index via `window.appquery().app().json.child('_index')`.
+
 * **`id_to_path`**: Maps an element's unique ID (e.g., `bTGkv`) to its exact tree location.
 * **`page_name_to_path`**: Maps a page's name to its exact tree location.
 
@@ -89,8 +93,18 @@ elementNode.set(myElementData, metadata);
 
 ### Creating Entirely New Elements
 Injecting new elements requires a two-step process to ensure Bubble's search index is aware of the new data.
-1. Update the index: `rootNode.set_index('id_to_path', newElementData.id, targetNode._path())`
-2. Write the data: `targetNode.set(newElementData, metadata)`
+This involves a special `set_index` function that is not used for normal data manipulation.
+
+1.  **Update the Index:** Call `set_index()` on the root node. This function takes the index name (`id_to_path`), the new element's ID, and the **compressed path** where the element will live. The compressed path is retrieved by calling `._path()` on the destination node.
+    ```javascript
+    rootNode.set_index('id_to_path', newElementData.id, targetNode._path());
+    ```
+2.  **Write the Data:** Call `set()` on the target node where the element will actually be created (e.g., a child of a parent element).
+    ```javascript
+    targetNode.set(newElementData, metadata);
+    ```
+
+*(Note: `rootNode` is a placeholder for `window.appquery().app().json`, and `targetNode` is the destination Node for the new element.)*
 
 ---
 
