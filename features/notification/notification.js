@@ -34,45 +34,55 @@ window.loadedCodelessLoveScripts ||= {};
   }
 
   function showNotificatoinNotice() {
-    if (document.getElementById('codelesslove_notification')) return;
+    if (document.getElementById('❤️notification_overlay')) return;
 
     const logoUrl = chrome.runtime.getURL('extension-icons/icon-21.png');
-    const div = document.createElement('div');
-    div.id = 'codelesslove_notification';
-    // Reusing the class from the merge stall detector for consistent styling
-    div.className = 'codelesslove-stall-message';
-    div.innerHTML = `
-    <div class="codelesslove-header">
-        <img class="codelesslove-logo" src="${logoUrl}" alt="Codeless Love Icon" />
-        <span class="codelesslove-title">Powerup got a Powerup!</span>
-        <button class="codelesslove-close" title="Close">×</button>
-    </div>
-    <div class="codelesslove-body">
-        <p><b>Just Dropped</b> in v${currentAppVersion}</p>
-        <ul>
-            <li><b>Syntax Highlighting:</b> Expressions are now easier to read with colored operators. Thanks: Brenton Strine</li>
-            <li><b>Dark Mode:</b> So you can look like a leet hacker while programming at night. Thanks: Brenton Strine</li>
-            <li><b>Expression Prank Depranker:</b> In some circumstances clicking on the beginning of an expression would delete your expression. This fixes that. Thanks: Brenton Strine</li>
-            <li><b>Popup Search and Filtering:</b> Find features easier with searching and filtering. Thanks: Rico Trevisan</li>
-            <li><b>Popup Refinement:</b> Add collapsible accordions to categories and tighten up the spacing. Thanks: Rico Trevisan</li>
-            <li><b>Toggle Debug Mode</b> In runtime, toggle debug_mode on and off through the Powerup popup. Thanks: Brenton Strine</li>
-            <li><b>Contributor Credit:</b> Info on who contributed to which features, so you can say "thanks!"</li>
-        </ul>
-        <p><b>Bug Fixes</b></p>
-        <ul>
-            <li>Bulk Branch Delete</li>
-            <li>Search Bookmark</li>
-        </ul>
+    const overlay = document.createElement('div');
+    overlay.id = 'codelesslove_notification_overlay';
+    overlay.innerHTML = `
+    <div id="codelesslove_notification" class="❤️notification">
+        <div class="❤️header">
+            <img class="❤️logo" src="${logoUrl}" alt="Codeless Love Icon" />
+            <span class="❤️title">Powerup got a Powerup!</span>
+            <button class="❤️close" title="Close">×</button>
+        </div>
+        <div class="❤️body">
+            <p><b>Just Dropped</b> in v${currentAppVersion}</p>
+            <ul>
+                <li><b>Syntax Highlighting:</b> Expressions are now easier to read with colored operators. Thanks: Brenton Strine</li>
+                <li><b>Dark Mode:</b> So you can look like a leet hacker while programming at night. Thanks: Brenton Strine</li>
+                <li><b>Expression Prank Depranker:</b> In some circumstances clicking on the beginning of an expression would delete your expression. This fixes that. Thanks: Brenton Strine</li>
+                <li><b>Popup Search and Filtering:</b> Find features easier with searching and filtering. Thanks: Rico Trevisan</li>
+                <li><b>Popup Refinement:</b> Add collapsible accordions to categories and tighten up the spacing. Thanks: Rico Trevisan</li>
+                <li><b>Toggle Debug Mode</b> In runtime, toggle debug_mode on and off through the Powerup popup. Thanks: Brenton Strine</li>
+                <li><b>Contributor Credit:</b> Info on who contributed to which features, so you can say "thanks!"</li>
+            </ul>
+            <p><b>Bug Fixes</b></p>
+            <ul>
+                <li>Bulk Branch Delete</li>
+                <li>Search Bookmark</li>
+            </ul>
+        </div>
+        <div class="❤️footer">
+          <button class="❤️dismiss-button">Dismiss</button>
+        </div>
     </div>`;
-    document.body.appendChild(div);
+    document.body.appendChild(overlay);
 
-    const closeBtn = div.querySelector('.codelesslove-close');
+    const close = () => {
+      // On dismiss, save the current manifest version
+      chrome.storage.sync.set({ [STORAGE_KEY]: currentAppVersion });
+      overlay.remove();
+    };
+
+    const closeBtn = overlay.querySelector('.❤️close');
     if (closeBtn) {
-      closeBtn.onclick = () => {
-        // On dismiss, save the current manifest version
-        chrome.storage.sync.set({ [STORAGE_KEY]: currentAppVersion });
-        div.remove();
-      }
+      closeBtn.onclick = close;
+    }
+
+    const dismissBtn = overlay.querySelector('.❤️dismiss-button');
+    if (dismissBtn) {
+      dismissBtn.onclick = close;
     }
   }
 
