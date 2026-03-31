@@ -321,7 +321,7 @@
   },
   {
     "key": "search_palette_current",
-    "category": "Search Palette",
+    "category": "Search Palette Bookmark",
     "name": "Highlight Current Search Result",
     "description": "Adds visual feedback to show which search result was last clicked in the search palette.",
     "cssFile": "features/search_palette_current/style.css",
