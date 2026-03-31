@@ -295,8 +295,8 @@
     "key": "dark_mode",
     "category": "Editor Styling",
     "name": "Dark Mode",
-    "description": "Applies a dark mode theme to the Bubble editor. This is an experimental feature and may have visual glitches.",
-    "cssFile": "features/dark_mode/dark_mode.css",
+    "description": "Applies a dark mode theme to the Bubble editor. Automatically follows your system or browser dark mode settings.",
+    "cssFile": "features/editor_style_dark_mode/dark_mode.css",
     "default": false,
     "contributors": ["brenton"]
   },
