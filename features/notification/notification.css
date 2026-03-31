@@ -1,37 +1,35 @@
-❤️ codelesslove, body {
-  /* Fullscreen overlay for the notification */
-  #codelesslove_notification_overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.6);
-    z-index: 99998;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #333;
-  }
+/* Fullscreen overlay for the notification */
+#codelesslove_notification_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 99998;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
+}
 
-  /* The modal itself, centered by the overlay */
-  .❤️notification {
-    width: 80vw;
-    max-width: calc(100% - 80px);
-    height: 80vh;
-    max-height: calc(100% - 80px);
-    background-color: #fff;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    border-radius: 8px;
-    z-index: 99999;
-    display: flex;
-    flex-direction: column;
-  }
+/* The modal itself, centered by the overlay */
+.❤️notification {
+  max-width: 600px;
+  max-height: 80vh;
+  max-height: 80dvh;
+  width: calc(100vw - 40px);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
 
   /* Header styles */
-  .❤️stall-❤️notification .❤️header {
+  .❤️header {
     display: flex;
     align-items: center;
     padding: 12px 16px;
@@ -39,19 +37,20 @@
     flex-shrink: 0;
   }
 
-  .❤️notification .❤️logo {
+  .❤️logo {
     width: 21px;
     height: 21px;
     margin-right: 10px;
   }
 
-  .❤️notification .❤️title {
+  .❤️title {
     font-weight: 600;
-    font-size: 16px;
     flex-grow: 1;
+    margin: 0;
+    font-size: 25px;
   }
 
-  .❤️notification .❤️close {
+  .❤️close {
     background: none;
     border: none;
     font-size: 24px;
@@ -62,42 +61,86 @@
   }
 
   /* Body styles - make it scrollable */
-  .❤️notification .❤️body {
-    padding: 16px;
+  .❤️body {
+    padding: 12px 16px;
     font-size: 14px;
     line-height: 1.5;
     overflow-y: auto;
     flex-grow: 1;
-  }
 
-  .❤️notification .❤️body ul {
-    margin: 10px 0 0 20px;
-    padding: 0;
+    & ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .features-list,
+    .fixes-list {
+      & li {
+        padding: 4px 0;
+        border-bottom: 1px solid #f6f6f6;
+      }
+
+      & li:last-child {
+        border-bottom: none;
+      }
+
+      & b {
+        font-size: 15px;
+      }
+    }
+
+    .feature-description {
+      margin: 4px 0 8px 0;
+      padding: 0;
+      color: #555;
+    }
+
+    .feature-contributors {
+      font-size: 10px;
+      color: #888;
+    }
+
+    .section-header {
+      color: #4361ee;
+      font-size: 20px;
+      margin: 12px 0;
+      border-bottom: 1px solid #efefef;
+      font-weight: bold;
+    }
+
+    .❤️note {
+      font-style: italic;
+      max-width: 500px;
+      margin: 20px auto;
+    }
   }
 
   /* Footer for the dismiss button */
-  .❤️notification .❤️footer {
+  .❤️footer {
     padding: 12px 16px;
     border-top: 1px solid #eee;
     display: flex;
     justify-content: flex-end;
     flex-shrink: 0;
-  }
+    justify-content: center;
 
-  /* Green dismiss button */
-  .❤️notification .❤️dismiss-button {
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
+    /* Green dismiss button */
+    .❤️dismiss-button {
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      text-align: center;
+    }
 
-  .❤️notification .❤️dismiss-button:hover {
-    background-color: #27ae60;
+    .❤️dismiss-button:hover {
+      background-color: #27ae60;
+    }
   }
 }

@@ -33,35 +33,84 @@ window.loadedCodelessLoveScripts ||= {};
     return 0;
   }
 
-  function showNotificatoinNotice() {
+  function showNotificationNotice() {
     if (document.getElementById('❤️notification_overlay')) return;
 
     const logoUrl = chrome.runtime.getURL('extension-icons/icon-21.png');
     const overlay = document.createElement('div');
     overlay.id = 'codelesslove_notification_overlay';
     overlay.innerHTML = `
-    <div id="codelesslove_notification" class="❤️notification">
+    <div id="notification" class="❤️notification">
         <div class="❤️header">
             <img class="❤️logo" src="${logoUrl}" alt="Codeless Love Icon" />
-            <span class="❤️title">Powerup got a Powerup!</span>
+            <h1 class="❤️title">Powerup got a Powerup!</h1>
             <button class="❤️close" title="Close">×</button>
         </div>
         <div class="❤️body">
-            <p><b>Just Dropped</b> in v${currentAppVersion}</p>
-            <ul>
-                <li><b>Syntax Highlighting:</b> Expressions are now easier to read with colored operators. Thanks: Brenton Strine</li>
-                <li><b>Dark Mode:</b> So you can look like a leet hacker while programming at night. Thanks: Brenton Strine</li>
-                <li><b>Expression Prank Depranker:</b> In some circumstances clicking on the beginning of an expression would delete your expression. This fixes that. Thanks: Brenton Strine</li>
-                <li><b>Popup Search and Filtering:</b> Find features easier with searching and filtering. Thanks: Rico Trevisan</li>
-                <li><b>Popup Refinement:</b> Add collapsible accordions to categories and tighten up the spacing. Thanks: Rico Trevisan</li>
-                <li><b>Toggle Debug Mode</b> In runtime, toggle debug_mode on and off through the Powerup popup. Thanks: Brenton Strine</li>
-                <li><b>Contributor Credit:</b> Info on who contributed to which features, so you can say "thanks!"</li>
+            <p>You've just updated to version ${currentAppVersion}</p>
+            <h2 class="section-header">New Features</h2>
+            <ul class="features-list">
+                <li>
+                    <b>Syntax Highlighting</b>
+                    <p class="feature-description">Expressions are now easier to read with colored operators.</p>
+                    <div class="feature-contributors">Contributors: Brenton Strine</div>
+                </li>
+                <li>
+                    <b>Dark Mode</b>
+                    <p class="feature-description">So you can look like a leet hacker while programming at night.</p>
+                    <div class="feature-contributors">Contributors: Brenton Strine</div>
+                </li>
+                <li>
+                    <b>Expression Prank Depranker</b>
+                    <p class="feature-description">In some circumstances clicking on the beginning of an expression would delete your expression. This fixes that.</p>
+                    <div class="feature-contributors">Contributors: Brenton Strine</div>
+                </li>
+                <li>
+                    <b>Popup Search and Filtering</b>
+                    <p class="feature-description">Find features easier with searching and filtering.</p>
+                    <div class="feature-contributors">Contributors: Rico Trevisan</div>
+                </li>
+                <li>
+                    <b>Popup Refinement</b>
+                    <p class="feature-description">Add collapsible accordions to categories and tighten up the spacing.</p>
+                    <div class="feature-contributors">Contributors: Rico Trevisan</div>
+                </li>
+                <li>
+                    <b>Toggle Debug Mode</b>
+                    <p class="feature-description">In runtime, toggle debug_mode on and off through the Powerup popup.</p>
+                    <div class="feature-contributors">Contributors: Brenton Strine</div>
+                </li>
+                <li>
+                    <b>Contributor Credit</b>
+                    <p class="feature-description">Info on who contributed to which features, so you can say "thanks!"</p>
+                </li>
             </ul>
-            <p><b>Bug Fixes</b></p>
-            <ul>
-                <li>Bulk Branch Delete</li>
-                <li>Search Bookmark</li>
+            <h2 class="section-header">Bug Fixes</h2>
+            <ul class="fixes-list">
+                <li>
+                  <b>Bulk Branch Delete</b>
+                  <p class="feature-description">Should now appear inline again as well as in the popup under the feature card.</p>
+                </li>
+                <li>
+                  <b>Search Bookmark</b>
+                  <p class="feature-description">Was broken before but should work again now.</p>
+                </li>
+                <li>
+                  <b>Powerup Feature Changes Refresh Buttons</b>
+                  <p class="feature-description">Fix refresh buttons so you can easily refresh the tab(s) after making changes to your feature configuration.</p>
+                </li>
+                <li>
+                  <b>Removed the feature "Maximize App Interface Manager dropdown in top menubar"</b>
+                  <p class="feature-description">This feature was broken due to a Bubble update. The new Bubble menu is much better, making this feature unecessary.</p>
+                </li>
+                <li>
+                  <b>General Fixes</b>
+                  <p class="feature-description">Made general improvements to extension organizatoin and set the foundation for future contributions.</p>
+                </li>
             </ul>
+            <p class="❤️note">Thank you for using the Powerup extension! You can help by suggesting ideas, sharing with a friend, or even contributing new features!
+            
+            -Brenton</p>
         </div>
         <div class="❤️footer">
           <button class="❤️dismiss-button">Dismiss</button>
@@ -90,7 +139,7 @@ window.loadedCodelessLoveScripts ||= {};
   chrome.storage.sync.get(STORAGE_KEY, (result) => {
     const lastSeenVersion = result[STORAGE_KEY];
     if (compareVersions(currentAppVersion, lastSeenVersion) > 0) {
-      showNotificatoinNotice();
+      showNotificationNotice();
     }
   });
 })();

@@ -15,7 +15,7 @@
     "name": "Tab Naming",
     "description": "Automatically renames the Chrome tab to display the current branch name from the version URL parameter. Makes it easier to identify which branch you're working on when multiple editor tabs are open.",
     "jsFile": "features/tab_naming/tab_naming.js",
-    "default": false,
+    "default": true,
     "contributors": ["rico"]
   },
   {
@@ -123,19 +123,10 @@
     "contributors": ["brenton", "rathan"]
   },
   {
-    "key": "top_menu_layout",
-    "category": "Broken",
-    "name": "Maximize App Interface Manager dropdown in top menubar",
-    "description": "[Currently Broken] Make the unexpanded page dropdown take up the full width in the top menubar.",
-    "cssFile": "features/top_menu_layout/top_menu_layout.css",
-    "default": false,
-    "contributors": ["brenton"]
-  },
-  {
     "key": "top_menu_aim",
     "category": "Editor Styling",
     "name": "Maximize the expanded App Interface Manager dropdown menu",
-    "description": "When the AIM menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
+    "description": "When the pp Interface Manager (AIM) menu is expanded, make it take up as much space as possible, and prevent long page/RU names from being cut off.",
     "cssFile": "features/top_menu_layout/top_menu_aim.css",
     "default": true,
     "contributors": ["brenton"]
