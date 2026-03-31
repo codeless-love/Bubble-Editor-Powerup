@@ -3,6 +3,7 @@
   .search-palette .result-div.❤️current {
     background-color: aliceblue;
     position: relative;
+    border: solid 1px cornflowerblue !important;
     &:hover {
       background-color: #bbdfff;
     }
