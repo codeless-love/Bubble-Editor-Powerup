@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     "rico": { name: "Rico Trevisan", link: "https://www.mocharymethod.com/team/rico-trevisan" },
     "george": { name: "George Collier", link: "https://notquiteunicorns.xyz/" },
     "tim": { name: "Timothy Tu", link: "https://community.buildcamp.io/u/b0c0b288" },
-    "rafa": { name: "Rafa Chavantes", link: "https://rafa.chavantes.com/" }
+    "rafa": { name: "Rafa Chavantes", link: "https://rafa.chavantes.com/" },
+    thomas: { name: "Thomas Mey", link: "https://www.linkedin.com/in/thomas-mey-dev/", },
   };
 
   // Helper: Promisified chrome.storage.sync.get
@@ -47,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let domainState = "Unrelated";
   let currentDomain = "";
   let currentPath = "";
-  chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (!tabs || !tabs[0] || !tabs[0].url) return;
     try {
       const url = new URL(tabs[0].url);
@@ -135,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const originalPrefs = JSON.parse(JSON.stringify(prefs));
   // Track whether changes have been made
   let changesMade = false;
-  let applyFiltersRef = () => {};
+  let applyFiltersRef = () => { };
 
   const container = document.getElementById("features-list");
 
@@ -190,7 +191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     feature.config.inputs.forEach(inputConfig => {
       // Get the stored value or use default
-      chrome.storage.sync.get([inputConfig.key], function(result) {
+      chrome.storage.sync.get([inputConfig.key], function (result) {
         const value = result[inputConfig.key] !== undefined ? result[inputConfig.key] : inputConfig.default;
 
         // Create input container
@@ -233,8 +234,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         input.addEventListener("change", () => {
           // Store the value in chrome.storage
           const newValue = input.type === "checkbox" ? input.checked :
-                          input.type === "number" ? parseInt(input.value, 10) :
-                          input.value;
+            input.type === "number" ? parseInt(input.value, 10) :
+              input.value;
 
           const storageUpdate = {};
           storageUpdate[inputConfig.key] = newValue;
@@ -406,7 +407,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     div.addEventListener("click", (event) => {
       // Prevent default behavior for label and span elements
       if (event.target.tagName === 'LABEL' ||
-          (event.target.tagName === 'SPAN' && event.target.parentElement && event.target.parentElement.tagName === 'LABEL')) {
+        (event.target.tagName === 'SPAN' && event.target.parentElement && event.target.parentElement.tagName === 'LABEL')) {
         event.preventDefault();
       }
 
@@ -415,8 +416,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Don't toggle if clicking on an input field or its label
       if (event.target.tagName === 'INPUT' ||
-          (event.target.tagName === 'LABEL' && event.target.closest('.input-container')) ||
-          event.target.closest('.input-container')) {
+        (event.target.tagName === 'LABEL' && event.target.closest('.input-container')) ||
+        event.target.closest('.input-container')) {
         return;
       }
 
@@ -437,8 +438,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cards = Array.from(accordion.querySelectorAll(".feature:not(.sub-feature)"));
     const total = cards.length;
     const enabledCount = cards.filter((card) => {
-        const checkbox = card.querySelector('input[type="checkbox"]');
-        return checkbox && !checkbox.disabled && checkbox.checked;
+      const checkbox = card.querySelector('input[type="checkbox"]');
+      return checkbox && !checkbox.disabled && checkbox.checked;
     }).length;
     const countEl = accordion.querySelector(".category-count");
     if (countEl) {
@@ -470,18 +471,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const countSpan = document.createElement("span");
       countSpan.className = "category-count";
-      
+
       trigger.appendChild(titleSpan);
       trigger.appendChild(countSpan);
       trigger.insertAdjacentHTML(
-          "beforeend",
-          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
+        "beforeend",
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
       );
 
       trigger.addEventListener("click", () => {
-          const isOpen = accordion.dataset.state === "open";
-          accordion.dataset.state = isOpen ? "closed" : "open";
-          trigger.setAttribute("aria-expanded", String(!isOpen));
+        const isOpen = accordion.dataset.state === "open";
+        accordion.dataset.state = isOpen ? "closed" : "open";
+        trigger.setAttribute("aria-expanded", String(!isOpen));
       });
 
       const content = document.createElement("div");
@@ -513,10 +514,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       if (content.children.length > 0) {
-          accordion.appendChild(trigger);
-          accordion.appendChild(content);
-          container.appendChild(accordion);
-          updateCategoryCount(accordion);
+        accordion.appendChild(trigger);
+        accordion.appendChild(content);
+        container.appendChild(accordion);
+        updateCategoryCount(accordion);
       }
     }
   });
@@ -685,78 +686,78 @@ document.addEventListener("DOMContentLoaded", async () => {
       const query = searchInput.value.toLowerCase().trim();
 
       document.querySelectorAll(".accordion").forEach((section) => {
-          const categoryName = section.dataset.category.toLowerCase();
-          const categoryMatches = query ? categoryName.includes(query) : false;
+        const categoryName = section.dataset.category.toLowerCase();
+        const categoryMatches = query ? categoryName.includes(query) : false;
 
-          const cards = Array.from(section.querySelectorAll(".feature"));
-          const visibility = new Map();
+        const cards = Array.from(section.querySelectorAll(".feature"));
+        const visibility = new Map();
 
-          // Pass 1: Determine initial visibility for all features
-          cards.forEach(card => {
-              const checkbox = card.querySelector('input[type="checkbox"]');
-              const featureKey = checkbox?.id;
-              if (!featureKey) return;
+        // Pass 1: Determine initial visibility for all features
+        cards.forEach(card => {
+          const checkbox = card.querySelector('input[type="checkbox"]');
+          const featureKey = checkbox?.id;
+          if (!featureKey) return;
 
-              const featureData = features.find(f => f.key === featureKey);
-              if (!featureData) return;
+          const featureData = features.find(f => f.key === featureKey);
+          if (!featureData) return;
 
-              const title = (featureData.name || "").toLowerCase();
-              const desc = (featureData.description || "").toLowerCase();
-              const isEnabled = checkbox.checked;
+          const title = (featureData.name || "").toLowerCase();
+          const desc = (featureData.description || "").toLowerCase();
+          const isEnabled = checkbox.checked;
 
-              let isVisible;
-              if (categoryMatches) {
-                  isVisible = true;
-              } else {
-                  isVisible = query ? (title.includes(query) || desc.includes(query)) : true;
-              }
-              if (isVisible && currentFilter === "enabled") isVisible = isEnabled;
-              if (isVisible && currentFilter === "disabled") isVisible = !isEnabled;
+          let isVisible;
+          if (categoryMatches) {
+            isVisible = true;
+          } else {
+            isVisible = query ? (title.includes(query) || desc.includes(query)) : true;
+          }
+          if (isVisible && currentFilter === "enabled") isVisible = isEnabled;
+          if (isVisible && currentFilter === "disabled") isVisible = !isEnabled;
 
-              visibility.set(featureKey, isVisible);
-          });
+          visibility.set(featureKey, isVisible);
+        });
 
-          // Pass 2: If a sub-feature is visible, ensure its parent is also visible
-          cards.forEach(card => {
-              const checkbox = card.querySelector('input[type="checkbox"]');
-              const featureKey = checkbox?.id;
-              if (!featureKey) return;
+        // Pass 2: If a sub-feature is visible, ensure its parent is also visible
+        cards.forEach(card => {
+          const checkbox = card.querySelector('input[type="checkbox"]');
+          const featureKey = checkbox?.id;
+          if (!featureKey) return;
 
-              const featureData = features.find(f => f.key === featureKey);
-              if (!featureData || !isSubFeature(featureData)) return;
+          const featureData = features.find(f => f.key === featureKey);
+          if (!featureData || !isSubFeature(featureData)) return;
 
-              if (visibility.get(featureKey)) { // if sub-feature is visible
-                  const parentKey = featureData.requires;
-                  if (parentKey) {
-                      visibility.set(parentKey, true); // force parent to be visible
-                  }
-              }
-          });
+          if (visibility.get(featureKey)) { // if sub-feature is visible
+            const parentKey = featureData.requires;
+            if (parentKey) {
+              visibility.set(parentKey, true); // force parent to be visible
+            }
+          }
+        });
 
-          let visibleCount = 0;
-          // Pass 3: Apply visibility to DOM and update counts
-          cards.forEach(card => {
-              const checkbox = card.querySelector('input[type="checkbox"]');
-              const featureKey = checkbox?.id;
-              if (!featureKey) return;
+        let visibleCount = 0;
+        // Pass 3: Apply visibility to DOM and update counts
+        cards.forEach(card => {
+          const checkbox = card.querySelector('input[type="checkbox"]');
+          const featureKey = checkbox?.id;
+          if (!featureKey) return;
 
-              const isVisible = visibility.get(featureKey);
-              card.style.display = isVisible ? '' : 'none';
+          const isVisible = visibility.get(featureKey);
+          card.style.display = isVisible ? '' : 'none';
 
-              if (isVisible && !card.classList.contains('sub-feature')) {
-                  visibleCount++;
-              }
-          });
-          
-          // Also need to hide/show the .sub-features containers
-          section.querySelectorAll('.sub-features').forEach(container => {
-              const hasVisibleChild = Array.from(container.querySelectorAll('.feature.sub-feature')).some(
-                  child => child.style.display !== 'none'
-              );
-              container.style.display = hasVisibleChild ? '' : 'none';
-          });
+          if (isVisible && !card.classList.contains('sub-feature')) {
+            visibleCount++;
+          }
+        });
 
-          section.style.display = visibleCount > 0 ? 'block' : 'none';
+        // Also need to hide/show the .sub-features containers
+        section.querySelectorAll('.sub-features').forEach(container => {
+          const hasVisibleChild = Array.from(container.querySelectorAll('.feature.sub-feature')).some(
+            child => child.style.display !== 'none'
+          );
+          container.style.display = hasVisibleChild ? '' : 'none';
+        });
+
+        section.style.display = visibleCount > 0 ? 'block' : 'none';
       });
     };
 
@@ -764,12 +765,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     searchInput.addEventListener("input", applyFilters);
 
     filterBtns.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            filterBtns.forEach((b) => b.removeAttribute('data-state'));
-            btn.dataset.state = "active";
-            currentFilter = btn.dataset.filter;
-            applyFilters();
-        });
+      btn.addEventListener("click", () => {
+        filterBtns.forEach((b) => b.removeAttribute('data-state'));
+        btn.dataset.state = "active";
+        currentFilter = btn.dataset.filter;
+        applyFilters();
+      });
     });
   }
 
@@ -788,7 +789,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         link.href = chrome.runtime.getURL(message.cssFile);
         document.head.appendChild(link);
       }
-      
+
       // Load JS if provided
       if (message.jsFile) {
         const script = document.createElement('script');
@@ -797,7 +798,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         script.className = '❤️injected-script';
         document.head.appendChild(script);
       }
-      
+
       sendResponse({ success: true });
     }
   });

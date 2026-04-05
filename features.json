@@ -28,7 +28,7 @@
     "default": true,
     "contributors": ["george"]
   },
-{
+  {
     "key": "left_to_right_action_view",
     "category": "Workflow View",
     "name": "Wrap Actions Left-to-Right",
@@ -407,5 +407,15 @@
     "jsFile": "features/styles-drag-rearrange/styles-drag-rearrange.js",
     "default": true,
     "contributors": ["rico"]
+  },
+  {
+    "key": "delete_unused_colors",
+    "category": "Style Tab",
+    "name": "Delete unused colors",
+    "description": "List and delete color variables unused in the app",
+    "cssFile": "features/delete_unused_colors/delete_unused_colors.css",
+    "jsFile": "features/delete_unused_colors/delete_unused_colors.js",
+    "default": false,
+    "contributors": ["thomas"]
   }
 ]
