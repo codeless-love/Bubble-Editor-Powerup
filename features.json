@@ -415,7 +415,7 @@
     "description": "List and delete color variables unused in the app",
     "cssFile": "features/delete_unused_colors/delete_unused_colors.css",
     "jsFile": "features/delete_unused_colors/delete_unused_colors.js",
-    "default": false,
+    "default": true,
     "contributors": ["thomas"]
   }
 ]
