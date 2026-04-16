@@ -195,6 +195,16 @@
     "contributors": ["george", "brenton"]
   },
   {
+    "key": "expression_arbitrary_text_display",
+    "category": "Expressions",
+    "name": "Rename Arbitrary Text",
+    "description": "Adds an optional Display field to Arbitrary text expressions so you can rename the token label without changing its value.",
+    "cssFile": "features/expression_arbitrary_text_display/expression_arbitrary_text_display.css",
+    "jsFile": "features/expression_arbitrary_text_display/expression_arbitrary_text_display.js",
+    "default": true,
+    "contributors": ["george"]
+  },
+  {
     "key": "expression_collapser",
     "category": "Expressions",
     "name": "Collapse and expand subexpressions",
