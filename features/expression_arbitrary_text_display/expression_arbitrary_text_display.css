@@ -1,0 +1,38 @@
+/* Roughly match Bubble's property-editor text input */
+.expression-popover.ppe.arbitrary-text-popover [data-cl-arbitrary-text-display-row="input"] .cl-single-line-property-input {
+  width: 100%;
+}
+
+.expression-popover.ppe.arbitrary-text-popover [data-cl-arbitrary-text-display-row="input"] .cl-single-line-property-input__control {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  box-sizing: border-box;
+  padding: 3px 6px;
+  border: 1px solid var(--b-border-default);
+  border-radius: var(--b-input-radius);
+  background: var(--b-bg-secondary);
+  color: var(--b-txt-primary);
+  font-family: var(--b-font-family);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 12px;
+  outline: none;
+  box-shadow: none !important;
+}
+
+.expression-popover.ppe.arbitrary-text-popover [data-cl-arbitrary-text-display-row="input"] .cl-single-line-property-input__control::placeholder {
+  color: var(--b-txt-secondary);
+  opacity: 1;
+}
+
+.expression-popover.ppe.arbitrary-text-popover [data-cl-arbitrary-text-display-row="input"] .cl-single-line-property-input__control:hover {
+  border-color: var(--b-border-hover);
+}
+
+.expression-popover.ppe.arbitrary-text-popover [data-cl-arbitrary-text-display-row="input"] .cl-single-line-property-input__control:focus {
+  border-color: var(--b-border-focus);
+  box-shadow: none !important;
+}
