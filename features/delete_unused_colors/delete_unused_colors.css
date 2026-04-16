@@ -1,0 +1,322 @@
+/* Delete unused colors — extension popup UI */
+
+.delete-unused-colors-tool.tool-section {
+  margin-left: 28px;
+}
+
+.delete-unused-colors-tool.tool-section > p {
+  margin-left: 0;
+}
+
+.duc-scan-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--primary-color, #4361ee);
+  color: #fff;
+}
+
+.duc-scan-btn:hover:not(:disabled) {
+  background: var(--primary-hover, #3a56d4);
+}
+
+.duc-scan-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.duc-inline-message {
+  margin-top: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  line-height: 1.4;
+  border-radius: 6px;
+}
+
+.duc-inline-message[hidden] {
+  display: none !important;
+}
+
+.duc-inline-message--success {
+  color: var(--success-color, #10b981);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.duc-inline-message--error {
+  color: var(--danger-color, #ef4444);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.duc-scan-loader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: var(--border-radius, 8px);
+  background: var(--secondary-color, #f8f9fa);
+  border: 1px solid var(--border-color, #e9ecef);
+  font-size: 13px;
+  color: var(--text-secondary, #6c757d);
+}
+
+.duc-scan-loader[hidden] {
+  display: none !important;
+}
+
+.duc-scan-loader-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color, #e9ecef);
+  border-top-color: var(--primary-color, #4361ee);
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: duc-spin 0.7s linear infinite;
+}
+
+@keyframes duc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#duc-app-raw-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+#duc-app-raw-modal[hidden] {
+  display: none !important;
+}
+
+.duc-app-raw-dialog {
+  position: relative;
+  background: var(--card-background, #fff);
+  border-radius: var(--border-radius, 8px);
+  box-shadow: 0 12px 40px var(--shadow-color, rgba(0, 0, 0, 0.08));
+  max-width: 100%;
+  width: min(560px, 100%);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color, #e9ecef);
+}
+
+.duc-confirm-overlay {
+  position: absolute;
+  inset: -1px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--border-radius, 8px);
+}
+
+.duc-confirm-overlay[hidden] {
+  display: none !important;
+}
+
+.duc-confirm-dialog {
+  width: 100%;
+  max-width: 340px;
+  padding: 16px;
+  background: var(--card-background, #fff);
+  border-radius: var(--border-radius, 8px);
+  border: 1px solid var(--border-color, #e9ecef);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.duc-confirm-title {
+  margin: 0 0 10px;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: var(--text-color, #212529);
+}
+
+.duc-confirm-message {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary, #6c757d);
+}
+
+.duc-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.duc-app-raw-dialog > .duc-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  flex-shrink: 0;
+}
+
+.duc-app-raw-dialog > .duc-dialog-header h2 {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--text-color, #212529);
+}
+
+.duc-dialog-body {
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  flex: 1;
+  min-height: 0;
+}
+
+.duc-modal-error {
+  margin: 0 0 10px;
+  padding: 10px;
+  font-size: 13px;
+  color: var(--danger-color, #ef4444);
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.duc-unused-section {
+  margin-bottom: 14px;
+}
+
+.duc-unused-heading {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #6c757d);
+}
+
+.duc-unused-select-all-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--secondary-color, #f8f9fa);
+  border: 1px solid var(--border-color, #e9ecef);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.duc-unused-select-all-wrap label {
+  cursor: pointer;
+  user-select: none;
+}
+
+.duc-unused-select-all-wrap input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.duc-unused-list {
+  max-height: min(36vh, 280px);
+  overflow-y: auto;
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: 6px;
+  background: var(--card-background, #fff);
+}
+
+.duc-unused-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  font-size: 13px;
+}
+
+.duc-unused-row:last-child {
+  border-bottom: none;
+}
+
+.duc-unused-row:hover {
+  background: var(--secondary-color, #f8f9fa);
+}
+
+.duc-unused-row input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  flex-shrink: 0;
+}
+
+.duc-unused-row label {
+  cursor: pointer;
+  flex: 1;
+  line-height: 1.4;
+  user-select: none;
+}
+
+.duc-unused-empty {
+  margin: 0;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--text-secondary, #6c757d);
+}
+
+.duc-app-raw-dialog > .duc-dialog-footer {
+  padding: 12px;
+  border-top: 1px solid var(--border-color, #e9ecef);
+  flex-shrink: 0;
+}
+
+.duc-dialog-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.duc-dialog-footer .row {
+  display: flex;
+  justify-content: center;
+}
+
+.duc-apply-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #e74c3c;
+  color: #fff;
+}
+
+.duc-apply-btn:hover:not(:disabled) {
+  background: #c0392b;
+}
+
+.duc-apply-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     "rico": { name: "Rico Trevisan", link: "https://www.mocharymethod.com/team/rico-trevisan" },
     "george": { name: "George Collier", link: "https://notquiteunicorns.xyz/" },
     "tim": { name: "Timothy Tu", link: "https://community.buildcamp.io/u/b0c0b288" },
-    "rafa": { name: "Rafa Chavantes", link: "https://rafa.chavantes.com/" }
+    "rafa": { name: "Rafa Chavantes", link: "https://rafa.chavantes.com/" },
+    "thomas": { name: "Thomas Mey", link: "https://www.linkedin.com/in/thomas-mey-dev/" },
   };
 
   // Helper: Promisified chrome.storage.sync.get
